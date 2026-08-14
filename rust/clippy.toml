@@ -1,0 +1,22 @@
+# Clippy Configuration Standard
+too-many-arguments-threshold = 4
+too-many-lines-threshold = 60
+cognitive-complexity-threshold = 15
+cyclomatic-complexity-threshold = 10
+enum-size-threshold = 200
+pass-by-value-size-limit = 256
+trivial-copy-size-limit = 32
+disallowed-types = [
+    # Banning unconstrained bare channels or un-typed primitives where applicable
+]
+disallowed-methods = [
+    # Examples of discouraged methods in production services
+]
+doc-valid-idents = [
+    "PostgreSQL",
+    "Redis",
+    "OAuth",
+    "OpenAPI",
+    "GraphQL",
+    "gRPC",
+]
