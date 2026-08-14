@@ -50,3 +50,15 @@ The `Agentic` repository establishes an uncompromising, production-ready baselin
 | **Async / Concurrency** | Tokio with cancellation safety | Goroutines bounded by `context.Context`, `synctest` | Async/await with TanStack Query |
 | **Size Caps** | File: 400, Impl: 150, Fn: 60 | File: 400, Type: 200, Fn: 50 | File: 400, Component: 150, Fn: 60 |
 | **Security Auditing** | `cargo audit` + `cargo deny` | `govulncheck ./...` | Strict schemas + dependency audit |
+
+---
+
+## 4. Folder & File Design Architecture Reference
+
+| Architecture Pattern | Language / Stack | Key Characteristics | Reference Blueprint |
+|---|---|---|---|
+| **Feature-Driven Colocation** | TypeScript / React / Next.js | Self-contained domain vertical slices (`features/billing/`, `components/ui/`, `lib/`), suffix standards (`.schema.ts`, `.test.tsx`). | [`typescript/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/README.md#standard-project-layout-feature-driven-colocation) |
+| **Hexagonal Ports & Adapters** | Go 1.26 | Compiler-gated `internal/` encapsulation, pure `domain/`, application `service/` ports, and concrete `adapter/` (postgres, http). | [`go/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/go/README.md#standard-project-layout) |
+| **Modular Clean Architecture** | Rust 2024 (Single Crate) | Strict trait decoupling: pure `domain/` models $\leftarrow$ `application/` services $\leftarrow$ `infrastructure/` adapters. | [`rust/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md#option-a-modular-clean-architecture-single-crate) |
+| **Cargo Workspace Monorepo** | Rust 2024 (Multi-Crate) | Compile-time boundary enforcement across crates (`crates/domain`, `crates/application`, `crates/infra-*`, `crates/server`). | [`rust/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md#option-b-cargo-workspace-multi-crate-monorepo) |
+

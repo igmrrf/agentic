@@ -40,30 +40,55 @@ This directory contains the engineering standards, configuration templates, and 
 
 ---
 
-## Standard Project Layout
+## Standard Project Layout: Feature-Driven Colocation
 
-### Next.js / Fullstack Application
 ```
 ts-project/
-├── biome.json               # Formatter and linter configuration
-├── tsconfig.json            # Strict TypeScript compiler options (TypeScript 7.0)
+├── biome.json                   # Linter & formatter configuration
+├── tsconfig.json                # Strict TypeScript compiler options
 ├── package.json
 ├── src/
-│   ├── app/                 # Routes and page components
-│   ├── components/          # Reusable UI components
-│   │   ├── ui/              # Base design system primitives
-│   │   └── features/        # Domain-specific composite components
-│   ├── hooks/               # Extracted standalone reusable hooks
+│   ├── app/                     # Routing shell (Next.js App Router / React Router)
+│   │   ├── layout.tsx
+│   │   └── (dashboard)/
+│   │       └── transfers/
+│   │           └── page.tsx     # Thin orchestrator (imports from features/transfers)
+│   │
+│   ├── features/                # Self-contained domain vertical slices
+│   │   └── transfers/           # Business feature module
+│   │       ├── index.ts         # Public feature export boundary
+│   │       ├── components/      # Feature UI & form components
+│   │       │   ├── transfer-card.tsx
+│   │       │   └── transfer-form/
+│   │       │       ├── transfer-form.tsx
+│   │       │       ├── use-transfer-form.ts
+│   │       │       ├── transfer-form.schema.ts
+│   │       │       └── __tests__/
+│   │       │           └── transfer-form.test.tsx
+│   │       ├── api/             # TanStack Query hooks & API fetchers
+│   │       │   └── use-transfers-query.ts
+│   │       ├── types/           # Schema-inferred domain types
+│   │       │   └── index.ts
+│   │       └── utils/           # Feature-specific helpers
+│   │           └── format-status.ts
+│   │
+│   ├── components/              # Domain-agnostic design system primitives
+│   │   └── ui/
+│   │       ├── button.tsx
+│   │       ├── modal.tsx
+│   │       └── input.tsx
+│   │
+│   ├── hooks/                   # Globally shared custom hooks (reused >2 times)
 │   │   ├── use-debounce.ts
-│   │   └── use-account.ts
-│   ├── lib/                 # Shared utilities, client factories, query keys
-│   │   ├── query-keys.ts
-│   │   └── api-client.ts
-│   ├── schemas/             # Zod validation schemas and derived types
-│   │   └── account.ts
-│   └── server/              # Server-side services, repositories, DB clients
-│       ├── services/
-│       └── db/
+│   │   └── use-media-query.ts
+│   │
+│   ├── lib/                     # Infrastructure singletons & clients
+│   │   ├── api-client.ts
+│   │   ├── query-client.ts
+│   │   └── query-keys.ts
+│   │
+│   └── config/                  # Validated runtime environment
+│       └── env.ts
 ```
 
 ---

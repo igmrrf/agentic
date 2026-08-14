@@ -171,18 +171,42 @@ Crossing a cap requires decomposing the package into smaller domain-focused subp
 
 ---
 
-## 10. API & Layered Architecture
+## 10. Folder & File Design Architecture (Standard Go Layout)
 
-- **Standard Go Directory Structure:**
-  - `cmd/`: Binary entrypoints (`cmd/server/main.go`).
-  - `internal/`: Private application and domain code (cannot be imported by external projects).
-    - `internal/domain/`: Pure entities and business invariants.
-    - `internal/service/`: Business use cases and application orchestration.
-    - `internal/adapter/`: Database repositories, external clients, HTTP/gRPC handlers.
-  - `pkg/`: Public library code intended for external consumption.
-  - `api/`: OpenAPI specs, Protobuf definitions, JSON schemas.
-- **HTTP Handlers:**
-  - Parse request body/query -> validate schema -> invoke service -> return standardized JSON response envelope.
+Organize Go microservices using standard package encapsulation with Hexagonal Ports & Adapters:
+
+```
+go-service/
+├── cmd/
+│   └── server/
+│       └── main.go              # Composition root: bootstraps config, adapters & server
+├── internal/                    # Private compiler-gated application code
+│   ├── domain/                  # Pure Domain Core (zero external frameworks/DB imports)
+│   │   ├── account.go           # Entities, value objects & invariants
+│   │   └── errors.go            # Package sentinel errors (ErrNotFound, ErrInsufficientFunds)
+│   ├── service/                 # Application Use Cases & Workflows
+│   │   ├── account_service.go   # Business orchestrators
+│   │   └── ports.go             # Consumer-driven interfaces (AccountRepository, Notifier)
+│   └── adapter/                 # Concrete I/O implementations of ports
+│       ├── postgres/            # Database repository adapter
+│       │   ├── db.go
+│       │   ├── account_repo.go  # Implements ports.AccountRepository
+│       │   └── queries.sql
+│       └── http/                # HTTP Delivery layer
+│           ├── server.go        # HTTP router setup
+│           ├── handler.go       # DTO parsing, validation & response envelope
+│           ├── middleware/      # Auth, rate-limiting & telemetry middlewares
+│           └── dto/             # Request & response JSON payload structs
+├── pkg/                         # Public SDKs (safe for external module import)
+└── api/                         # OpenAPI specs, Protocol Buffer definitions
+```
+
+- **File Suffix Standards:**
+  - `*_service.go`: Business use case orchestrators
+  - `*_repo.go`: Database repository adapters
+  - `*_handler.go`: HTTP / gRPC request handlers
+  - `*_test.go`: Colocated unit & integration tests
+- **Anti-Junk Drawer Rule:** Banish generic packages (`util`, `common`, `helpers`). Name packages strictly by domain responsibility (`account`, `postgres`, `auth`).
 
 ---
 

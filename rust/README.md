@@ -32,27 +32,29 @@ This directory contains the engineering standards, configuration templates, and 
 
 ## Project Layout Blueprint
 
-Standard layout for Rust microservices and modular crates:
+### Option A: Modular Clean Architecture (Single Crate)
 
 ```
-crate-root/
+rust-service/
 ├── Cargo.toml               # Crate configuration (edition = "2024", resolver = "3")
 ├── clippy.toml              # Clippy configuration
 ├── rustfmt.toml             # Rustfmt configuration (style_edition = "2024")
 ├── src/
-│   ├── main.rs              # Binary entry point (CLI/server bootstrap)
+│   ├── main.rs              # Binary entry point & composition root
 │   ├── lib.rs               # Library root and public interface declarations
 │   ├── domain/              # Entities, value objects, domain errors (pure Rust)
 │   │   ├── mod.rs
-│   │   ├── models.rs
+│   │   ├── account.rs
 │   │   └── errors.rs
 │   ├── application/         # Use cases, orchestrators, repository traits
 │   │   ├── mod.rs
-│   │   ├── services.rs
+│   │   ├── transfer_service.rs
 │   │   └── ports.rs
 │   └── infrastructure/      # Concrete DB adapters, HTTP clients, telemetry
 │       ├── mod.rs
-│       ├── persistence.rs
+│       ├── database/
+│       │   ├── mod.rs
+│       │   └── postgres_repo.rs
 │       └── web/
 │           ├── mod.rs
 │           ├── handlers.rs
@@ -61,6 +63,19 @@ crate-root/
     ├── common/
     │   └── mod.rs
     └── api_integration_test.rs
+```
+
+### Option B: Cargo Workspace (Multi-Crate Monorepo)
+
+```
+workspace-root/
+├── Cargo.toml               # [workspace] with shared dependencies & lints
+└── crates/
+    ├── domain/              # Pure domain models & business rules (#![no_std] capable)
+    ├── application/             # Application services & trait definitions (depends on domain)
+    ├── infra-postgres/      # SQLx/PostgreSQL implementation (depends on application, domain)
+    ├── infra-http/          # Axum HTTP routes & OpenAPI handlers (depends on application)
+    └── server/              # Binary orchestrator (glues all infra crates together)
 ```
 
 ---

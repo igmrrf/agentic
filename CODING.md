@@ -92,12 +92,17 @@ Crossing a cap is a signal to decompose. Pure static data tables (e.g. ISO codes
 
 ---
 
-## 8. Module Boundaries & Layering
+## 8. Module Boundaries, Layering & Folder Architecture
 
-- **One-directional dependency flow:** Higher-level application and UI modules may depend on domain and shared utility modules, but shared libraries must never import from application/feature directories.
-- **No circular dependencies.** Circular dependencies indicate improper separation of concerns. Break cycles by introducing a shared boundary or consolidating colocated logic.
-- **Colocation beats premature abstraction:** Keep a helper or submodule colocated with the single consumer that uses it. Promote to a shared module only when a second genuine consumer emerges.
-- **Explicit exports:** Expose only the minimal necessary public API from a module. Keep internal helpers private.
+- **One-directional dependency flow:** Higher-level application and delivery modules may depend on domain and shared utility modules, but shared libraries and core domain code must never import from outer feature directories:
+  $$\text{Delivery (HTTP/CLI/UI)} \longrightarrow \text{Application (Use Cases)} \longrightarrow \text{Domain (Entities/Invariants)} \longleftarrow \text{Infrastructure (Adapters/DB)}$$
+- **Feature-driven vertical slices ("Screaming Architecture"):** Organize folders by business domain features (e.g. `features/billing/`, `features/transfers/`) rather than pure technical groupings (`controllers/`, `views/`).
+- **"Delete with one keystroke" cohesion:** A feature folder must be self-contained so that deleting it cleanly removes all its UI, state, API queries, types, and tests without leaving orphaned files.
+- **No generic junk drawers:** Banish catch-all `utils/` or `common/` directories. Name utility modules by concrete responsibility (`date/`, `crypto/`, `formatting/`).
+- **Shallow hierarchy ceiling:** Keep directory nesting shallow (maximum 3 to 4 levels). Over-nested hierarchies impede discovery and refactoring.
+- **Colocation beats premature abstraction:** Keep a helper, hook, or sub-component colocated within the single feature that uses it. Promote to global shared modules only when a second genuine consumer exists.
+- **No circular dependencies:** Circular dependencies indicate improper separation of concerns. Break cycles by introducing a shared interface boundary or consolidating colocated logic.
+- **Explicit exports:** Expose only the minimal necessary public API from a module. Keep internal implementation helpers private.
 
 ---
 

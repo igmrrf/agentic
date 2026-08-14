@@ -60,7 +60,49 @@
 
 ---
 
-## 4. Naming & Identifiers
+## 4. Folder & File Design Architecture
+
+Organize TypeScript and fullstack React applications by **feature vertical slices**:
+
+```
+src/
+├── app/                         # Thin routing shell (Next.js / Router)
+│   └── (dashboard)/
+│       └── transfers/
+│           └── page.tsx         # Orchestrator importing from features/transfers
+├── features/                    # Domain-specific vertical slices
+│   └── transfers/               # Self-contained feature module
+│       ├── index.ts             # Public feature export
+│       ├── components/          # Feature UI components
+│       │   ├── transfer-card.tsx
+│       │   └── transfer-form/
+│       │       ├── transfer-form.tsx
+│       │       ├── use-transfer-form.ts
+│       │       ├── transfer-form.schema.ts
+│       │       └── __tests__/
+│       │           └── transfer-form.test.tsx
+│       ├── api/                 # Data queries & mutations
+│       │   └── use-transfers-query.ts
+│       ├── types/               # Inferred domain types
+│       │   └── index.ts
+│       └── utils/               # Feature-scoped helpers
+│           └── format-status.ts
+├── components/ui/               # Domain-agnostic design system primitives (button, modal)
+├── hooks/                       # Globally shared extracted hooks (reused >2 times)
+├── lib/                         # Infrastructure singletons (api-client, query-client)
+└── config/                      # Validated environment configuration (env.ts)
+```
+
+- **File Suffix Standards:**
+  - `*.schema.ts`: Zod validation schemas
+  - `*.test.ts` / `*.test.tsx`: Colocated test files
+  - `use-*.ts`: Custom hook modules
+  - `*.types.ts`: Domain type definitions
+- **Colocation Principle:** Keep subcomponents, hooks, and schemas colocated inside the feature folder. Promote to global `components/ui/` or `hooks/` only when a second genuine consumer requires it.
+
+---
+
+## 5. Naming & Identifiers
 
 Names are the specification. Accurate naming eliminates the need for inline comments.
 

@@ -45,6 +45,14 @@ curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scri
 
 ## Universal Foundations
 
-- **Root Rules:** [`CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/CODING.md) defines universal craft standards across all stacks (no explanatory comments, no backwards-compatibility `if`-branch shims, strict size caps, zero-swallowed errors, parity-first refactoring).
-- **Architecture Review:** [`standards_review.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/standards_review.md) contains the review summary, verified research findings, and version matrix.
+- **Root Rules:** [`CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/CODING.md) defines universal craft standards across all stacks (no explanatory comments, no backwards-compatibility `if`-branch shims, strict size caps, zero-swallowed errors, parity-first refactoring, folder/file design).
+- **Architecture Review:** [`standards_review.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/standards_review.md) contains the review summary, verified research findings, version matrix, and architecture references.
 - **Scaffolding Tool:** [`scripts/init.sh`](file:///Users/igmrrf/Desktop/tmp/Agentic/scripts/init.sh) provides automated project configuration.
+
+---
+
+## Folder & File Architecture Patterns
+
+- [**TypeScript / React Feature-Driven Colocation**](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/README.md#standard-project-layout-feature-driven-colocation): Vertical domain slices (`src/features/[feature]/`), colocated components, hooks, schemas, and tests.
+- [**Go Standard Hexagonal Layout**](file:///Users/igmrrf/Desktop/tmp/Agentic/go/README.md#standard-project-layout): Compiler-gated `internal/` encapsulation, pure `domain/`, `service/` use cases, and `adapter/` (postgres/http).
+- [**Rust Modular Clean Architecture & Workspace Monorepo**](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md#project-layout-blueprint): Trait-decoupled domain/application layers and multi-crate workspace separation.

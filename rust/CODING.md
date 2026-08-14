@@ -142,14 +142,58 @@ Crossing a cap requires decomposition into cohesive sub-modules or traits. Pure 
 
 ---
 
-## 10. API & Architecture
+## 10. Folder & File Design Architecture
 
-- **Clean / Hexagonal Architecture:**
-  - `domain`: Pure business rules, entities, and value objects (zero I/O, zero external framework dependencies).
-  - `application`: Use cases, orchestrators, and trait interfaces for repositories and gateways.
-  - `infrastructure`: Concrete implementations of database clients, HTTP adapters, message queues, and external APIs.
-- **Trait-driven dependency injection:** Domain and application layers interact with traits (e.g. `pub trait AccountRepository: Send + Sync + 'static`).
-- **Axum / Actix HTTP Handlers:** Handlers parse request payloads via typed extractors (`Json<CreateAccountRequest>`), invoke application services, and return typed responses (`Result<Json<AccountResponse>, AppError>`).
+### Option A: Modular Clean Architecture (Single Crate)
+
+```
+rust-service/
+├── Cargo.toml                   # edition = "2024", resolver = "3"
+├── src/
+│   ├── main.rs                  # Composition root: config parsing & dependency wiring
+│   ├── lib.rs                   # Crate root exporting public module interface
+│   ├── domain/                  # Pure domain logic (entities, newtypes, errors)
+│   │   ├── mod.rs
+│   │   ├── account.rs           # AccountId newtype, state enums
+│   │   └── errors.rs            # Typed thiserror definitions
+│   ├── application/             # Use cases & port traits
+│   │   ├── mod.rs
+│   │   ├── transfer_service.rs  # Business workflows
+│   │   └── ports.rs             # pub trait AccountRepository: Send + Sync
+│   └── infrastructure/          # Concrete adapters
+│       ├── mod.rs
+│       ├── database/
+│       │   ├── mod.rs
+│       │   └── postgres_repo.rs # Implements AccountRepository
+│       └── web/
+│           ├── mod.rs
+│           ├── handlers.rs      # Axum extractors & typed JSON responses
+│           └── routes.rs        # Router wiring
+└── tests/                       # External integration tests
+    ├── common/
+    │   └── mod.rs
+    └── api_integration_test.rs
+```
+
+### Option B: Cargo Workspace (Multi-Crate Monorepo)
+
+For large systems requiring strict compile-time boundary enforcement:
+
+```
+workspace-root/
+├── Cargo.toml                   # [workspace] with shared dependencies & lints
+└── crates/
+    ├── domain/                  # Pure domain models & business rules (#![no_std] capable)
+    ├── application/             # Application services & trait definitions (depends on domain)
+    ├── infra-postgres/          # SQLx/PostgreSQL implementation (depends on application, domain)
+    ├── infra-http/              # Axum HTTP routes & OpenAPI handlers (depends on application)
+    └── server/                  # Binary orchestrator (glues all infra crates together)
+```
+
+- **File Naming Standards:**
+  - `snake_case` for all `.rs` files and directory names.
+  - `mod.rs` for module roots when subdirectories are used.
+  - Colocated unit tests inside `#[cfg(test)] mod tests` in the same file.
 
 ---
 
