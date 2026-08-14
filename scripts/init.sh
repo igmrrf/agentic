@@ -3,6 +3,10 @@
 # Agentic Standards Initializer & Scaffolding Tool
 # Propagates universal engineering standards, language rules, linter configs,
 # and CI workflows to new or existing projects.
+#
+# Supports both:
+# 1. Local execution:  ./scripts/init.sh [OPTIONS]
+# 2. Remote cURL pipe: curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- [OPTIONS]
 # ==============================================================================
 
 set -euo pipefail
@@ -24,8 +28,21 @@ FORCE_OVERWRITE=false
 CREATE_BACKUP=false
 DRY_RUN=false
 
-# Determine script source directory
-SCRIPT_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Remote source repository configuration
+AGENTIC_BRANCH="${AGENTIC_BRANCH:-main}"
+REPO_RAW_BASE="${AGENTIC_REPO_RAW_BASE:-https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/${AGENTIC_BRANCH}}"
+
+# Determine if running locally from cloned repo or remotely via curl pipe
+IS_REMOTE=true
+SCRIPT_SOURCE_DIR=""
+
+if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ -f "${BASH_SOURCE[0]}" ]]; then
+    POSSIBLE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    if [[ -f "$POSSIBLE_DIR/CODING.md" ]]; then
+        IS_REMOTE=false
+        SCRIPT_SOURCE_DIR="$POSSIBLE_DIR"
+    fi
+fi
 
 # Helper functions
 log_info() {
@@ -55,7 +72,7 @@ print_banner() {
 
 print_usage() {
     cat << EOF
-Usage: $(basename "$0") [OPTIONS]
+Usage: init.sh [OPTIONS]
 
 Options:
   -l, --lang <language>       Target language: rust, go, ts (typescript), all
@@ -72,10 +89,10 @@ Examples:
   # Apply standards to an existing project (auto-detects language)
   ./scripts/init.sh
 
-  # Explicit language targeting with backup protection
-  ./scripts/init.sh --lang=rust --target=./existing-app --backup --force
+  # Remote execution via cURL
+  curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=typescript --target=.
 
-  # Dry run preview on an existing repository
+  # Safe dry-run preview on an existing project
   ./scripts/init.sh --target=./my-project --dry-run
 EOF
 }
@@ -185,8 +202,8 @@ case "$LANGUAGE" in
         ;;
 esac
 
-# Safe file copy utility
-copy_file() {
+# Safe file copy utility for local execution
+copy_local_file() {
     local src="$1"
     local dest="$2"
 
@@ -218,8 +235,52 @@ copy_file() {
     fi
 }
 
+# Safe file download utility for remote cURL pipe execution
+download_remote_file() {
+    local url="$1"
+    local dest="$2"
+
+    if [[ -f "$dest" ]]; then
+        if [[ "$FORCE_OVERWRITE" == "false" ]]; then
+            log_warn "File already exists: $dest (use -f/--force to overwrite)"
+            return
+        elif [[ "$CREATE_BACKUP" == "true" ]]; then
+            if [[ "$DRY_RUN" == "true" ]]; then
+                log_info "[DRY RUN] Would backup: $dest -> ${dest}.bak"
+            else
+                cp "$dest" "${dest}.bak"
+                log_info "Backup created: ${dest}.bak"
+            fi
+        fi
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "[DRY RUN] Would download: $url -> $dest"
+    else
+        mkdir -p "$(dirname "$dest")"
+        if curl -fsSL "$url" -o "$dest"; then
+            log_success "Downloaded: $dest"
+        else
+            log_error "Failed to download $url"
+        fi
+    fi
+}
+
+# Unified installer router
+install_file() {
+    local rel_path="$1"
+    local dest="$2"
+
+    if [[ "$IS_REMOTE" == "false" ]]; then
+        copy_local_file "$SCRIPT_SOURCE_DIR/$rel_path" "$dest"
+    else
+        download_remote_file "$REPO_RAW_BASE/$rel_path" "$dest"
+    fi
+}
+
 # Main Execution
 print_banner
+log_info "Execution Mode  : $(if [[ "$IS_REMOTE" == "false" ]]; then echo "Local Repository ($SCRIPT_SOURCE_DIR)"; else echo "Remote cURL ($REPO_RAW_BASE)"; fi)"
 log_info "Target Directory: $TARGET_DIR"
 log_info "Target Language : $LANGUAGE"
 log_info "Include CI      : $INCLUDE_CI"
@@ -234,44 +295,44 @@ fi
 
 # 1. Base Universal Coding Rules
 log_info "Setting up Universal Coding Rules..."
-copy_file "$SCRIPT_SOURCE_DIR/CODING.md" "$TARGET_DIR/CODING.md"
+install_file "CODING.md" "$TARGET_DIR/CODING.md"
 
 # 2. Language-Specific Standards & Tooling
 if [[ "$LANGUAGE" == "rust" || "$LANGUAGE" == "all" ]]; then
     log_info "Applying Rust 2024 Standards..."
-    copy_file "$SCRIPT_SOURCE_DIR/rust/CODING.md" "$TARGET_DIR/docs/CODING_RUST.md"
-    copy_file "$SCRIPT_SOURCE_DIR/rust/rustfmt.toml" "$TARGET_DIR/rustfmt.toml"
-    copy_file "$SCRIPT_SOURCE_DIR/rust/clippy.toml" "$TARGET_DIR/clippy.toml"
+    install_file "rust/CODING.md" "$TARGET_DIR/docs/CODING_RUST.md"
+    install_file "rust/rustfmt.toml" "$TARGET_DIR/rustfmt.toml"
+    install_file "rust/clippy.toml" "$TARGET_DIR/clippy.toml"
     
     if [[ ! -f "$TARGET_DIR/Cargo.toml" ]]; then
-        copy_file "$SCRIPT_SOURCE_DIR/rust/Cargo.toml" "$TARGET_DIR/Cargo.toml"
+        install_file "rust/Cargo.toml" "$TARGET_DIR/Cargo.toml"
     else
         log_info "Existing Cargo.toml detected; leaving package configuration intact."
     fi
 
     if [[ "$INCLUDE_CI" == "true" ]]; then
-        copy_file "$SCRIPT_SOURCE_DIR/templates/ci/rust-ci.yml" "$TARGET_DIR/.github/workflows/rust-ci.yml"
+        install_file "templates/ci/rust-ci.yml" "$TARGET_DIR/.github/workflows/rust-ci.yml"
     fi
 fi
 
 if [[ "$LANGUAGE" == "go" || "$LANGUAGE" == "all" ]]; then
     log_info "Applying Go 1.26 Standards..."
-    copy_file "$SCRIPT_SOURCE_DIR/go/CODING.md" "$TARGET_DIR/docs/CODING_GO.md"
-    copy_file "$SCRIPT_SOURCE_DIR/go/.golangci.yml" "$TARGET_DIR/.golangci.yml"
+    install_file "go/CODING.md" "$TARGET_DIR/docs/CODING_GO.md"
+    install_file "go/.golangci.yml" "$TARGET_DIR/.golangci.yml"
 
     if [[ "$INCLUDE_CI" == "true" ]]; then
-        copy_file "$SCRIPT_SOURCE_DIR/templates/ci/go-ci.yml" "$TARGET_DIR/.github/workflows/go-ci.yml"
+        install_file "templates/ci/go-ci.yml" "$TARGET_DIR/.github/workflows/go-ci.yml"
     fi
 fi
 
 if [[ "$LANGUAGE" == "typescript" || "$LANGUAGE" == "all" ]]; then
     log_info "Applying TypeScript 7.0 Standards..."
-    copy_file "$SCRIPT_SOURCE_DIR/typescript/CODING.md" "$TARGET_DIR/docs/CODING_TYPESCRIPT.md"
-    copy_file "$SCRIPT_SOURCE_DIR/typescript/biome.json" "$TARGET_DIR/biome.json"
-    copy_file "$SCRIPT_SOURCE_DIR/typescript/tsconfig.json" "$TARGET_DIR/tsconfig.json"
+    install_file "typescript/CODING.md" "$TARGET_DIR/docs/CODING_TYPESCRIPT.md"
+    install_file "typescript/biome.json" "$TARGET_DIR/biome.json"
+    install_file "typescript/tsconfig.json" "$TARGET_DIR/tsconfig.json"
 
     if [[ "$INCLUDE_CI" == "true" ]]; then
-        copy_file "$SCRIPT_SOURCE_DIR/templates/ci/typescript-ci.yml" "$TARGET_DIR/.github/workflows/typescript-ci.yml"
+        install_file "templates/ci/typescript-ci.yml" "$TARGET_DIR/.github/workflows/typescript-ci.yml"
     fi
 fi
 
@@ -321,7 +382,7 @@ if [[ "$DRY_RUN" == "true" ]]; then
     log_info "Dry run finished. No files were written."
 else
     log_success "Standards setup complete for $LANGUAGE in '$TARGET_DIR'!"
-    log_info "Next Steps for Existing Projects:"
+    log_info "Next Steps:"
     echo "  1. Review CODING.md and docs/ for domain alignment."
     echo "  2. Run your linter in changed-files mode (ratchet principle)."
     echo "  3. Commit standards with: git commit -m 'chore: adopt agentic engineering standards'"

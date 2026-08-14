@@ -28,7 +28,7 @@ Use the built-in initializer script [`scripts/init.sh`](file:///Users/igmrrf/Des
 ### Remote Initialization via cURL
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/main/scripts/init.sh | bash -s -- --lang=rust --target=.
+curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=rust --target=.
 ```
 
 ---
