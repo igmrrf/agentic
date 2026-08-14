@@ -338,29 +338,134 @@ fi
 
 # 3. AI Agent Rules Setup (Antigravity, Gemini, Cursor)
 if [[ "$INCLUDE_AGENT_RULES" == "true" ]]; then
-    log_info "Setting up AI Coding Agent Rules..."
+    log_info "Setting up AI Coding Agent Rules for $LANGUAGE..."
     
-    # Gemini / Antigravity Agent Rules
     if [[ "$DRY_RUN" == "true" ]]; then
         log_info "[DRY RUN] Would create: $TARGET_DIR/.gemini/rules/coding_standards.md"
         log_info "[DRY RUN] Would create: $TARGET_DIR/.cursor/rules/coding.mdc"
     else
         mkdir -p "$TARGET_DIR/.gemini/rules"
-        cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+        mkdir -p "$TARGET_DIR/.cursor/rules"
+
+        if [[ "$LANGUAGE" == "typescript" ]]; then
+            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+# Repository Coding Standards (TypeScript & React)
+
+Always adhere to `CODING.md` and `docs/CODING_TYPESCRIPT.md`:
+- **Zero Explanatory Comments:** Write self-documenting code. Never explain what code does.
+- **Fail Fast & Explicitly:** Never swallow errors; avoid empty catches.
+- **Iteration Rules:**
+  - MUST use `for...of` loops for side effects or operations that return no data.
+  - ONLY use `.map()` when creating and returning a new array or transformed object.
+- **Custom Hooks & Component Architecture:**
+  - For any custom hook logic reimplemented more than twice, extract into a standalone hook (`use*.ts`) under `hooks/`.
+  - Component body size cap: <= 150 lines.
+- **Strict Typing & Modern Syntax:**
+  - Zero `any` in production code (use `unknown` and narrow).
+  - Schema-first validation with Zod at all external boundaries.
+  - Always use `import type` for type-only imports (`verbatimModuleSyntax`).
+  - Use `object-as-const` instead of TypeScript `enum` (`erasableSyntaxOnly`).
+- **Size Caps:** File <= 400 lines, Component <= 150 lines, Function <= 60 lines.
+- **Refactoring:** Zero behavior/layout changes without characterization tests.
+EOF
+
+            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+---
+description: TypeScript and React engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_TYPESCRIPT.md`:
+- No explanatory comments.
+- Use `for...of` loops for side effects / no-return operations; `.map()` strictly for transformations.
+- Extract standalone hooks (`use*.ts`) when hook logic is reused >2 times.
+- Component body cap <= 150 lines, Function <= 60 lines, File <= 400 lines.
+- Zero `any`, schema-first validation (Zod), explicit `import type`.
+- No TypeScript `enum` or `namespace` (use `object-as-const` and ES modules).
+EOF
+
+        elif [[ "$LANGUAGE" == "rust" ]]; then
+            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+# Repository Coding Standards (Rust 2024)
+
+Always adhere to `CODING.md` and `docs/CODING_RUST.md`:
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Zero Panics in Production:** Zero `.unwrap()` or `.expect()` calls in production paths. Propagate all errors via `Result<T, E>`.
+- **Rust 2024 Idioms:**
+  - Explicit `unsafe { ... }` blocks inside `unsafe fn` bodies (`unsafe_op_in_unsafe_fn`).
+  - Use `use<..>` syntax for precise lifetime capturing in RPIT.
+  - Native `async fn` in traits.
+- **Error Modeling:** Strongly typed `thiserror` for libraries/domain; `anyhow` restricted to CLI/main.
+- **Borrowing & Invariants:** Borrowed slices (`&str`, `&[T]`, `&Path`) over owned allocations; typestate pattern and newtypes (`AccountId(Uuid)`).
+- **Size Caps:** File <= 400 lines, Struct `impl` <= 150 lines, Function <= 60 lines.
+- **Refactoring:** Parity-first refactoring with characterization tests.
+EOF
+
+            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+---
+description: Rust 2024 engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_RUST.md`:
+- No explanatory comments.
+- Zero `.unwrap()` / `.expect()` in production (enforce typed `Result<T, E>`).
+- Rust 2024: explicit `unsafe { ... }` blocks, `use<..>` lifetime capturing.
+- Borrowed slices over owned types; typestate and newtypes for domain safety.
+- Struct `impl` <= 150 lines, Function <= 60 lines, File <= 400 lines.
+EOF
+
+        elif [[ "$LANGUAGE" == "go" ]]; then
+            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+# Repository Coding Standards (Go 1.26)
+
+Always adhere to `CODING.md` and `docs/CODING_GO.md`:
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Context & Goroutines:**
+  - Pass `ctx context.Context` as the first argument in all I/O and DB calls. Never store `context.Context` in a struct.
+  - Every goroutine must have an explicit exit lifecycle (`sync.WaitGroup`, `errgroup.Group`, or `ctx.Done()`). No goroutine leaks.
+- **Error Handling:**
+  - Errors are values; never ignore them (`_ = fn()`).
+  - Wrap errors with `%w`: `fmt.Errorf("...: %w", err)`.
+  - Use `errors.Join` for multi-error aggregation and `errors.Is` / `errors.As` for inspection.
+- **Idioms & Structs:**
+  - Accept interfaces, return concrete structs. Small, consumer-driven interfaces (1-3 methods).
+  - Use `new(expr)` for direct pointer initialization.
+  - Use `iter.Seq` / `iter.Seq2` with `range-over-func` for collection streaming.
+- **Size Caps:** File <= 400 lines, Type file <= 200 lines, Function <= 50 lines.
+- **Refactoring:** Parity-first refactoring with table-driven tests and `-race` detection.
+EOF
+
+            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+---
+description: Go 1.26 engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_GO.md`:
+- No explanatory comments.
+- `ctx context.Context` first argument; zero unmanaged goroutines.
+- Errors wrapped with `%w`; zero swallowed errors.
+- Small consumer-driven interfaces; concrete return structs.
+- Type file <= 200 lines, Function <= 50 lines, File <= 400 lines.
+EOF
+
+        else
+            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
 # Repository Coding Standards
 
 Always follow the root `CODING.md` and the language-specific standards under `docs/`:
 - **Universal Standards:** `CODING.md`
 - **Zero Explanatory Comments:** Write self-documenting code.
 - **Fail Fast & Explicitly:** Never swallow errors or use empty catches.
-- **Strict Size Caps:** File <= 400 lines, Function <= 60 lines.
+- **Strict Size Caps:** File <= 400 lines, Component/Struct <= 150 lines, Function <= 60 lines.
 - **Refactoring:** Zero behavior/contract changes without characterization tests.
 EOF
-        log_success "Created: $TARGET_DIR/.gemini/rules/coding_standards.md"
 
-        # Cursor MDC Agent Rules
-        mkdir -p "$TARGET_DIR/.cursor/rules"
-        cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
 ---
 description: Universal repository engineering and coding standards
 globs: *
@@ -373,6 +478,9 @@ Always adhere to the authoritative engineering standards in `CODING.md` and `doc
 - Single responsibility, early returns, max nesting depth 3.
 - Strict typing (zero `any`, schema-first boundaries).
 EOF
+        fi
+
+        log_success "Created: $TARGET_DIR/.gemini/rules/coding_standards.md"
         log_success "Created: $TARGET_DIR/.cursor/rules/coding.mdc"
     fi
 fi
