@@ -17,6 +17,11 @@ Use the built-in initializer script [`scripts/init.sh`](file:///Users/igmrrf/Des
 ./scripts/init.sh --lang=go --target=/path/to/my-service
 ./scripts/init.sh --lang=typescript --target=/path/to/my-service
 
+# Target a specific AI agent for rules:
+./scripts/init.sh --gemini
+./scripts/init.sh -a claude
+./scripts/init.sh --cursor
+
 # Safe adoption on an existing project (preview with dry-run and backup protection):
 ./scripts/init.sh --target=/path/to/existing-repo --dry-run
 ./scripts/init.sh --target=/path/to/existing-repo --backup --force

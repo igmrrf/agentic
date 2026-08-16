@@ -248,3 +248,5 @@ Before declaring any task complete or submitting a pull request, verify:
   - [**Rust Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/CODING.md)
   - [**Go Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/go/CODING.md)
   - [**TypeScript Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/CODING.md)
+  - [**Python Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/python/CODING.md)
+  - [**Lua Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/CODING.md)

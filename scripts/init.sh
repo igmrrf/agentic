@@ -22,6 +22,7 @@ COLOR_RED="\033[31m"
 # Default configuration
 TARGET_DIR="."
 LANGUAGE=""
+AGENT="all"
 INCLUDE_CI=true
 INCLUDE_AGENT_RULES=true
 FORCE_OVERWRITE=false
@@ -77,11 +78,15 @@ Usage: init.sh [OPTIONS]
 Options:
   -l, --lang <language>       Target language: rust, go, ts (typescript), all
                               (Auto-detected if run in an existing project)
+  -a, --agent <agent>         Target AI agent: gemini, claude, cursor, all (default: all)
+      --gemini                Shortcut for --agent gemini
+      --claude                Shortcut for --agent claude
+      --cursor                Shortcut for --agent cursor
   -t, --target <directory>    Target project directory (default: current directory)
   -b, --backup                Create .bak backup copies before overwriting existing files
   -d, --dry-run               Preview changes without modifying or creating files
       --no-ci                 Skip copying GitHub Actions CI workflows
-      --no-agent-rules        Skip setting up .gemini and .cursor AI agent rules
+      --no-agent-rules        Skip setting up AI agent rules
   -f, --force                 Overwrite existing configuration files
   -h, --help                  Show this help message
 
@@ -89,11 +94,12 @@ Examples:
   # Apply standards to an existing project (auto-detects language)
   ./scripts/init.sh
 
+  # Target specific AI agent for rules
+  ./scripts/init.sh --gemini
+  ./scripts/init.sh -a claude
+
   # Remote execution via cURL
   curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=typescript --target=.
-
-  # Safe dry-run preview on an existing project
-  ./scripts/init.sh --target=./my-project --dry-run
 EOF
 }
 
@@ -106,6 +112,26 @@ while [[ $# -gt 0 ]]; do
             ;;
         --lang=*)
             LANGUAGE="${1#*=}"
+            shift
+            ;;
+        -a|--agent)
+            AGENT="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
+            shift 2
+            ;;
+        --agent=*)
+            AGENT="$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')"
+            shift
+            ;;
+        --gemini)
+            AGENT="gemini"
+            shift
+            ;;
+        --claude)
+            AGENT="claude"
+            shift
+            ;;
+        --cursor)
+            AGENT="cursor"
             shift
             ;;
         -t|--target)
@@ -283,6 +309,7 @@ print_banner
 log_info "Execution Mode  : $(if [[ "$IS_REMOTE" == "false" ]]; then echo "Local Repository ($SCRIPT_SOURCE_DIR)"; else echo "Remote cURL ($REPO_RAW_BASE)"; fi)"
 log_info "Target Directory: $TARGET_DIR"
 log_info "Target Language : $LANGUAGE"
+log_info "Target Agent    : $AGENT"
 log_info "Include CI      : $INCLUDE_CI"
 log_info "Agent Rules     : $INCLUDE_AGENT_RULES"
 log_info "Backup Mode     : $CREATE_BACKUP"
@@ -336,19 +363,24 @@ if [[ "$LANGUAGE" == "typescript" || "$LANGUAGE" == "all" ]]; then
     fi
 fi
 
-# 3. AI Agent Rules Setup (Antigravity, Gemini, Cursor)
+# 3. AI Agent Rules Setup
 if [[ "$INCLUDE_AGENT_RULES" == "true" ]]; then
-    log_info "Setting up AI Coding Agent Rules for $LANGUAGE..."
+    log_info "Setting up AI Coding Agent Rules for $LANGUAGE ($AGENT)..."
     
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log_info "[DRY RUN] Would create: $TARGET_DIR/.gemini/rules/coding_standards.md"
-        log_info "[DRY RUN] Would create: $TARGET_DIR/.cursor/rules/coding.mdc"
-    else
-        mkdir -p "$TARGET_DIR/.gemini/rules"
-        mkdir -p "$TARGET_DIR/.cursor/rules"
+    create_rule_file() {
+        local file_path="$1"
+        local content="$2"
+        if [[ "$DRY_RUN" == "true" ]]; then
+            log_info "[DRY RUN] Would create: $file_path"
+        else
+            mkdir -p "$(dirname "$file_path")"
+            echo "$content" > "$file_path"
+            log_success "Created: $file_path"
+        fi
+    }
 
-        if [[ "$LANGUAGE" == "typescript" ]]; then
-            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+    if [[ "$LANGUAGE" == "typescript" ]]; then
+        read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards (TypeScript & React)
 
 Always adhere to `CODING.md` and `docs/CODING_TYPESCRIPT.md`:
@@ -369,7 +401,7 @@ Always adhere to `CODING.md` and `docs/CODING_TYPESCRIPT.md`:
 - **Refactoring:** Zero behavior/layout changes without characterization tests.
 EOF
 
-            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+        read -r -d '' CURSOR_MDC << 'EOF' || true
 ---
 description: TypeScript and React engineering and coding standards
 globs: *
@@ -385,8 +417,8 @@ Always adhere to `CODING.md` and `docs/CODING_TYPESCRIPT.md`:
 - No TypeScript `enum` or `namespace` (use `object-as-const` and ES modules).
 EOF
 
-        elif [[ "$LANGUAGE" == "rust" ]]; then
-            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+    elif [[ "$LANGUAGE" == "rust" ]]; then
+        read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards (Rust 2024)
 
 Always adhere to `CODING.md` and `docs/CODING_RUST.md`:
@@ -402,7 +434,7 @@ Always adhere to `CODING.md` and `docs/CODING_RUST.md`:
 - **Refactoring:** Parity-first refactoring with characterization tests.
 EOF
 
-            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+        read -r -d '' CURSOR_MDC << 'EOF' || true
 ---
 description: Rust 2024 engineering and coding standards
 globs: *
@@ -417,8 +449,8 @@ Always adhere to `CODING.md` and `docs/CODING_RUST.md`:
 - Struct `impl` <= 150 lines, Function <= 60 lines, File <= 400 lines.
 EOF
 
-        elif [[ "$LANGUAGE" == "go" ]]; then
-            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+    elif [[ "$LANGUAGE" == "go" ]]; then
+        read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards (Go 1.26)
 
 Always adhere to `CODING.md` and `docs/CODING_GO.md`:
@@ -438,7 +470,7 @@ Always adhere to `CODING.md` and `docs/CODING_GO.md`:
 - **Refactoring:** Parity-first refactoring with table-driven tests and `-race` detection.
 EOF
 
-            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+        read -r -d '' CURSOR_MDC << 'EOF' || true
 ---
 description: Go 1.26 engineering and coding standards
 globs: *
@@ -453,8 +485,8 @@ Always adhere to `CODING.md` and `docs/CODING_GO.md`:
 - Type file <= 200 lines, Function <= 50 lines, File <= 400 lines.
 EOF
 
-        else
-            cat << 'EOF' > "$TARGET_DIR/.gemini/rules/coding_standards.md"
+    else
+        read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards
 
 Always follow the root `CODING.md` and the language-specific standards under `docs/`:
@@ -465,7 +497,7 @@ Always follow the root `CODING.md` and the language-specific standards under `do
 - **Refactoring:** Zero behavior/contract changes without characterization tests.
 EOF
 
-            cat << 'EOF' > "$TARGET_DIR/.cursor/rules/coding.mdc"
+        read -r -d '' CURSOR_MDC << 'EOF' || true
 ---
 description: Universal repository engineering and coding standards
 globs: *
@@ -478,10 +510,16 @@ Always adhere to the authoritative engineering standards in `CODING.md` and `doc
 - Single responsibility, early returns, max nesting depth 3.
 - Strict typing (zero `any`, schema-first boundaries).
 EOF
-        fi
+    fi
 
-        log_success "Created: $TARGET_DIR/.gemini/rules/coding_standards.md"
-        log_success "Created: $TARGET_DIR/.cursor/rules/coding.mdc"
+    if [[ "$AGENT" == "gemini" || "$AGENT" == "all" ]]; then
+        create_rule_file "$TARGET_DIR/GEMINI.md" "$RULES_MD"
+    fi
+    if [[ "$AGENT" == "claude" || "$AGENT" == "all" ]]; then
+        create_rule_file "$TARGET_DIR/CLAUDE.md" "$RULES_MD"
+    fi
+    if [[ "$AGENT" == "cursor" || "$AGENT" == "all" ]]; then
+        create_rule_file "$TARGET_DIR/.cursor/rules/coding.mdc" "$CURSOR_MDC"
     fi
 fi
 
