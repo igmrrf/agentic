@@ -22,7 +22,7 @@ COLOR_RED="\033[31m"
 # Default configuration
 TARGET_DIR="."
 LANGUAGE=""
-AGENT="all"
+AGENTS=()
 INCLUDE_CI=true
 INCLUDE_AGENT_RULES=true
 FORCE_OVERWRITE=false
@@ -78,10 +78,13 @@ Usage: init.sh [OPTIONS]
 Options:
   -l, --lang <language>       Target language: rust, go, ts (typescript), python, lua, all
                               (Auto-detected if run in an existing project)
-  -a, --agent <agent>         Target AI agent: gemini, claude, cursor, all (default: all)
+  -a, --agent <agent>         Target AI agent: gemini, claude, cursor, cline, windsurf, copilot, all (default: all)
       --gemini                Shortcut for --agent gemini
       --claude                Shortcut for --agent claude
       --cursor                Shortcut for --agent cursor
+      --cline                 Shortcut for --agent cline
+      --windsurf              Shortcut for --agent windsurf
+      --copilot               Shortcut for --agent copilot
   -t, --target <directory>    Target project directory (default: current directory)
   -b, --backup                Create .bak backup copies before overwriting existing files
   -d, --dry-run               Preview changes without modifying or creating files
@@ -115,23 +118,41 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -a|--agent)
-            AGENT="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
+            IFS=',' read -ra ADDR <<< "$2"
+            for a in "${ADDR[@]}"; do
+                AGENTS+=("$(echo "$a" | tr '[:upper:]' '[:lower:]')")
+            done
             shift 2
             ;;
         --agent=*)
-            AGENT="$(echo "${1#*=}" | tr '[:upper:]' '[:lower:]')"
+            IFS=',' read -ra ADDR <<< "${1#*=}"
+            for a in "${ADDR[@]}"; do
+                AGENTS+=("$(echo "$a" | tr '[:upper:]' '[:lower:]')")
+            done
             shift
             ;;
         --gemini)
-            AGENT="gemini"
+            AGENTS+=("gemini")
             shift
             ;;
         --claude)
-            AGENT="claude"
+            AGENTS+=("claude")
             shift
             ;;
         --cursor)
-            AGENT="cursor"
+            AGENTS+=("cursor")
+            shift
+            ;;
+        --cline|--roocode)
+            AGENTS+=("cline")
+            shift
+            ;;
+        --windsurf)
+            AGENTS+=("windsurf")
+            shift
+            ;;
+        --copilot)
+            AGENTS+=("copilot")
             shift
             ;;
         -t|--target)
@@ -174,6 +195,10 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ ${#AGENTS[@]} -eq 0 ]; then
+    AGENTS=("all")
+fi
 
 # Auto-detect language in target directory if not specified
 detect_language() {
@@ -319,7 +344,7 @@ print_banner
 log_info "Execution Mode  : $(if [[ "$IS_REMOTE" == "false" ]]; then echo "Local Repository ($SCRIPT_SOURCE_DIR)"; else echo "Remote cURL ($REPO_RAW_BASE)"; fi)"
 log_info "Target Directory: $TARGET_DIR"
 log_info "Target Language : $LANGUAGE"
-log_info "Target Agent    : $AGENT"
+log_info "Target Agent    : ${AGENTS[*]}"
 log_info "Include CI      : $INCLUDE_CI"
 log_info "Agent Rules     : $INCLUDE_AGENT_RULES"
 log_info "Backup Mode     : $CREATE_BACKUP"
@@ -398,7 +423,7 @@ fi
 
 # 3. AI Agent Rules Setup
 if [[ "$INCLUDE_AGENT_RULES" == "true" ]]; then
-    log_info "Setting up AI Coding Agent Rules for $LANGUAGE ($AGENT)..."
+    log_info "Setting up AI Coding Agent Rules for $LANGUAGE (${AGENTS[*]})..."
     
     create_rule_file() {
         local file_path="$1"
@@ -540,14 +565,33 @@ EOF
     RULES_MD="${RULES_MD}"$'\n\n'"${UNIVERSAL_RULES}"$'\n\n'"${LANG_RULES}"
     CURSOR_MDC="${CURSOR_MDC}"$'\n\n'"${UNIVERSAL_RULES}"$'\n\n'"${LANG_RULES}"
 
-    if [[ "$AGENT" == "gemini" || "$AGENT" == "all" ]]; then
+    has_agent() {
+        local target="$1"
+        for a in "${AGENTS[@]}"; do
+            if [[ "$a" == "all" || "$a" == "$target" ]]; then
+                return 0
+            fi
+        done
+        return 1
+    }
+
+    if has_agent "gemini"; then
         create_rule_file "$TARGET_DIR/GEMINI.md" "$RULES_MD"
     fi
-    if [[ "$AGENT" == "claude" || "$AGENT" == "all" ]]; then
+    if has_agent "claude"; then
         create_rule_file "$TARGET_DIR/CLAUDE.md" "$RULES_MD"
     fi
-    if [[ "$AGENT" == "cursor" || "$AGENT" == "all" ]]; then
+    if has_agent "cursor"; then
         create_rule_file "$TARGET_DIR/.cursor/rules/coding.mdc" "$CURSOR_MDC"
+    fi
+    if has_agent "cline"; then
+        create_rule_file "$TARGET_DIR/.clinerules" "$RULES_MD"
+    fi
+    if has_agent "windsurf"; then
+        create_rule_file "$TARGET_DIR/.windsurfrules" "$RULES_MD"
+    fi
+    if has_agent "copilot"; then
+        create_rule_file "$TARGET_DIR/.github/copilot-instructions.md" "$RULES_MD"
     fi
 fi
 

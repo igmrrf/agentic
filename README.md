@@ -10,7 +10,7 @@ Every language guide is written to hold in **any** project of that language — 
 
 Use the built-in initializer script [`scripts/init.sh`](scripts/init.sh) to bootstrap standards, linter configs, CI workflows, and AI agent rules into any new or existing project.
 
-> **Note:** The setup script directly embeds the coding standards into agent-based instruction files (`CLAUDE.md`, `GEMINI.md`, and `.cursor/rules/coding.mdc`), instead of generating separate raw `CODING.md` files in the target directory. This ensures that LLM agents natively parse and adhere to the guidelines.
+> **Note:** The setup script directly embeds the coding standards into agent-based instruction files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, and `.github/copilot-instructions.md`), instead of generating separate raw `CODING.md` files in the target directory. This ensures that LLM agents natively parse and adhere to the guidelines.
 
 ```bash
 # Interactive setup (auto-detects project language in existing repositories):
@@ -27,6 +27,12 @@ Use the built-in initializer script [`scripts/init.sh`](scripts/init.sh) to boot
 ./scripts/init.sh --gemini
 ./scripts/init.sh -a claude
 ./scripts/init.sh --cursor
+./scripts/init.sh --cline
+./scripts/init.sh --windsurf
+./scripts/init.sh --copilot
+
+# Target multiple AI agents simultaneously:
+./scripts/init.sh --claude --gemini --cursor
 
 # Safe adoption on an existing project (preview with dry-run and backup protection):
 ./scripts/init.sh --target=/path/to/existing-repo --dry-run
