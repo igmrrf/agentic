@@ -6,6 +6,19 @@
 
 ---
 
+## 0. How to Read These Standards
+
+- **This document is language-agnostic and applies to every project.** Language guides (`rust/`, `go/`, `typescript/`, `python/`, `lua/`) add idioms, toolchains, and carve-outs. They never relax a universal rule; where a language cannot honour one, the language guide states the exception explicitly.
+- **Rule scope tags.** Rules apply everywhere unless tagged:
+  - `[service]` — applies only to network-facing services (HTTP, gRPC, queue consumers, RPC).
+  - `[app]` — applies only to deployed applications, not to reusable libraries.
+  - `[lib]` — applies only to libraries and SDKs consumed by third parties.
+- **Non-negotiable vs. tunable.** Rules about correctness, safety, and failure handling are non-negotiable. Numeric thresholds (size caps, nesting depth, parameter counts) and named tools are project-configurable defaults: a project may raise or lower them once, in writing, repository-wide — never per file, never ad hoc.
+- **Tool names are defaults, not requirements.** Where a specific formatter, linter, or library is named, the requirement is *"exactly one, configured repository-wide, enforced in CI"*. The named tool is the default choice when the project has no existing one.
+- **Adopting into an existing repository.** Apply to changed files first (see the lint ratchet in §1). A standard that would require a repo-wide rewrite to land a one-line fix is being applied wrongly.
+
+---
+
 ## 1. Automated Formatting & Linting
 
 - **The automated formatter is the sole authority.** Never format code by hand or manually organize imports. Run the repository's configured formatter before committing.
@@ -22,11 +35,12 @@
 Names are the primary documentation. Precise naming eliminates the need for inline comments.
 
 - **Say what the thing is.** Avoid cryptic abbreviations that a newcomer would not immediately understand (`countryCode` not `cc`, `beneficiary` not `bnf`).
-- **No single-letter names anywhere.** Variables, parameters, callback arguments, loop variables, catch bindings, and generic type parameters must have descriptive names (`record` not `r`, `error` not `e`, `index` not `i`).
-- **Standard casing:**
-  - Lowercase / camelCase / snake_case for values, variables, and functions (per language standard).
-  - Upper / PascalCase for types, structs, interfaces, classes, and traits.
-  - Screaming snake_case for module-level constants and static globals.
+- **No single-letter names.** Variables, parameters, callback arguments, loop variables, catch bindings, and generic type parameters must have descriptive names (`record` not `r`, `error` not `e`, `index` not `i`).
+  - This is a deliberate deviation from the terse-identifier habits of several languages. Each language guide lists the **only** permitted exceptions — conventional idioms whose meaning is universal and which linters expect (`ctx`, `t *testing.T`, Go method receivers, mathematical coordinates in a formula). Anything not on that list is a violation.
+- **Standard casing follows the language's own convention, not a cross-language one.** Use the casing the language's formatter and standard library use; do not import another language's style:
+  - Values, variables, functions: `camelCase` or `snake_case` per language standard.
+  - Types, structs, interfaces, classes, traits, enums: `PascalCase` (or the language's equivalent).
+  - Module-level constants and static globals: `SCREAMING_SNAKE_CASE` where the language has the concept.
 - **Booleans read as predicates:** `isActive`, `hasPermission`, `canProceed`, `shouldRetry`. Never a bare noun (`active`) or an inverted negative (`isNotReady`).
 - **Functions are verbs:** `buildTransactionRequest`, `resolveVariant`, `fetchBeneficiaryDetails`. Functions named for a noun must be values or getters.
 - **No type noise in names:** `userList` not `userArray`, `accountMap` not `accountHashMap`, `Account` not `IAccount` or `AccountInterface`.
@@ -69,7 +83,11 @@ Soft caps enforced to ensure readability and maintainability:
 | Type / Struct / Component Body | 150 lines |
 | Function / Method | 60 lines |
 
-Crossing a cap is a signal to decompose. Pure static data tables (e.g. ISO codes, mapping tables) are exempt if placed in dedicated data files.
+Crossing a cap is a signal to decompose, not an automatic failure — see §0 on tunable thresholds.
+
+**Exempt** (never counted, never hand-edited): generated code, vendored code, lockfiles, database migrations, and pure static data tables (ISO codes, mapping tables) placed in dedicated data files.
+
+**Never satisfy a cap by making the code worse.** Splitting a cohesive unit into fragments that must be read together to be understood trades one readability problem for a harder one. If decomposition has no natural seam, record the justification and keep the unit whole.
 
 ---
 
@@ -87,17 +105,30 @@ Crossing a cap is a signal to decompose. Pure static data tables (e.g. ISO codes
 
 - **Pure core, impure edges:** Business logic should be pure functions (deterministic output given the same input, zero I/O, zero clock dependency). Confine side effects (network, storage, timers, logging) to the application boundary.
 - **Immutable updates:** Prefer immutable data structures and transformations over in-place state mutation.
-- **Deterministic lifecycle management:** Any spawned background worker, timer, subscription, or connection pool must have an explicit teardown mechanism to prevent resource leaks.
+- **Deterministic lifecycle management:** Any spawned background worker, timer, subscription, file handle, or connection pool must have an explicit teardown mechanism to prevent resource leaks. Acquire and release in the same scope using the language's scoped-release construct (`defer`, `with`, RAII/`Drop`, `try`-with-resources).
 - **Derive state; do not duplicate:** If two values must remain synchronized, store one canonical value and compute the second on demand.
+- **Inject time, randomness, and identity.** Clock reads, random number generation, and ID/UUID creation are I/O. Pass them in at the boundary so business logic stays deterministic and testable.
+- **Bounded queues and explicit backpressure:** Every buffer, work queue, and channel between producers and consumers has a documented capacity limit. Unbounded buffering converts a slow consumer into an out-of-memory crash.
+- **Cancellation propagates:** Long-running and I/O-bound operations accept and honour a cancellation or deadline signal from their caller, and pass it down to everything they call.
+- **No shared mutable state without a documented discipline:** Concurrent access is guarded by ownership, immutability, or an explicit lock whose scope is as small as possible. Locks are never held across an I/O or `await` boundary unless the invariant demands it and the code says why.
 
 ---
 
 ## 8. Module Boundaries, Layering & Folder Architecture
 
-- **One-directional dependency flow:** Higher-level application and delivery modules may depend on domain and shared utility modules, but shared libraries and core domain code must never import from outer feature directories:
-  $$\text{Delivery (HTTP/CLI/UI)} \longrightarrow \text{Application (Use Cases)} \longrightarrow \text{Domain (Entities/Invariants)} \longleftarrow \text{Infrastructure (Adapters/DB)}$$
-- **Feature-driven vertical slices ("Screaming Architecture"):** Organize folders by business domain features (e.g. `features/billing/`, `features/transfers/`) rather than pure technical groupings (`controllers/`, `views/`).
-- **"Delete with one keystroke" cohesion:** A feature folder must be self-contained so that deleting it cleanly removes all its UI, state, API queries, types, and tests without leaving orphaned files.
+- **One-directional dependency flow:** Dependencies point inward. Delivery and infrastructure code may depend on the domain; the domain must never import from delivery, infrastructure, or outer feature directories.
+
+  ```
+  Delivery (HTTP / CLI / UI / consumer)  ──┐
+                                           ├──▶  Application (use cases)  ──▶  Domain (entities, invariants)
+  Infrastructure (DB / network adapters) ──┘                                            ▲
+                                                                                        │
+                              infrastructure implements interfaces owned by ────────────┘
+  ```
+
+  The layer *names* are a template, not a mandate — a library or CLI may collapse them. The **direction** is the rule: the pure core never imports the impure edge.
+- **Feature-driven vertical slices ("Screaming Architecture"):** Organize folders by business domain features (e.g. `billing/`, `transfers/`) rather than pure technical groupings (`controllers/`, `views/`, `models/`). Projects with a single cohesive domain (most libraries and CLIs) skip this layer rather than inventing artificial features.
+- **"Delete with one keystroke" cohesion:** A feature folder must be self-contained so that deleting it cleanly removes all its UI, state, queries, types, and tests without leaving orphaned files.
 - **No generic junk drawers:** Banish catch-all `utils/` or `common/` directories. Name utility modules by concrete responsibility (`date/`, `crypto/`, `formatting/`).
 - **Shallow hierarchy ceiling:** Keep directory nesting shallow (maximum 3 to 4 levels). Over-nested hierarchies impede discovery and refactoring.
 - **Colocation beats premature abstraction:** Keep a helper, hook, or sub-component colocated within the single feature that uses it. Promote to global shared modules only when a second genuine consumer exists.
@@ -154,31 +185,39 @@ Crossing a cap is a signal to decompose. Pure static data tables (e.g. ISO codes
 
 ---
 
-## 14. Boundaries & Service Contracts
+## 14. Boundaries & Service Contracts `[service]`
 
-All boundary endpoints and service handlers follow a consistent execution sequence:
+Every request handler follows the same execution sequence. Steps that do not apply to a given transport (a queue consumer has no rate limiter) are omitted deliberately, not forgotten.
+
 1. **Authentication & Authorization:** Verify identity and permissions.
 2. **Rate Limiting & Throttling:** Protect write and sensitive endpoints.
 3. **Input Validation:** Parse and validate the incoming request schema.
 4. **Domain Execution:** Invoke business use cases and infrastructure ports.
-5. **Standardized Response:** Return a typed success or error envelope.
+5. **Standardized Response:** Return a typed success or error result.
+
+- **Idempotency for non-idempotent operations:** Any handler that creates or moves state and can be retried by a client, proxy, or queue must be idempotent — via an idempotency key, a natural unique constraint, or a conditional write.
 
 ---
 
 ## 15. Validation at System Boundaries
 
-- **Strict schema validation:** All untrusted external inputs (HTTP bodies, query strings, message queue payloads, environment variables) must pass schema validation.
+- **Strict schema validation:** All untrusted external input (request bodies, query strings, headers, message queue payloads, file uploads, environment variables, CLI arguments, deserialized cache entries) must be parsed and validated into a typed value at the boundary. Interior code receives validated types only, never raw input.
+- **Parse, don't validate:** Validation returns a narrowed type. A function that returns `bool` and leaves the caller holding the raw value invites re-validation drift.
 - **Centralized validation error formatting:** Format validation failures through a consistent error structure.
 - **Reject unexpected fields:** Enforce strict payload parsing to prevent parameter injection and unintended field assignment.
+- **Bound every input:** Enforce maximum body size, collection length, string length, and numeric range. Unbounded input is a denial-of-service vector.
 
 ---
 
-## 16. Response Envelopes & Error Contracts
+## 16. Response Envelopes & Error Contracts `[service]`
 
-- **Standard envelope format:** Expose consistent top-level response contracts across all services:
+- **One response contract per project, applied everywhere.** Whatever shape is chosen, every endpoint uses it and every client can rely on it. The default for a JSON/HTTP API with no existing convention:
   - Success: `{ success: true, data: ... }`
   - Failure: `{ success: false, error: { code: ..., message: ... } }`
-- **Never leak internal stack traces:** Stack traces, internal server IPs, and database schemas must be omitted from production client responses.
+
+  Projects bound to an existing contract — RFC 9457 Problem Details, gRPC status codes, GraphQL `errors`, JSON:API — use that contract instead. Do not wrap a standard envelope inside a second custom one.
+- **Stable machine-readable error codes:** Clients branch on `code`, never on the human-readable message. Message text may change without a breaking-change bump; codes may not.
+- **Never leak internals:** Stack traces, internal hostnames and IPs, SQL, and schema details must be omitted from responses in production. Correlate instead: return an opaque request ID that appears in the server-side log.
 
 ---
 
@@ -213,10 +252,13 @@ Refactoring is strictly structural. A refactor must introduce **zero behavior, l
 
 ## 20. Testing Standards
 
-- **Colocated or standard test suites:** Place unit tests in standard test directories adjacent to or associated with the source code.
-- **Behavior-driven assertions:** Assert against observable behavior and public contracts rather than internal private state.
-- **Deterministic and isolated:** Tests must be deterministic, order-independent, and free of external network or unmocked clock dependencies.
-- **Continuous Integration gate:** The test suite must pass 100% green before any change can be merged.
+- **Colocated or standard test suites:** Place unit tests where the language's ecosystem expects them — colocated with the source or in the conventional test directory. Follow the language guide; do not invent a third location.
+- **Behavior-driven assertions:** Assert against observable behavior and public contracts rather than internal private state. A test that breaks on a pure refactor was testing the implementation.
+- **Deterministic and isolated:** Tests must be deterministic, order-independent, parallel-safe, and free of external network, real wall-clock, and unseeded randomness. Each test creates the state it needs and cleans up after itself.
+- **Test at the boundary that can break:** Cover business rules and edge cases at the unit level, and cover each system boundary (serialization, persistence, transport) with at least one integration test that exercises the real thing.
+- **Every bug fix ships with a regression test** that fails before the fix and passes after.
+- **Coverage is a diagnostic, not a target.** Use it to find untested branches; never write assertions solely to move the number.
+- **Continuous Integration gate:** The test suite must pass 100% green before any change can be merged. Skipped, quarantined, or flaky-retried tests are tracked with an owner and a removal date, never left silently disabled.
 
 ---
 
@@ -224,7 +266,17 @@ Refactoring is strictly structural. A refactor must introduce **zero behavior, l
 
 - **Minimal external dependencies:** Favor standard library capabilities and existing dependencies before adding new third-party packages.
 - **Audit and security checks:** Every dependency must pass license compliance and vulnerability auditing in CI.
+- **Committed lockfile, reproducible builds:** Applications commit an exact lockfile and CI installs from it without resolving. Libraries declare permissive version ranges and test against the lowest supported version.
 - **Remove orphaned dependencies:** When removing a feature, remove its unique dependencies immediately.
+
+---
+
+## 21b. Public API Stability `[lib]`
+
+- **The public surface is the smallest thing that works.** Anything exported is a contract; anything not exported can change freely. Default new items to private.
+- **Semantic versioning is binding:** Removing or narrowing a public item, adding a required parameter, or changing a serialization format is a major version. Additive changes are minor.
+- **Deprecate before deleting:** Mark the old item deprecated with the replacement named in the message, keep it working for at least one minor release, and remove it in the next major.
+- **Document contracts, error conditions, and invariants** for every public item (see §3).
 
 ---
 
@@ -245,8 +297,8 @@ Before declaring any task complete or submitting a pull request, verify:
 - **One logical change per commit:** Commits must be focused and reversible.
 - **Accurate commit descriptions:** Commit messages must describe the motivation and scope of the change.
 - **Language-specific standards:** For language-specific idioms, toolchains, and configurations, consult:
-  - [**Rust Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/CODING.md)
-  - [**Go Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/go/CODING.md)
-  - [**TypeScript Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/CODING.md)
-  - [**Python Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/python/CODING.md)
-  - [**Lua Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/CODING.md)
+  - [**Rust Standards**](rust/CODING.md)
+  - [**Go Standards**](go/CODING.md)
+  - [**TypeScript Standards**](typescript/CODING.md)
+  - [**Python Standards**](python/CODING.md)
+  - [**Lua Standards**](lua/CODING.md)

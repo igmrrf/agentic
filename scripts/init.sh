@@ -76,7 +76,7 @@ print_usage() {
 Usage: init.sh [OPTIONS]
 
 Options:
-  -l, --lang <language>       Target language: rust, go, ts (typescript), all
+  -l, --lang <language>       Target language: rust, go, ts (typescript), python, lua, all
                               (Auto-detected if run in an existing project)
   -a, --agent <agent>         Target AI agent: gemini, claude, cursor, all (default: all)
       --gemini                Shortcut for --agent gemini
@@ -184,6 +184,10 @@ detect_language() {
         echo "go"
     elif [[ -f "$dir/package.json" || -f "$dir/tsconfig.json" || -f "$dir/biome.json" ]]; then
         echo "typescript"
+    elif [[ -f "$dir/pyproject.toml" || -f "$dir/setup.py" || -f "$dir/requirements.txt" ]]; then
+        echo "python"
+    elif [[ -f "$dir/.luacheckrc" || -f "$dir/stylua.toml" ]] || compgen -G "$dir/*.rockspec" > /dev/null; then
+        echo "lua"
     else
         echo ""
     fi
@@ -199,14 +203,18 @@ if [[ -z "$LANGUAGE" ]]; then
         echo "Select target language for this project:"
         echo "  1) Rust (Rust 2024 Edition, MSRV 1.85.0+)"
         echo "  2) Go (Go 1.26+)"
-        echo "  3) TypeScript (TypeScript 7.0+, Biome)"
-        echo "  4) All Languages (Multi-language repository)"
-        read -rp "Enter choice [1-4]: " CHOICE
+        echo "  3) TypeScript (TypeScript 5.5+, Biome)"
+        echo "  4) Python (3.11+, Ruff + mypy)"
+        echo "  5) Lua (5.1 / LuaJIT / 5.4, StyLua + luacheck)"
+        echo "  6) All Languages (Multi-language repository)"
+        read -rp "Enter choice [1-6]: " CHOICE
         case "$CHOICE" in
             1) LANGUAGE="rust" ;;
             2) LANGUAGE="go" ;;
             3) LANGUAGE="ts" ;;
-            4) LANGUAGE="all" ;;
+            4) LANGUAGE="python" ;;
+            5) LANGUAGE="lua" ;;
+            6) LANGUAGE="all" ;;
             *)
                 log_error "Invalid selection. Exiting."
                 exit 1
@@ -221,9 +229,11 @@ case "$LANGUAGE" in
     rust|rs) LANGUAGE="rust" ;;
     go|golang) LANGUAGE="go" ;;
     ts|typescript|js|javascript) LANGUAGE="typescript" ;;
+    py|python) LANGUAGE="python" ;;
+    lua) LANGUAGE="lua" ;;
     all|multi) LANGUAGE="all" ;;
     *)
-        log_error "Unsupported language: $LANGUAGE. Choose rust, go, ts, or all."
+        log_error "Unsupported language: $LANGUAGE. Choose rust, go, ts, python, lua, or all."
         exit 1
         ;;
 esac
@@ -320,14 +330,27 @@ if [[ "$DRY_RUN" == "false" ]]; then
     mkdir -p "$TARGET_DIR"
 fi
 
+# Helper to fetch file content directly
+fetch_file_content() {
+    local rel_path="$1"
+    if [[ "$IS_REMOTE" == "false" ]]; then
+        if [[ -f "$SCRIPT_SOURCE_DIR/$rel_path" ]]; then
+            cat "$SCRIPT_SOURCE_DIR/$rel_path"
+        fi
+    else
+        curl -fsSL "$REPO_RAW_BASE/$rel_path" 2>/dev/null || true
+    fi
+}
+
 # 1. Base Universal Coding Rules
-log_info "Setting up Universal Coding Rules..."
-install_file "CODING.md" "$TARGET_DIR/CODING.md"
+log_info "Fetching Universal Coding Rules..."
+UNIVERSAL_RULES="$(fetch_file_content "CODING.md")"
+LANG_RULES=""
 
 # 2. Language-Specific Standards & Tooling
 if [[ "$LANGUAGE" == "rust" || "$LANGUAGE" == "all" ]]; then
     log_info "Applying Rust 2024 Standards..."
-    install_file "rust/CODING.md" "$TARGET_DIR/docs/CODING_RUST.md"
+    LANG_RULES="${LANG_RULES}$(fetch_file_content "rust/CODING.md")"$'\n\n'
     install_file "rust/rustfmt.toml" "$TARGET_DIR/rustfmt.toml"
     install_file "rust/clippy.toml" "$TARGET_DIR/clippy.toml"
     
@@ -344,7 +367,7 @@ fi
 
 if [[ "$LANGUAGE" == "go" || "$LANGUAGE" == "all" ]]; then
     log_info "Applying Go 1.26 Standards..."
-    install_file "go/CODING.md" "$TARGET_DIR/docs/CODING_GO.md"
+    LANG_RULES="${LANG_RULES}$(fetch_file_content "go/CODING.md")"$'\n\n'
     install_file "go/.golangci.yml" "$TARGET_DIR/.golangci.yml"
 
     if [[ "$INCLUDE_CI" == "true" ]]; then
@@ -353,14 +376,24 @@ if [[ "$LANGUAGE" == "go" || "$LANGUAGE" == "all" ]]; then
 fi
 
 if [[ "$LANGUAGE" == "typescript" || "$LANGUAGE" == "all" ]]; then
-    log_info "Applying TypeScript 7.0 Standards..."
-    install_file "typescript/CODING.md" "$TARGET_DIR/docs/CODING_TYPESCRIPT.md"
+    log_info "Applying TypeScript Standards..."
+    LANG_RULES="${LANG_RULES}$(fetch_file_content "typescript/CODING.md")"$'\n\n'
     install_file "typescript/biome.json" "$TARGET_DIR/biome.json"
     install_file "typescript/tsconfig.json" "$TARGET_DIR/tsconfig.json"
 
     if [[ "$INCLUDE_CI" == "true" ]]; then
         install_file "templates/ci/typescript-ci.yml" "$TARGET_DIR/.github/workflows/typescript-ci.yml"
     fi
+fi
+
+if [[ "$LANGUAGE" == "python" || "$LANGUAGE" == "all" ]]; then
+    log_info "Applying Python Standards..."
+    LANG_RULES="${LANG_RULES}$(fetch_file_content "python/CODING.md")"$'\n\n'
+fi
+
+if [[ "$LANGUAGE" == "lua" || "$LANGUAGE" == "all" ]]; then
+    log_info "Applying Lua Standards..."
+    LANG_RULES="${LANG_RULES}$(fetch_file_content "lua/CODING.md")"$'\n\n'
 fi
 
 # 3. AI Agent Rules Setup
@@ -383,7 +416,6 @@ if [[ "$INCLUDE_AGENT_RULES" == "true" ]]; then
         read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards (TypeScript & React)
 
-Always adhere to `CODING.md` and `docs/CODING_TYPESCRIPT.md`:
 - **Zero Explanatory Comments:** Write self-documenting code. Never explain what code does.
 - **Fail Fast & Explicitly:** Never swallow errors; avoid empty catches.
 - **Iteration Rules:**
@@ -408,7 +440,6 @@ globs: *
 alwaysApply: true
 ---
 
-Always adhere to `CODING.md` and `docs/CODING_TYPESCRIPT.md`:
 - No explanatory comments.
 - Use `for...of` loops for side effects / no-return operations; `.map()` strictly for transformations.
 - Extract standalone hooks (`use*.ts`) when hook logic is reused >2 times.
@@ -421,7 +452,6 @@ EOF
         read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards (Rust 2024)
 
-Always adhere to `CODING.md` and `docs/CODING_RUST.md`:
 - **Zero Explanatory Comments:** Write self-documenting code.
 - **Zero Panics in Production:** Zero `.unwrap()` or `.expect()` calls in production paths. Propagate all errors via `Result<T, E>`.
 - **Rust 2024 Idioms:**
@@ -441,7 +471,6 @@ globs: *
 alwaysApply: true
 ---
 
-Always adhere to `CODING.md` and `docs/CODING_RUST.md`:
 - No explanatory comments.
 - Zero `.unwrap()` / `.expect()` in production (enforce typed `Result<T, E>`).
 - Rust 2024: explicit `unsafe { ... }` blocks, `use<..>` lifetime capturing.
@@ -453,7 +482,6 @@ EOF
         read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards (Go 1.26)
 
-Always adhere to `CODING.md` and `docs/CODING_GO.md`:
 - **Zero Explanatory Comments:** Write self-documenting code.
 - **Context & Goroutines:**
   - Pass `ctx context.Context` as the first argument in all I/O and DB calls. Never store `context.Context` in a struct.
@@ -477,7 +505,6 @@ globs: *
 alwaysApply: true
 ---
 
-Always adhere to `CODING.md` and `docs/CODING_GO.md`:
 - No explanatory comments.
 - `ctx context.Context` first argument; zero unmanaged goroutines.
 - Errors wrapped with `%w`; zero swallowed errors.
@@ -489,8 +516,6 @@ EOF
         read -r -d '' RULES_MD << 'EOF' || true
 # Repository Coding Standards
 
-Always follow the root `CODING.md` and the language-specific standards under `docs/`:
-- **Universal Standards:** `CODING.md`
 - **Zero Explanatory Comments:** Write self-documenting code.
 - **Fail Fast & Explicitly:** Never swallow errors or use empty catches.
 - **Strict Size Caps:** File <= 400 lines, Component/Struct <= 150 lines, Function <= 60 lines.
@@ -504,13 +529,16 @@ globs: *
 alwaysApply: true
 ---
 
-Always adhere to the authoritative engineering standards in `CODING.md` and `docs/`:
 - No explanatory comments.
 - No backwards-compatibility `if`-branch shims.
 - Single responsibility, early returns, max nesting depth 3.
 - Strict typing (zero `any`, schema-first boundaries).
 EOF
     fi
+
+    # Append the full standards content to the rules
+    RULES_MD="${RULES_MD}"$'\n\n'"${UNIVERSAL_RULES}"$'\n\n'"${LANG_RULES}"
+    CURSOR_MDC="${CURSOR_MDC}"$'\n\n'"${UNIVERSAL_RULES}"$'\n\n'"${LANG_RULES}"
 
     if [[ "$AGENT" == "gemini" || "$AGENT" == "all" ]]; then
         create_rule_file "$TARGET_DIR/GEMINI.md" "$RULES_MD"
@@ -529,7 +557,7 @@ if [[ "$DRY_RUN" == "true" ]]; then
 else
     log_success "Standards setup complete for $LANGUAGE in '$TARGET_DIR'!"
     log_info "Next Steps:"
-    echo "  1. Review CODING.md and docs/ for domain alignment."
+    echo "  1. Review the generated agent rules files for domain alignment."
     echo "  2. Run your linter in changed-files mode (ratchet principle)."
     echo "  3. Commit standards with: git commit -m 'chore: adopt agentic engineering standards'"
 fi

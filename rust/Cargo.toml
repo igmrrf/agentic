@@ -10,17 +10,27 @@ authors = ["Agentic Engineering Team"]
 license = "MIT"
 
 [workspace.lints.rust]
-unsafe_code = "forbid"
+# `deny`, not `forbid`: CODING.md §8 permits `unsafe` in a low-level FFI or
+# serialization crate that carries `// SAFETY:` proofs and passes Miri. `forbid`
+# cannot be overridden by a member crate, which would make that impossible.
+# High-level business crates still set `#![forbid(unsafe_code)]` themselves.
+unsafe_code = "deny"
 missing_docs = "warn"
 rust_2018_idioms = "warn"
 unused_must_use = "deny"
-unsafe_op_in_unsafe_fn = "warn"
+unsafe_op_in_unsafe_fn = "deny"
 static_mut_refs = "deny"
 
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
+# `nursery` lints are explicitly unstable and change between toolchains. Keeping
+# them on requires pinning the toolchain in `rust-toolchain.toml`; drop this line
+# if the project tracks stable without a pin (CODING.md §1).
 nursery = { level = "warn", priority = -1 }
+# Denied in production code. Test and benchmark targets legitimately unwrap; add
+# `#![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]` to the
+# crate root rather than relaxing the level here.
 unwrap_used = "deny"
 expect_used = "deny"
 panic = "deny"
@@ -41,6 +51,9 @@ missing_safety_doc = "warn"
 opt-level = 3
 lto = "thin"
 codegen-units = 1
+# `abort` is correct for a binary that must not continue after a panic. Remove it
+# if anything in the tree relies on unwinding — `catch_unwind` at a request
+# boundary, a plugin host, or a library published for third-party use.
 panic = "abort"
 strip = true
 

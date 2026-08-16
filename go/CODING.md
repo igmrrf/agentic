@@ -1,9 +1,14 @@
-# Go Coding Rules & Standards (Go 1.26)
+# Go Coding Rules & Standards
+
+Applies to **every** Go project — library module, CLI, backend service, worker, or operator. Rules that only apply to a specific project shape carry a scope tag.
+
+Read [`../CODING.md`](../CODING.md) first — it is the universal baseline. This document adds Go specifics and never relaxes it.
 
 - **No explanatory comments.** Write code that reads on its own.
 - **No backwards-compatibility shims.** Database migrations, schema versioning, and API routing handle compatibility—not runtime `if`-branches.
 - **Errors are values; never ignore them.** Check every returned error immediately. Swallowing errors with `_ = fn()` is forbidden.
-- **Leverage Go 1.26 idioms:** Use `new(expr)` pointer initialization, `range-over-func` (`iter.Seq`, `iter.Seq2`), `testing/synctest`, `log/slog`, and `errors.Join`.
+- **Baseline: Go 1.26.** New projects target the current stable release and use its idioms — `new(expr)` pointer initialization, `range-over-func` iterators (`iter.Seq`, `iter.Seq2`), `testing/synctest`, `log/slog`, `errors.Join`. A module pinned to an older `go` directive for compatibility reasons states the pin in `go.mod`; version-gated rules below are marked and do not apply there.
+- **Idiomatic Go wins ties.** Where a rule here has no strong justification and Effective Go, the Go Code Review Comments, or `gofmt` disagree, the language convention wins. Deliberate deviations are called out explicitly below.
 
 ---
 
@@ -26,8 +31,10 @@
   - No underscores, no hyphens, and no `mixedCaps` in package names.
   - Avoid generic/stuttering names: avoid `util`, `common`, `helpers`, `models`. Name packages by domain responsibility.
 - **Identifiers & Scope:**
-  - `camelCase` for unexported identifiers, `PascalCase` for exported identifiers.
-  - No single-letter names in multi-line scopes. `ctx` for `context.Context` and `t` for `*testing.T` are standard idioms. For domain variables, use `account`, `invoice`, `customer`, `index` instead of `a`, `i`, `c`.
+  - `camelCase` for unexported identifiers, `PascalCase` for exported identifiers. Initialisms keep their case: `userID`, `HTTPClient`, `parseURL` — never `userId` or `HttpClient`.
+  - No single-letter names in multi-line scopes. For domain variables, use `account`, `invoice`, `customer`, `index` instead of `a`, `i`, `c`.
+  - **Only permitted exceptions**, all of them established Go idioms that tooling and readers expect: `ctx context.Context`, `t *testing.T` / `b *testing.B`, `err`, `ok` from a comma-ok assignment, and **method receivers**, where Go convention permits one or two letters (`func (s *Service)`). A receiver name carries no information the type name does not already give; either a short abbreviation or a short word (`service`) is acceptable, but the choice must be identical across the entire method set of a type — `revive` flags inconsistent receiver names.
+  - Scope length justifies name length: a two-line closure parameter may be short; a variable live across forty lines may not.
 - **Avoid Stuttering:**
   - Do not repeat package name in type names: inside package `account`, use `Entity` or `Service`, not `AccountEntity` or `AccountService` (which becomes `account.AccountService` at call sites).
 - **Interface Naming:**
@@ -171,9 +178,39 @@ Crossing a cap requires decomposing the package into smaller domain-focused subp
 
 ---
 
-## 10. Folder & File Design Architecture (Standard Go Layout)
+## 10. Folder & File Design Architecture
 
-Organize Go microservices using standard package encapsulation with Hexagonal Ports & Adapters:
+Pick the shape that matches the module. Go's own standard library is flat; layers are earned, not assumed.
+
+### Option A: Library Module
+
+```
+my-module/
+├── go.mod
+├── mymodule.go              # Package root: the public API
+├── mymodule_test.go
+├── parser.go                # Cohesive units of the same package
+├── internal/                # Implementation detail, uncallable from outside the module
+└── examples/ or example_test.go
+```
+
+- **Flat until it hurts.** A library with one coherent responsibility is one package. Splitting into subpackages before there is a real boundary creates import cycles and forces exports that should have stayed private.
+- **`internal/` is the encapsulation tool.** Anything not part of the promise to callers goes there and can be changed freely.
+
+### Option B: CLI
+
+```
+my-cli/
+├── main.go                  # Or cmd/<name>/main.go for multiple binaries
+└── internal/
+    ├── cli/                 # Flag/arg parsing and command wiring only
+    ├── <domain>/            # The actual work, testable without the CLI
+    └── config/
+```
+
+- **`main` is thin:** parse, wire, call, map the error to an exit code. Logic that lives in `main` cannot be tested.
+
+### Option C: Backend Service (Hexagonal Ports & Adapters)
 
 ```
 go-service/
@@ -197,16 +234,28 @@ go-service/
 │           ├── handler.go       # DTO parsing, validation & response envelope
 │           ├── middleware/      # Auth, rate-limiting & telemetry middlewares
 │           └── dto/             # Request & response JSON payload structs
-├── pkg/                         # Public SDKs (safe for external module import)
+├── pkg/                         # Public SDKs — only if third parties genuinely import them
 └── api/                         # OpenAPI specs, Protocol Buffer definitions
 ```
 
+- **`internal/` by default; `pkg/` only when earned.** `pkg/` is not part of the Go toolchain and carries no meaning — it is a convention that only pays for itself when external consumers actually import the code. A service with no external consumers has no `pkg/`.
 - **File Suffix Standards:**
   - `*_service.go`: Business use case orchestrators
   - `*_repo.go`: Database repository adapters
   - `*_handler.go`: HTTP / gRPC request handlers
   - `*_test.go`: Colocated unit & integration tests
 - **Anti-Junk Drawer Rule:** Banish generic packages (`util`, `common`, `helpers`). Name packages strictly by domain responsibility (`account`, `postgres`, `auth`).
+- **Package boundaries are API boundaries.** Import cycles are a compile error in Go for a reason: if two packages need each other, they are one package or they need a third holding the shared interface.
+
+---
+
+## 10b. Configuration & Security
+
+- **Parse configuration once, at startup, into a typed struct**, and fail immediately on anything missing or invalid. No `os.Getenv` scattered through handlers.
+- **Secrets never live in source, fixtures, or `go:embed` assets.** They arrive from the environment or a secret manager, and types holding them do not implement a `String()` that prints them.
+- **Parameterize every query.** Use placeholders and `database/sql` arguments; never build SQL by concatenating input. `text/template` for HTML is a vulnerability — use `html/template`.
+- **Validate untrusted input at the boundary** into a domain type before it reaches business logic, and bound every request body, slice length, and string length.
+- **`context.Context` carries deadlines and cancellation, not dependencies.** Never smuggle a logger, database handle, or config through it; request-scoped identifiers are the only acceptable values, behind a typed key.
 
 ---
 

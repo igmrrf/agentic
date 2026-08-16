@@ -1,6 +1,8 @@
 # Rust Standards & Architecture Blueprint (Rust 2024 Edition)
 
-This directory contains the engineering standards, configuration templates, and architectural patterns for all Rust crates and services within this repository, targeting the **Rust 2024 Edition** (MSRV 1.85.0+).
+This directory contains the engineering standards, configuration templates, and architectural patterns for **every** Rust project — library crate, CLI, backend service, `no_std`/embedded firmware, WASM module, or proc-macro.
+
+**Baseline: Rust 2024 Edition (MSRV 1.85.0+).** [`CODING.md`](CODING.md) marks its edition-gated rules and states how to pin lower; everything else holds on any supported toolchain.
 
 ## Table of Contents
 
@@ -32,7 +34,9 @@ This directory contains the engineering standards, configuration templates, and 
 
 ## Project Layout Blueprint
 
-### Option A: Modular Clean Architecture (Single Crate)
+The two service-shaped layouts are below. A library or CLI crate uses a flatter shape — see [`CODING.md` §10 Option A](CODING.md#10-folder--file-design-architecture).
+
+### Option B: Modular Clean Architecture (Single Crate)
 
 ```
 rust-service/
@@ -42,37 +46,37 @@ rust-service/
 ├── src/
 │   ├── main.rs              # Binary entry point & composition root
 │   ├── lib.rs               # Library root and public interface declarations
+│   ├── domain.rs            # Module root (2018+ path style — not domain/mod.rs)
 │   ├── domain/              # Entities, value objects, domain errors (pure Rust)
-│   │   ├── mod.rs
 │   │   ├── account.rs
 │   │   └── errors.rs
+│   ├── application.rs
 │   ├── application/         # Use cases, orchestrators, repository traits
-│   │   ├── mod.rs
 │   │   ├── transfer_service.rs
 │   │   └── ports.rs
+│   ├── infrastructure.rs
 │   └── infrastructure/      # Concrete DB adapters, HTTP clients, telemetry
-│       ├── mod.rs
+│       ├── database.rs
 │       ├── database/
-│       │   ├── mod.rs
 │       │   └── postgres_repo.rs
+│       ├── web.rs
 │       └── web/
-│           ├── mod.rs
 │           ├── handlers.rs
 │           └── routes.rs
 └── tests/                   # Integration and end-to-end test suites
     ├── common/
-    │   └── mod.rs
+    │   └── mod.rs           # `tests/` helper modules still require mod.rs
     └── api_integration_test.rs
 ```
 
-### Option B: Cargo Workspace (Multi-Crate Monorepo)
+### Option C: Cargo Workspace (Multi-Crate Monorepo)
 
 ```
 workspace-root/
 ├── Cargo.toml               # [workspace] with shared dependencies & lints
 └── crates/
     ├── domain/              # Pure domain models & business rules (#![no_std] capable)
-    ├── application/             # Application services & trait definitions (depends on domain)
+    ├── application/         # Application services & trait definitions (depends on domain)
     ├── infra-postgres/      # SQLx/PostgreSQL implementation (depends on application, domain)
     ├── infra-http/          # Axum HTTP routes & OpenAPI handlers (depends on application)
     └── server/              # Binary orchestrator (glues all infra crates together)
@@ -83,9 +87,9 @@ workspace-root/
 ## Toolchain & Linter Configuration
 
 The root configuration templates in this directory should be linked or copied to every Rust crate:
-- [`rustfmt.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/rustfmt.toml): Strict formatting rules with `edition = "2024"` and `style_edition = "2024"`.
-- [`clippy.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/clippy.toml): Clippy thresholds and banned identifiers.
-- [`Cargo.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/Cargo.toml): Reference workspace `Cargo.toml` with strict workspace lints and resolver v3.
+- [`rustfmt.toml`](rustfmt.toml): Strict formatting rules with `edition = "2024"` and `style_edition = "2024"`.
+- [`clippy.toml`](clippy.toml): Clippy thresholds and banned identifiers.
+- [`Cargo.toml`](Cargo.toml): Reference workspace `Cargo.toml` with strict workspace lints and resolver v3.
 
 ---
 

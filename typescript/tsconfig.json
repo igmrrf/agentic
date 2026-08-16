@@ -1,17 +1,30 @@
 {
+  // Base configuration. `tsconfig.json` is JSONC — comments are supported.
+  //
+  // This template targets a browser/UI project. For a backend service, CLI, or
+  // library: drop "DOM" and "DOM.Iterable" from `lib`, remove `jsx`, and see the
+  // conditionally-required options in CODING.md §1 before enabling
+  // `isolatedDeclarations` or `erasableSyntaxOnly`.
   "compilerOptions": {
     "target": "ES2024",
+    // UI only. Backend/library: ["ES2024"] — keeping DOM lets browser-only
+    // globals type-check in code that will crash on the server.
     "lib": ["DOM", "DOM.Iterable", "ES2024"],
+    // NodeNext derives module kind from package.json. Without `"type": "module"`
+    // there, every file is treated as CommonJS and `verbatimModuleSyntax` then
+    // rejects top-level value exports with TS1287. Set `"type": "module"`.
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "moduleDetection": "force",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "isolatedDeclarations": true,
-    "verbatimModuleSyntax": true,
-    "erasableSyntaxOnly": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // UI only. Remove for non-JSX projects; set "preserve" when a bundler
+    // (Next.js, Vite) owns the JSX transform.
     "jsx": "react-jsx",
+
+    // Required everywhere
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -27,10 +40,30 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+
+    // Conditionally required (CODING.md §1).
+    //
+    // erasableSyntaxOnly (TS 5.8+): required when a type-stripping runtime
+    //   executes the source (Node --experimental-strip-types, Deno, Bun).
+    //   Incompatible with decorator/metadata frameworks — pick one world.
+    "erasableSyntaxOnly": true,
+
+    // isolatedDeclarations (TS 5.5+): required for packages that publish .d.ts.
+    //   Demands an explicit return type on every export. It cannot be combined
+    //   with the "noEmit" below — TS5069 requires "declaration" or "composite" —
+    //   so a publishing package enables the emit block instead:
+    //
+    //     "isolatedDeclarations": true,
+    //     "declaration": true,
+    //     "declarationMap": true,
+    //     "outDir": "dist",
+    //
+    // Type-check only, for an application that is bundled by another tool.
     "noEmit": true
   },
-  "include": ["src/**/*", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "build"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "build", "coverage"]
 }
