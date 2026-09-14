@@ -1,5 +1,6 @@
 # Rustfmt Configuration Standard (Rust 2024 Edition)
-# Stable options adhering to the Rust 2024 Style Edition
+#
+# Stable options — honoured by `cargo fmt` on any toolchain.
 edition = "2024"
 style_edition = "2024"
 max_width = 100
@@ -12,4 +13,17 @@ reorder_modules = true
 merge_derives = true
 remove_nested_parens = true
 match_block_trailing_comma = true
-fn_params_layout = "Tall"
+
+# Nightly-only options. Stable rustfmt IGNORES these and prints a warning rather
+# than failing, so a config that relies on them silently does nothing on stable —
+# uncomment only alongside a `rust-toolchain.toml` pinning nightly for formatting,
+# or run `cargo +nightly fmt`.
+#
+# fn_params_layout = "Tall"
+# group_imports = "StdExternalCrate"   # std -> external crates -> local (CODING.md §1)
+# imports_granularity = "Crate"
+# trailing_comma = "Vertical"
+# wrap_comments = true
+# comment_width = 100
+# normalize_doc_attributes = true
+# format_strings = true

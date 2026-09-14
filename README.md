@@ -2,11 +2,15 @@
 
 Authoritative engineering standards, coding rules, architectural blueprints, and toolchain configurations for multi-language development across **Rust**, **Go**, **TypeScript**, **Python**, **Lua**, **Swift**, and **Kotlin**.
 
+Every language guide is written to hold in **any** project of that language — library, CLI, service, or application — not for one framework. Framework- and runtime-specific guidance is always scoped explicitly (a tagged section or an appendix) so it can be ignored where it does not apply. Named tools are defaults for greenfield projects; the binding requirement is *one* formatter, *one* linter, *one* type checker, enforced in CI.
+
 ---
 
 ## Quickstart: Scaffolding a New Project
 
-Use the built-in initializer script [`scripts/init.sh`](file:///Users/igmrrf/Desktop/tmp/Agentic/scripts/init.sh) to bootstrap standards, linter configs, CI workflows, and AI agent rules into any new or existing project:
+Use the built-in initializer script [`scripts/init.sh`](scripts/init.sh) to bootstrap standards, linter configs, CI workflows, and AI agent rules into any new or existing project.
+
+> **Note:** The setup script directly embeds the coding standards into agent-based instruction files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, and `.github/copilot-instructions.md`), instead of generating separate raw `CODING.md` files in the target directory. This ensures that LLM agents natively parse and adhere to the guidelines.
 
 ```bash
 # Interactive setup (auto-detects project language in existing repositories):
@@ -17,7 +21,7 @@ Use the built-in initializer script [`scripts/init.sh`](file:///Users/igmrrf/Des
 ./scripts/init.sh --lang=go --target=/path/to/my-service
 ./scripts/init.sh --lang=typescript --target=/path/to/my-service
 ./scripts/init.sh --lang=python --target=/path/to/my-service
-./scripts/init.sh --lang=lua --target=/path/to/my-service
+./scripts/init.sh --lang=lua --target=/path/to/my-plugin
 ./scripts/init.sh --lang=swift --target=/path/to/my-service
 ./scripts/init.sh --lang=kotlin --target=/path/to/my-service
 
@@ -25,6 +29,12 @@ Use the built-in initializer script [`scripts/init.sh`](file:///Users/igmrrf/Des
 ./scripts/init.sh --gemini
 ./scripts/init.sh -a claude
 ./scripts/init.sh --cursor
+./scripts/init.sh --cline
+./scripts/init.sh --windsurf
+./scripts/init.sh --copilot
+
+# Target multiple AI agents simultaneously:
+./scripts/init.sh --claude --gemini --cursor
 
 # Safe adoption on an existing project (preview with dry-run and backup protection):
 # NOTE: By default, init.sh copies ONLY standards, linter/formatter configs, CI workflows,
@@ -49,33 +59,38 @@ curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scri
 
 ## Language Standards
 
-| Language | Target Version | Standards & Rules | Blueprint & Overview | Toolchain / Configs | CI Workflow |
+| Language | Baseline | Standards & Rules | Blueprint & Overview | Toolchain / Configs | CI Workflow |
 |---|---|---|---|---|---|
-| **Rust** | Rust 2024 (1.85.0+) | [`rust/CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/CODING.md) | [`rust/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md) | [`rustfmt.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/rustfmt.toml), [`clippy.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/clippy.toml), [`Cargo.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/Cargo.toml) | [`rust-ci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/templates/ci/rust-ci.yml) |
-| **Go** | Go 1.26 | [`go/CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/go/CODING.md) | [`go/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/go/README.md) | [`.golangci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/go/.golangci.yml) | [`go-ci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/templates/ci/go-ci.yml) |
-| **TypeScript** | TypeScript 7.0 | [`typescript/CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/CODING.md) | [`typescript/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/README.md) | [`biome.json`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/biome.json), [`tsconfig.json`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/tsconfig.json) | [`typescript-ci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/templates/ci/typescript-ci.yml) |
-| **Python** | Python 3.12+ | [`python/CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/python/CODING.md) | [`python/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/python/README.md) | [`pyproject.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/python/pyproject.toml) | [`python-ci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/templates/ci/python-ci.yml) |
-| **Lua** | LuaJIT / Lua 5.4 | [`lua/CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/CODING.md) | [`lua/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/README.md) | [`.stylua.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/.stylua.toml), [`.luarc.json`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/.luarc.json), [`.luacheckrc`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/.luacheckrc) | [`lua-ci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/templates/ci/lua-ci.yml) |
-| **Swift** | Swift 6.0+ | [`swift/CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/CODING.md) | [`swift/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/README.md) | [`.swiftlint.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/.swiftlint.yml), [`.swiftformat`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/.swiftformat), [`Package.swift`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/Package.swift) | [`swift-ci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/templates/ci/swift-ci.yml) |
-| **Kotlin** | Kotlin 2.0+ (K2) | [`kotlin/CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/CODING.md) | [`kotlin/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/README.md) | [`detekt.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/detekt.yml), [`.editorconfig`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/.editorconfig), [`build.gradle.kts`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/build.gradle.kts) | [`kotlin-ci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/templates/ci/kotlin-ci.yml) |
+| **Rust** | Rust 2024 (1.85.0+) | [`rust/CODING.md`](rust/CODING.md) | [`rust/README.md`](rust/README.md) | [`rustfmt.toml`](rust/rustfmt.toml), [`clippy.toml`](rust/clippy.toml), [`Cargo.toml`](rust/Cargo.toml) | [`rust-ci.yml`](templates/ci/rust-ci.yml) |
+| **Go** | Go 1.26 | [`go/CODING.md`](go/CODING.md) | [`go/README.md`](go/README.md) | [`.golangci.yml`](go/.golangci.yml) | [`go-ci.yml`](templates/ci/go-ci.yml) |
+| **TypeScript** | TypeScript 5.5+ | [`typescript/CODING.md`](typescript/CODING.md) | [`typescript/README.md`](typescript/README.md) | [`biome.json`](typescript/biome.json), [`tsconfig.json`](typescript/tsconfig.json) | [`typescript-ci.yml`](templates/ci/typescript-ci.yml) |
+| **Python** | Python 3.12+ | [`python/CODING.md`](python/CODING.md) | [`python/README.md`](python/README.md) | [`pyproject.toml`](python/pyproject.toml) | [`python-ci.yml`](templates/ci/python-ci.yml) |
+| **Lua** | LuaJIT / Lua 5.4 | [`lua/CODING.md`](lua/CODING.md) | [`lua/README.md`](lua/README.md) | [`.stylua.toml`](lua/.stylua.toml), [`.luarc.json`](lua/.luarc.json), [`.luacheckrc`](lua/.luacheckrc) | [`lua-ci.yml`](templates/ci/lua-ci.yml) |
+| **Swift** | Swift 6.0+ | [`swift/CODING.md`](swift/CODING.md) | [`swift/README.md`](swift/README.md) | [`.swiftlint.yml`](swift/.swiftlint.yml), [`.swiftformat`](swift/.swiftformat), [`Package.swift`](swift/Package.swift) | [`swift-ci.yml`](templates/ci/swift-ci.yml) |
+| **Kotlin** | Kotlin 2.0+ (K2) | [`kotlin/CODING.md`](kotlin/CODING.md) | [`kotlin/README.md`](kotlin/README.md) | [`detekt.yml`](kotlin/detekt.yml), [`.editorconfig`](kotlin/.editorconfig), [`build.gradle.kts`](kotlin/build.gradle.kts) | [`kotlin-ci.yml`](templates/ci/kotlin-ci.yml) |
+
+**Baseline** is the version whose idioms the guide assumes, not a hard requirement. Each guide marks its version-gated rules and states how to pin lower.
 
 ---
 
 ## Universal Foundations
 
-- **Root Rules:** [`CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/CODING.md) defines universal craft standards across all stacks (no explanatory comments, no backwards-compatibility `if`-branch shims, strict size caps, zero-swallowed errors, parity-first refactoring, folder/file design).
-- **Architecture Review:** [`standards_review.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/standards_review.md) contains the review summary, verified research findings, version matrix, and architecture references.
-- **Audit & Quality Scorecard:** [`code_review.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/code_review.md) documents production-readiness assessments and toolchain verifications.
-- **Scaffolding Tool:** [`scripts/init.sh`](file:///Users/igmrrf/Desktop/tmp/Agentic/scripts/init.sh) provides automated project configuration.
+- **Root Rules:** [`CODING.md`](CODING.md) defines universal craft standards across all stacks (no explanatory comments, no backwards-compatibility `if`-branch shims, strict size caps, zero-swallowed errors, parity-first refactoring, folder/file design). Its §0 explains scope tags (`[service]`, `[app]`, `[lib]`), which rules are non-negotiable versus project-tunable, and how to adopt the standards into an existing repository.
+- **Architecture Review:** [`standards_review.md`](standards_review.md) contains the review summary, verified research findings, version matrix, and architecture references.
+- **Scaffolding Tool:** [`scripts/init.sh`](scripts/init.sh) provides automated project configuration.
 
 ---
 
 ## Folder & File Architecture Patterns
 
-- [**TypeScript / React Feature-Driven Colocation**](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/README.md#standard-project-layout-feature-driven-colocation): Vertical domain slices (`src/features/[feature]/`), colocated components, hooks, schemas, and tests.
-- [**Go Standard Hexagonal Layout**](file:///Users/igmrrf/Desktop/tmp/Agentic/go/README.md#standard-project-layout): Compiler-gated `internal/` encapsulation, pure `domain/`, `service/` use cases, and `adapter/` (postgres/http).
-- [**Rust Modular Clean Architecture & Workspace Monorepo**](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md#project-layout-blueprint): Trait-decoupled domain/application layers and multi-crate workspace separation.
-- [**Python Clean Hexagonal Layout**](file:///Users/igmrrf/Desktop/tmp/Agentic/python/README.md#standard-project-layout): Domain entities, application service orchestrators, and typed ports/adapters.
-- [**Lua Modular Architecture**](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/README.md#standard-project-layout): Local module encapsulation, EmmyLua annotations, and Busted test structure.
-- [**Swift Modular Framework Layout**](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/README.md#standard-project-layout): Pure domain value types, actor isolation, protocol port boundaries, and SPM modularization.
-- [**Kotlin Hexagonal Layout**](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/README.md#standard-project-layout): Domain models (`value class`), Coroutine-based use cases, and Gradle K2 compiler configuration.
+Each language guide offers several layouts and expects you to pick the one matching the project shape — a library does not inherit a service's layering.
+
+| Project shape | Where the layout lives |
+|---|---|
+| **Library / SDK** | [Rust §10 Option A](rust/CODING.md#10-folder--file-design-architecture) · [Go §10 Option A](go/CODING.md#10-folder--file-design-architecture) · [TypeScript §12](typescript/CODING.md#12-project-layout) · [Python §10](python/CODING.md#10-project-layout) · [Lua §9](lua/CODING.md#9-project-layout) · [Swift §7](swift/CODING.md#7-folder--file-architecture) |
+| **CLI** | [Rust §10 Option A](rust/CODING.md#10-folder--file-design-architecture) · [Go §10 Option B](go/CODING.md#10-folder--file-design-architecture) · [TypeScript §12](typescript/CODING.md#12-project-layout) |
+| **Backend service** (hexagonal ports & adapters) | [Go §10 Option C](go/CODING.md#10-folder--file-design-architecture) · [Rust §10 Option B](rust/CODING.md#10-folder--file-design-architecture) · [TypeScript §12](typescript/CODING.md#12-project-layout) · [Python §10](python/CODING.md#10-project-layout) · [Swift §7](swift/CODING.md#7-folder--file-architecture) · [Kotlin §7](kotlin/CODING.md#7-folder--file-architecture) |
+| **UI application** (feature-driven vertical slices) | [TypeScript §12](typescript/CODING.md#12-project-layout) + [Appendix A](typescript/CODING.md#appendix-a-ui-component-frameworks) |
+| **Multi-crate monorepo** | [Rust §10 Option C](rust/CODING.md#10-folder--file-design-architecture) |
+
+The universal rule behind all of them ([`CODING.md` §8](CODING.md#8-module-boundaries-layering--folder-architecture)): dependencies point inward, and the pure core never imports the impure edge.

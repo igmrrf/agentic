@@ -1,5 +1,12 @@
-# GolangCI-Lint Configuration Standard (Go 1.26)
-# Aligns with go/CODING.md rules, size caps, error wrapping, and structured logging
+# GolangCI-Lint Configuration Standard
+#
+# Schema: golangci-lint v2 (the format installed by `golangci-lint-action` with
+# `version: latest`). v2 renamed `linters.disable-all` -> `linters.default`, moved
+# `linters-settings` under `linters.settings`, moved formatters into their own
+# `formatters` block, and folded `gosimple` and `stylecheck` into `staticcheck`.
+# A v1 config is rejected outright by a v2 binary — run `golangci-lint migrate`
+# if you are pinning an older release.
+version: "2"
 
 run:
   timeout: 5m
@@ -7,9 +14,9 @@ run:
   tests: true
 
 linters:
-  disable-all: true
+  default: none
   enable:
-    # Standard quality & bug detection
+    # Correctness
     - errcheck
     - govet
     - ineffassign
@@ -18,107 +25,68 @@ linters:
     - bodyclose
     - noctx
     - rowserrcheck
-    - unconvert
-    - unparam
-    - whitespace
-    - prealloc
-    - nilerr
-
-    # Security & correctness
+    - exhaustive
+    # Security
     - gosec
-
-    # Error handling & wrapping (%w, errors.Is, errors.As)
-    - errorlint
-
-    # Structured logging standards (log/slog)
-    - sloglint
-
-    # Concurrency & context rules
-    - containedctx
-    - tparallel
-
-    # Code style & naming
+    # Style & simplification
     - revive
     - gocritic
-    - exhaustive
+    - unconvert
+    - unparam
+    - prealloc
+    - whitespace
 
-    # Size caps & complexity (CODING.md Section 5)
-    - funlen
-    - nestif
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        # Field ordering is a deliberate readability choice; enable only in
+        # memory-critical packages where struct padding has been measured.
+        - fieldalignment
+    revive:
+      rules:
+        - name: exported
+          arguments:
+            - checkPrivateReceivers
+        - name: blank-imports
+        - name: context-as-first-argument
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: if-return
+        - name: increment-decrement
+        - name: var-naming
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: indent-error-flow
+        - name: superfluous-else
+        - name: unreachable-code
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+      disabled-checks:
+        - whyNoLint
+    exhaustive:
+      # A `default` clause must not satisfy the check: adding an enum variant
+      # has to break the build, not fall through silently.
+      default-signifies-exhaustive: false
 
-    # Formatting & imports
+  exclusions:
+    # Do not lint generated files; do not inherit golangci-lint's default
+    # exclusion presets, which silence several errcheck and gosec findings.
+    generated: lax
+
+formatters:
+  enable:
     - gofmt
-    - gci
-
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-
-  errorlint:
-    errorf: true
-    asserts: true
-    comparison: true
-
-  sloglint:
-    no-mixed-args: true
-    kv-only: false
-    attr-only: false
-    no-global: "all"
-    context: "all"
-
-  funlen:
-    lines: 50
-    statements: 40
-    ignore-comments: true
-
-  nestif:
-    min-complexity: 4
-
-  gci:
-    sections:
-      - standard
-      - default
-
-  gofmt:
-    simplify: true
-
-  revive:
-    rules:
-      - name: exported
-        arguments:
-          - checkPrivateReceivers
-      - name: blank-imports
-      - name: context-as-first-argument
-      - name: dot-imports
-      - name: error-return
-      - name: error-strings
-      - name: error-naming
-      - name: if-return
-      - name: increment-decrement
-      - name: var-naming
-      - name: package-comments
-      - name: range
-      - name: receiver-naming
-      - name: time-naming
-      - name: unexported-return
-      - name: indent-error-flow
-      - name: superfluous-else
-      - name: unreachable-code
-
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-      - performance
-    disabled-checks:
-      - whyNoLint
-
-  exhaustive:
-    default-signifies-exhaustive: false
+    - goimports
 
 issues:
-  exclude-use-default: false
   max-issues-per-linter: 0
   max-same-issues: 0

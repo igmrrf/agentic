@@ -40,19 +40,26 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noDoubleEquals": "error"
+        "noDoubleEquals": "error",
+        "noConsole": { "level": "error", "options": { "allow": ["error", "warn"] } },
+        "useAwait": "error"
       },
       "style": {
         "noNonNullAssertion": "error",
         "useConst": "error",
         "useImportType": "error",
-        "noParameterProperties": "error"
+        "noParameterProperties": "error",
+        "noParameterAssign": "error",
+        "useThrowOnlyError": "error"
       },
       "correctness": {
         "noUnusedVariables": "error",
         "noUnusedImports": "error",
         "useHookAtTopLevel": "error",
         "useExhaustiveDependencies": "error"
+      },
+      "nursery": {
+        "noFloatingPromises": "error"
       }
     }
   },
@@ -72,4 +79,3 @@
     }
   }
 }
-

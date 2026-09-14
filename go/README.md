@@ -1,6 +1,8 @@
 # Go Standards & Architecture Blueprint (Go 1.26)
 
-This directory contains the engineering standards, project layout blueprints, and linter configurations for all Go services and packages in this repository, targeting **Go 1.26**.
+This directory contains the engineering standards, project layout blueprints, and linter configurations for **every** Go project — library module, CLI, backend service, worker, or operator.
+
+**Baseline: Go 1.26.** [`CODING.md`](CODING.md) marks its version-gated rules and states how to pin lower; everything else holds on any supported Go release.
 
 ## Table of Contents
 
@@ -34,7 +36,7 @@ This directory contains the engineering standards, project layout blueprints, an
 
 ## Standard Project Layout
 
-Standard layout for Go backend services and microservices:
+This is the **backend service** layout (hexagonal ports & adapters). Library modules and CLIs use flatter shapes — see [`CODING.md` §10](CODING.md#10-folder--file-design-architecture) for all three.
 
 ```
 go-service/
@@ -54,7 +56,7 @@ go-service/
 │       └── http/            # HTTP handlers, routing, and middlewares
 │           ├── handler.go
 │           └── routes.go
-├── pkg/                     # Public libraries and shared SDKs
+├── pkg/                     # Public SDKs — only if third parties genuinely import them
 ├── api/                     # OpenAPI specs, Protocol Buffer definitions
 ├── .golangci.yml            # Complete golangci-lint configuration
 ├── go.mod
@@ -65,7 +67,7 @@ go-service/
 
 ## Linter & Toolchain Configuration
 
-The [`.golangci.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/go/.golangci.yml) file in this directory configures `golangci-lint` with strict, production-tested linters:
+The [`.golangci.yml`](.golangci.yml) file in this directory configures `golangci-lint` with strict, production-tested linters:
 - `govet`, `errcheck`, `staticcheck`, `revive`, `gocritic`, `exhaustive`, `prealloc`, `noctx`, `gosec`, `bodyclose`, `rowserrcheck`.
 
 ---

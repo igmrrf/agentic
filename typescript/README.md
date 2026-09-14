@@ -1,13 +1,15 @@
-# TypeScript Standards & Architecture Blueprint (TypeScript 7.0)
+# TypeScript Standards & Architecture Blueprint
 
-This directory contains the engineering standards, configuration templates, and project blueprints for all TypeScript projects in this repository, targeting **TypeScript 7.0** (with native Go-powered compiler).
+This directory contains the engineering standards, configuration templates, and project blueprints for all TypeScript projects — library, CLI, backend service, or UI application — on any runtime (Node, Deno, Bun, browser, edge).
+
+**Baseline: TypeScript 5.5+.** The rules in [`CODING.md`](CODING.md) are written to hold across the 5.x and 7.x lines; version- and project-shape-gated options are marked there. The 7.0 material below is the forward path, not a prerequisite.
 
 ## Table of Contents
 
 - [Core Principles](#core-principles)
 - [TypeScript 7.0 Highlights](#typescript-70-highlights)
 - [Key Language Rules](#key-language-rules)
-- [Standard Project Layout](#standard-project-layout)
+- [Standard Project Layout](#standard-project-layout-feature-driven-colocation)
 - [Configuration Templates](#configuration-templates)
 - [Verification Checklist](#verification-checklist)
 
@@ -16,9 +18,9 @@ This directory contains the engineering standards, configuration templates, and 
 ## Core Principles
 
 1. **Strict Zero-Any Typing:** `strict: true`, `noImplicitAny: true`, and zero `any` in production code.
-2. **Schema-First Data Boundaries:** Zod schemas are the single source of truth for runtime validation and static types.
-3. **Pure Logic & Isolated Effects:** Pure business logic separated from side-effect wrappers and UI components.
-4. **Predictable Query State:** Single object-style query-key factories for server state management.
+2. **Schema-First Data Boundaries:** a runtime schema validator is the single source of truth for validation *and* static types at every untrusted boundary. Zod is the default choice; Valibot, ArkType, and TypeBox are equally acceptable.
+3. **Pure Logic & Isolated Effects:** pure business logic separated from side-effect wrappers, transport code, and UI.
+4. **Explicit Failure & Cancellation:** typed errors with preserved `cause`, no floating promises, `AbortSignal` and a timeout on every I/O call.
 
 ---
 
@@ -34,13 +36,16 @@ This directory contains the engineering standards, configuration templates, and 
 
 ## Key Language Rules
 
-- **Iteration:** Use `for...of` loops for side effects / operations that do not return data.
+- **Iteration:** Use `for...of` loops for side effects / operations that do not return data — it is the only form that supports `await`, `break`, and `continue`.
 - **Transformations:** Use `.map()` strictly when generating new arrays or transformed objects.
-- **Hook Extraction:** Any custom hook logic reimplemented more than twice across components must be extracted into a standalone hook file (`use[Feature].ts`).
+- **Concurrency is explicit:** sequential `await` in a loop is a choice; independent work uses `Promise.all` / `allSettled` with a bounded limit.
+- **Hook Extraction** *(UI frameworks only — see [Appendix A](CODING.md#appendix-a-ui-component-frameworks))*: stateful logic reimplemented across two or more components is extracted into a standalone module.
 
 ---
 
 ## Standard Project Layout: Feature-Driven Colocation
+
+This is the **UI application** layout. Libraries, CLIs, and backend services use a different shape — see [`CODING.md` §12](CODING.md#12-project-layout) for all four.
 
 ```
 ts-project/
@@ -95,8 +100,8 @@ ts-project/
 
 ## Configuration Templates
 
-- [`biome.json`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/biome.json): Formatter and linter configuration with strict rules and VCS integration.
-- [`tsconfig.json`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/tsconfig.json): Strict TypeScript compiler options with `erasableSyntaxOnly`, `isolatedDeclarations`, and `verbatimModuleSyntax`.
+- [`biome.json`](biome.json): Formatter and linter configuration with strict rules and VCS integration.
+- [`tsconfig.json`](tsconfig.json): Strict TypeScript compiler options with `erasableSyntaxOnly`, `isolatedDeclarations`, and `verbatimModuleSyntax`.
 
 ---
 

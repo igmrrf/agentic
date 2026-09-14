@@ -1,10 +1,9 @@
-# Clippy Configuration Standard (Rust 2024 Edition)
-# Deeply aligned with rust/CODING.md rules, size caps, and safety invariants
-
-# Parameter count: Maximum 3 positional parameters (warns on 4+)
+# Clippy Configuration Standard
+#
+# Thresholds mirror the caps in CODING.md §4 and §5. Clippy warns when a value
+# EXCEEDS the threshold, so `too-many-arguments-threshold = 3` enforces the
+# documented "maximum 3 parameters" rule.
 too-many-arguments-threshold = 3
-
-# Function size: Soft cap 60 lines
 too-many-lines-threshold = 60
 
 # Nesting depth: Maximum 3 levels of indentation
@@ -37,7 +36,7 @@ disallowed-types = [
     { path = "std::sync::mpsc::Sender", reason = "Unbounded channel sender; use bounded tokio::sync::mpsc::Sender or crossbeam" },
 ]
 
-# Accepted documentation identifiers
+# Identifiers `clippy::doc_markdown` must not flag as needing backticks.
 doc-valid-idents = [
     "PostgreSQL",
     "Redis",
