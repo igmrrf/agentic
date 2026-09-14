@@ -1,0 +1,16 @@
+# SwiftFormat Configuration Standard
+# Single formatting authority for all Swift codebases
+
+--indent 4
+--maxwidth 100
+--semicolons never
+--self init-only
+--wraparguments before-first
+--wrapelements before-first
+--trimwhitespace always
+--stripunusedargs always
+--redundanttype inferred
+--closurevoid remove
+--patternlet inline
+--commas always
+--linebreaks lf

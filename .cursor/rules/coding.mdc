@@ -1,0 +1,11 @@
+---
+description: Universal repository engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to the authoritative engineering standards in `CODING.md` and `docs/`:
+- No explanatory comments.
+- No backwards-compatibility `if`-branch shims.
+- Single responsibility, early returns, max nesting depth 3.
+- Strict typing (zero `any`, schema-first boundaries).

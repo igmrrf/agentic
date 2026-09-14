@@ -1,0 +1,38 @@
+name: Python CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verify & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Toolchain & Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy pytest pytest-cov
+
+      - name: Ruff Format Check
+        run: ruff format --check .
+
+      - name: Ruff Linter Audit
+        run: ruff check .
+
+      - name: Mypy Strict Type Check
+        run: mypy src --config-file pyproject.toml
+
+      - name: Run Test Suite
+        run: pytest

@@ -1,0 +1,36 @@
+name: Swift CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verify & Test
+    runs-on: macos-14
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer || true
+
+      - name: Verify Swift Version
+        run: swift --version
+
+      - name: SwiftLint Check
+        run: |
+          if which swiftlint > /dev/null; then
+            swiftlint --strict
+          else
+            brew install swiftlint
+            swiftlint --strict
+          fi
+
+      - name: Build Package (Strict Concurrency & Warnings as Errors)
+        run: swift build -c release -Xswiftc -warnings-as-errors
+
+      - name: Run Test Suite
+        run: swift test --enable-code-coverage

@@ -1,0 +1,20 @@
+# EditorConfig Standard for Kotlin & ktlint
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+max_line_length = 100
+ktlint_standard_no-wildcard-imports = enabled
+ktlint_standard_argument-list-wrapping = enabled
+ktlint_standard_chain-wrapping = enabled
+ktlint_standard_comment-spacing = enabled
+ktlint_standard_indent = enabled
+ktlint_standard_parameter-list-wrapping = enabled
+ktlint_standard_spacing-between-declarations-with-annotations = enabled

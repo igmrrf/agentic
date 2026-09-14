@@ -25,6 +25,7 @@ LANGUAGE=""
 AGENT="all"
 INCLUDE_CI=true
 INCLUDE_AGENT_RULES=true
+INCLUDE_STARTER=false
 FORCE_OVERWRITE=false
 CREATE_BACKUP=false
 DRY_RUN=false
@@ -76,8 +77,8 @@ print_usage() {
 Usage: init.sh [OPTIONS]
 
 Options:
-  -l, --lang <language>       Target language: rust, go, ts (typescript), all
-                              (Auto-detected if run in an existing project)
+  -l, --lang <language>       Target language: rust, go, ts, python, lua, swift, kotlin, all
+                               (Auto-detected if run in an existing project)
   -a, --agent <agent>         Target AI agent: gemini, claude, cursor, all (default: all)
       --gemini                Shortcut for --agent gemini
       --claude                Shortcut for --agent claude
@@ -87,6 +88,7 @@ Options:
   -d, --dry-run               Preview changes without modifying or creating files
       --no-ci                 Skip copying GitHub Actions CI workflows
       --no-agent-rules        Skip setting up AI agent rules
+  -s, --with-starter          Include sample starter code and test files (default: false, standards & linters only)
   -f, --force                 Overwrite existing configuration files
   -h, --help                  Show this help message
 
@@ -94,12 +96,13 @@ Examples:
   # Apply standards to an existing project (auto-detects language)
   ./scripts/init.sh
 
-  # Target specific AI agent for rules
-  ./scripts/init.sh --gemini
-  ./scripts/init.sh -a claude
+  # Target specific language and AI agent
+  ./scripts/init.sh --lang=swift --gemini
+  ./scripts/init.sh --lang=kotlin -a claude
+  ./scripts/init.sh --lang=python --cursor
 
   # Remote execution via cURL
-  curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=typescript --target=.
+  curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=rust --target=.
 EOF
 }
 
@@ -158,6 +161,10 @@ while [[ $# -gt 0 ]]; do
             INCLUDE_AGENT_RULES=false
             shift
             ;;
+        -s|--with-starter|--starter)
+            INCLUDE_STARTER=true
+            shift
+            ;;
         -f|--force)
             FORCE_OVERWRITE=true
             shift
@@ -184,6 +191,14 @@ detect_language() {
         echo "go"
     elif [[ -f "$dir/package.json" || -f "$dir/tsconfig.json" || -f "$dir/biome.json" ]]; then
         echo "typescript"
+    elif [[ -f "$dir/pyproject.toml" || -f "$dir/requirements.txt" || -f "$dir/setup.py" ]]; then
+        echo "python"
+    elif [[ -f "$dir/.luarc.json" || -f "$dir/.stylua.toml" || -f "$dir/.luacheckrc" ]]; then
+        echo "lua"
+    elif [[ -f "$dir/Package.swift" ]] || ls "$dir"/*.xcodeproj >/dev/null 2>&1 || ls "$dir"/*.xcworkspace >/dev/null 2>&1; then
+        echo "swift"
+    elif [[ -f "$dir/build.gradle.kts" || -f "$dir/build.gradle" || -f "$dir/settings.gradle.kts" ]]; then
+        echo "kotlin"
     else
         echo ""
     fi
@@ -200,13 +215,21 @@ if [[ -z "$LANGUAGE" ]]; then
         echo "  1) Rust (Rust 2024 Edition, MSRV 1.85.0+)"
         echo "  2) Go (Go 1.26+)"
         echo "  3) TypeScript (TypeScript 7.0+, Biome)"
-        echo "  4) All Languages (Multi-language repository)"
-        read -rp "Enter choice [1-4]: " CHOICE
+        echo "  4) Python (Python 3.12+, Ruff, Mypy)"
+        echo "  5) Lua (LuaJIT / Lua 5.4, StyLua, EmmyLua)"
+        echo "  6) Swift (Swift 6.0+, SwiftLint, SwiftFormat)"
+        echo "  7) Kotlin (Kotlin 2.0+, K2 Compiler, Detekt)"
+        echo "  8) All Languages (Multi-language repository)"
+        read -rp "Enter choice [1-8]: " CHOICE
         case "$CHOICE" in
             1) LANGUAGE="rust" ;;
             2) LANGUAGE="go" ;;
             3) LANGUAGE="ts" ;;
-            4) LANGUAGE="all" ;;
+            4) LANGUAGE="python" ;;
+            5) LANGUAGE="lua" ;;
+            6) LANGUAGE="swift" ;;
+            7) LANGUAGE="kotlin" ;;
+            8) LANGUAGE="all" ;;
             *)
                 log_error "Invalid selection. Exiting."
                 exit 1
@@ -221,9 +244,13 @@ case "$LANGUAGE" in
     rust|rs) LANGUAGE="rust" ;;
     go|golang) LANGUAGE="go" ;;
     ts|typescript|js|javascript) LANGUAGE="typescript" ;;
+    py|python) LANGUAGE="python" ;;
+    lua) LANGUAGE="lua" ;;
+    swift) LANGUAGE="swift" ;;
+    kt|kotlin) LANGUAGE="kotlin" ;;
     all|multi) LANGUAGE="all" ;;
     *)
-        log_error "Unsupported language: $LANGUAGE. Choose rust, go, ts, or all."
+        log_error "Unsupported language: $LANGUAGE. Choose rust, go, ts, python, lua, swift, kotlin, or all."
         exit 1
         ;;
 esac
@@ -235,6 +262,10 @@ copy_local_file() {
 
     if [[ ! -f "$src" ]]; then
         log_warn "Source file not found: $src (skipping)"
+        return
+    fi
+
+    if [[ -f "$dest" && "$src" -ef "$dest" ]]; then
         return
     fi
 
@@ -312,6 +343,7 @@ log_info "Target Language : $LANGUAGE"
 log_info "Target Agent    : $AGENT"
 log_info "Include CI      : $INCLUDE_CI"
 log_info "Agent Rules     : $INCLUDE_AGENT_RULES"
+log_info "Include Starter : $INCLUDE_STARTER"
 log_info "Backup Mode     : $CREATE_BACKUP"
 log_info "Dry Run Mode    : $DRY_RUN"
 echo ""
@@ -331,10 +363,13 @@ if [[ "$LANGUAGE" == "rust" || "$LANGUAGE" == "all" ]]; then
     install_file "rust/rustfmt.toml" "$TARGET_DIR/rustfmt.toml"
     install_file "rust/clippy.toml" "$TARGET_DIR/clippy.toml"
     
-    if [[ ! -f "$TARGET_DIR/Cargo.toml" ]]; then
-        install_file "rust/Cargo.toml" "$TARGET_DIR/Cargo.toml"
-    else
-        log_info "Existing Cargo.toml detected; leaving package configuration intact."
+    if [[ "$INCLUDE_STARTER" == "true" ]]; then
+        if [[ ! -f "$TARGET_DIR/Cargo.toml" ]]; then
+            install_file "rust/Cargo.toml" "$TARGET_DIR/Cargo.toml"
+        fi
+        if [[ ! -f "$TARGET_DIR/src/lib.rs" && ! -f "$TARGET_DIR/src/main.rs" ]]; then
+            install_file "rust/src/lib.rs" "$TARGET_DIR/src/lib.rs"
+        fi
     fi
 
     if [[ "$INCLUDE_CI" == "true" ]]; then
@@ -347,6 +382,16 @@ if [[ "$LANGUAGE" == "go" || "$LANGUAGE" == "all" ]]; then
     install_file "go/CODING.md" "$TARGET_DIR/docs/CODING_GO.md"
     install_file "go/.golangci.yml" "$TARGET_DIR/.golangci.yml"
 
+    if [[ "$INCLUDE_STARTER" == "true" ]]; then
+        if [[ ! -f "$TARGET_DIR/go.mod" ]]; then
+            install_file "go/go.mod" "$TARGET_DIR/go.mod"
+        fi
+        if [[ ! -f "$TARGET_DIR/internal/domain/account.go" ]]; then
+            install_file "go/internal/domain/account.go" "$TARGET_DIR/internal/domain/account.go"
+            install_file "go/internal/domain/account_test.go" "$TARGET_DIR/internal/domain/account_test.go"
+        fi
+    fi
+
     if [[ "$INCLUDE_CI" == "true" ]]; then
         install_file "templates/ci/go-ci.yml" "$TARGET_DIR/.github/workflows/go-ci.yml"
     fi
@@ -358,8 +403,98 @@ if [[ "$LANGUAGE" == "typescript" || "$LANGUAGE" == "all" ]]; then
     install_file "typescript/biome.json" "$TARGET_DIR/biome.json"
     install_file "typescript/tsconfig.json" "$TARGET_DIR/tsconfig.json"
 
+    if [[ "$INCLUDE_STARTER" == "true" ]]; then
+        if [[ ! -f "$TARGET_DIR/src/index.ts" && ! -f "$TARGET_DIR/src/main.ts" && ! -f "$TARGET_DIR/src/index.tsx" ]]; then
+            install_file "typescript/src/index.ts" "$TARGET_DIR/src/index.ts"
+        fi
+    fi
+
     if [[ "$INCLUDE_CI" == "true" ]]; then
         install_file "templates/ci/typescript-ci.yml" "$TARGET_DIR/.github/workflows/typescript-ci.yml"
+    fi
+fi
+
+if [[ "$LANGUAGE" == "python" || "$LANGUAGE" == "all" ]]; then
+    log_info "Applying Python 3.12+ Standards..."
+    install_file "python/CODING.md" "$TARGET_DIR/docs/CODING_PYTHON.md"
+    if [[ ! -f "$TARGET_DIR/pyproject.toml" ]]; then
+        install_file "python/pyproject.toml" "$TARGET_DIR/pyproject.toml"
+    else
+        log_info "Existing pyproject.toml detected; leaving configuration intact."
+    fi
+
+    if [[ "$INCLUDE_STARTER" == "true" ]]; then
+        if [[ ! -d "$TARGET_DIR/src" ]]; then
+            install_file "python/src/service/__init__.py" "$TARGET_DIR/src/service/__init__.py"
+            install_file "python/src/service/domain/__init__.py" "$TARGET_DIR/src/service/domain/__init__.py"
+            install_file "python/src/service/domain/account.py" "$TARGET_DIR/src/service/domain/account.py"
+            install_file "python/tests/test_account.py" "$TARGET_DIR/tests/test_account.py"
+        fi
+    fi
+
+    if [[ "$INCLUDE_CI" == "true" ]]; then
+        install_file "templates/ci/python-ci.yml" "$TARGET_DIR/.github/workflows/python-ci.yml"
+    fi
+fi
+
+if [[ "$LANGUAGE" == "lua" || "$LANGUAGE" == "all" ]]; then
+    log_info "Applying Lua Standards..."
+    install_file "lua/CODING.md" "$TARGET_DIR/docs/CODING_LUA.md"
+    install_file "lua/.stylua.toml" "$TARGET_DIR/.stylua.toml"
+    install_file "lua/.luarc.json" "$TARGET_DIR/.luarc.json"
+    install_file "lua/.luacheckrc" "$TARGET_DIR/.luacheckrc"
+
+    if [[ "$INCLUDE_STARTER" == "true" ]]; then
+        if [[ ! -d "$TARGET_DIR/lua" ]]; then
+            install_file "lua/lua/service/account.lua" "$TARGET_DIR/lua/service/account.lua"
+            install_file "lua/spec/account_spec.lua" "$TARGET_DIR/spec/account_spec.lua"
+        fi
+    fi
+
+    if [[ "$INCLUDE_CI" == "true" ]]; then
+        install_file "templates/ci/lua-ci.yml" "$TARGET_DIR/.github/workflows/lua-ci.yml"
+    fi
+fi
+
+if [[ "$LANGUAGE" == "swift" || "$LANGUAGE" == "all" ]]; then
+    log_info "Applying Swift 6.0+ Standards..."
+    install_file "swift/CODING.md" "$TARGET_DIR/docs/CODING_SWIFT.md"
+    install_file "swift/.swiftlint.yml" "$TARGET_DIR/.swiftlint.yml"
+    install_file "swift/.swiftformat" "$TARGET_DIR/.swiftformat"
+
+    if [[ "$INCLUDE_STARTER" == "true" ]]; then
+        if [[ ! -f "$TARGET_DIR/Package.swift" ]] && ! ls "$TARGET_DIR"/*.xcodeproj >/dev/null 2>&1; then
+            install_file "swift/Package.swift" "$TARGET_DIR/Package.swift"
+            if [[ ! -d "$TARGET_DIR/Sources" ]]; then
+                install_file "swift/Sources/SwiftService/Account.swift" "$TARGET_DIR/Sources/SwiftService/Account.swift"
+                install_file "swift/Tests/SwiftServiceTests/AccountTests.swift" "$TARGET_DIR/Tests/SwiftServiceTests/AccountTests.swift"
+            fi
+        fi
+    fi
+
+    if [[ "$INCLUDE_CI" == "true" ]]; then
+        install_file "templates/ci/swift-ci.yml" "$TARGET_DIR/.github/workflows/swift-ci.yml"
+    fi
+fi
+
+if [[ "$LANGUAGE" == "kotlin" || "$LANGUAGE" == "all" ]]; then
+    log_info "Applying Kotlin 2.0+ Standards..."
+    install_file "kotlin/CODING.md" "$TARGET_DIR/docs/CODING_KOTLIN.md"
+    install_file "kotlin/detekt.yml" "$TARGET_DIR/detekt.yml"
+    install_file "kotlin/.editorconfig" "$TARGET_DIR/.editorconfig"
+
+    if [[ "$INCLUDE_STARTER" == "true" ]]; then
+        if [[ ! -f "$TARGET_DIR/build.gradle.kts" && ! -f "$TARGET_DIR/build.gradle" ]]; then
+            install_file "kotlin/build.gradle.kts" "$TARGET_DIR/build.gradle.kts"
+            if [[ ! -d "$TARGET_DIR/src" ]]; then
+                install_file "kotlin/src/main/kotlin/com/agentic/service/domain/Account.kt" "$TARGET_DIR/src/main/kotlin/com/agentic/service/domain/Account.kt"
+                install_file "kotlin/src/test/kotlin/com/agentic/service/domain/AccountTest.kt" "$TARGET_DIR/src/test/kotlin/com/agentic/service/domain/AccountTest.kt"
+            fi
+        fi
+    fi
+
+    if [[ "$INCLUDE_CI" == "true" ]]; then
+        install_file "templates/ci/kotlin-ci.yml" "$TARGET_DIR/.github/workflows/kotlin-ci.yml"
     fi
 fi
 
@@ -485,15 +620,132 @@ Always adhere to `CODING.md` and `docs/CODING_GO.md`:
 - Type file <= 200 lines, Function <= 50 lines, File <= 400 lines.
 EOF
 
+    elif [[ "$LANGUAGE" == "python" ]]; then
+        read -r -d '' RULES_MD << 'EOF' || true
+# Repository Coding Standards (Python 3.12+)
+
+Always adhere to `CODING.md` and `docs/CODING_PYTHON.md`:
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Mandatory Static Typing:** Modern Python 3.12+ type hints (`str | None`, `type Alias = ...`) on all signatures. Zero untyped escapes.
+- **Fail Fast & Explicitly:** Never catch broad `Exception` or swallow errors. Use granular custom domain exceptions.
+- **Toolchain Authority:** Ruff is the sole authority for formatting and linting (`ruff format`, `ruff check`). Mypy strict mode enforced.
+- **Size Caps:** File <= 400 lines, Function <= 50 statements, Max 3 positional arguments.
+- **Architecture:** Pure core domain logic separated from impure I/O adapters.
+EOF
+
+        read -r -d '' CURSOR_MDC << 'EOF' || true
+---
+description: Python 3.12+ engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_PYTHON.md`:
+- No explanatory comments.
+- Mandatory type hints (3.12+ pipe unions); zero `Any` escapes in production.
+- Granular exception handling; no bare `except Exception:`.
+- Ruff format and lint ratchet; Mypy strict mode.
+- Function <= 50 statements, Max 3 positional arguments.
+EOF
+
+    elif [[ "$LANGUAGE" == "lua" ]]; then
+        read -r -d '' RULES_MD << 'EOF' || true
+# Repository Coding Standards (Lua)
+
+Always adhere to `CODING.md` and `docs/CODING_LUA.md`:
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Local by Default:** Every variable, function, and import must be explicitly `local`. Zero accidental globals.
+- **Error Handling:** Return `nil, err` on recoverable failures; `error()` strictly for unrecoverable state corruption.
+- **EmmyLua Type Annotations:** Annotate public APIs and types (`---@class`, `---@param`, `---@return`).
+- **Formatting & Linting:** StyLua is the sole formatting authority; Luacheck zero-warning gate.
+- **Control Flow:** 1-based indexing awareness, `ipairs` for arrays, `pairs` for tables, max nesting depth 3.
+EOF
+
+        read -r -d '' CURSOR_MDC << 'EOF' || true
+---
+description: Lua engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_LUA.md`:
+- No explanatory comments.
+- Strict `local` variables; zero global namespace pollution.
+- Explicit `nil, err` error returns.
+- EmmyLua typing (`---@param`, `---@return`) and StyLua formatting.
+- Max nesting depth 3; `ipairs` for lists, `pairs` for tables.
+EOF
+
+    elif [[ "$LANGUAGE" == "swift" ]]; then
+        read -r -d '' RULES_MD << 'EOF' || true
+# Repository Coding Standards (Swift 6.0+)
+
+Always adhere to `CODING.md` and `docs/CODING_SWIFT.md`:
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Swift 6 Strict Concurrency:** Compile-time data-race safety. All shared mutable state must be actor-isolated or `@Sendable`.
+- **Zero Force-Unwraps:** Never use `!` on optionals or `try!`. Unwind safely via `guard let` or typed throws.
+- **Value Semantics First:** Prefer `struct` and `enum` with immutable `let` properties. Restrict `class` to identity requirements.
+- **Modern Observation:** Use `@Observable` macro; do not use legacy `ObservableObject` in new code.
+- **Size Caps:** File <= 400 lines, Type <= 150 lines, Function <= 50 lines, Max 3 parameters.
+- **Refactoring:** Zero behavior/layout changes without characterization tests.
+EOF
+
+        read -r -d '' CURSOR_MDC << 'EOF' || true
+---
+description: Swift 6.0+ engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_SWIFT.md`:
+- No explanatory comments.
+- Swift 6 strict concurrency: complete data-race safety, actor isolation, Sendable.
+- Zero `!` force unwraps or `try!`; guard let early returns.
+- Value semantics (struct/enum) over classes.
+- File <= 400 lines, Type <= 150 lines, Function <= 50 lines, Max 3 parameters.
+EOF
+
+    elif [[ "$LANGUAGE" == "kotlin" ]]; then
+        read -r -d '' RULES_MD << 'EOF' || true
+# Repository Coding Standards (Kotlin 2.0+)
+
+Always adhere to `CODING.md` and `docs/CODING_KOTLIN.md`:
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Target Kotlin 2.0+ (K2 Compiler):** Strict compiler checks and fast type inference.
+- **Zero Force-Unwraps:** Absolute ban on `!!`. Use safe calls `?.`, Elvis operator `?:`, or smart casting.
+- **Immutability by Default:** `val` on all properties; read-only collections (`List`, `Map`).
+- **Sealed Interfaces:** Model domain states and results with `sealed interface` for exhaustive `when` matching.
+- **Structured Concurrency:** Coroutines must run within a managed `CoroutineScope`. Zero `GlobalScope`.
+- **Size Caps:** File <= 400 lines, Class <= 150 lines, Function <= 50 lines, Max 3 parameters.
+EOF
+
+        read -r -d '' CURSOR_MDC << 'EOF' || true
+---
+description: Kotlin 2.0+ engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_KOTLIN.md`:
+- No explanatory comments.
+- Target Kotlin 2.0+ K2 compiler with warnings as errors.
+- Zero `!!` force unwraps; Elvis operator and smart casting.
+- `val` and read-only collections by default.
+- Sealed interfaces for domain types and exhaustive when expressions.
+- Structured concurrency (managed CoroutineScope, no GlobalScope).
+- File <= 400 lines, Class <= 150 lines, Function <= 50 lines.
+EOF
+
     else
         read -r -d '' RULES_MD << 'EOF' || true
-# Repository Coding Standards
+# Repository Coding Standards (Multi-Language)
 
 Always follow the root `CODING.md` and the language-specific standards under `docs/`:
 - **Universal Standards:** `CODING.md`
 - **Zero Explanatory Comments:** Write self-documenting code.
 - **Fail Fast & Explicitly:** Never swallow errors or use empty catches.
-- **Strict Size Caps:** File <= 400 lines, Component/Struct <= 150 lines, Function <= 60 lines.
+- **Strict Size Caps:** File <= 400 lines, Component/Struct <= 150 lines, Function <= 50-60 lines.
+- **Pure Core, Impure Edges:** Decouple business entities from delivery and persistence layers.
 - **Refactoring:** Zero behavior/contract changes without characterization tests.
 EOF
 

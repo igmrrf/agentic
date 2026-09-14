@@ -1,0 +1,107 @@
+[project]
+name = "python-service"
+version = "0.1.0"
+description = "Agentic Engineering Standards reference Python service"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ==============================================================================
+# Ruff Linter & Formatter Configuration
+# Single authority for formatting, linting, imports, and complexity gates
+# ==============================================================================
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort (import organization)
+    "B",      # flake8-bugbear (common bug prevention)
+    "C901",   # McCabe complexity ceiling
+    "N",      # pep8-naming
+    "UP",     # pyupgrade (modern Python 3.12+ syntax)
+    "ANN",    # flake8-annotations (enforce explicit type hints)
+    "S",      # flake8-bandit (security audit)
+    "A",      # flake8-builtins (shadowing prevention)
+    "C4",     # flake8-comprehensions
+    "DTZ",    # flake8-datetimez (require timezone-aware datetimes)
+    "T10",    # flake8-debugger
+    "ISC",    # flake8-implicit-str-concat
+    "ICN",    # flake8-import-conventions
+    "G",      # flake8-logging-format
+    "PIE",    # flake8-pie
+    "T20",    # flake8-print (disallow print in production; use logging)
+    "PT",     # flake8-pytest-style
+    "RET",    # flake8-return (guard clauses and return discipline)
+    "SIM",    # flake8-simplify
+    "ARG",    # flake8-unused-arguments
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate (ban commented-out dead code)
+    "PL",     # Pylint
+    "TRY",    # tryceratops (clean exception handling)
+    "RUF",    # Ruff-specific rules
+]
+ignore = [
+    "ISC001", # Conflict with ruff formatter (recommended to disable by Ruff)
+    "TRY003", # Avoid specifying long messages outside exception class
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = [
+    "S101",    # Allow assert statements in pytest test suites
+    "PLR2004", # Allow magic numbers in test assertions
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 3         # Enforce max 3 positional parameters (CODING.md Section 4)
+max-statements = 50   # Function soft cap 50 statements (CODING.md Section 5)
+max-branches = 10
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+# ==============================================================================
+# Mypy Strict Type Checking Configuration
+# Zero untyped escapes in production code paths
+# ==============================================================================
+[tool.mypy]
+python_version = "3.12"
+strict = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+strict_equality = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+# ==============================================================================
+# Pytest Configuration
+# ==============================================================================
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers"
+pythonpath = ["src"]

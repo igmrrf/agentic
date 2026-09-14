@@ -1,0 +1,45 @@
+name: Lua CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verify & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: StyLua Formatter Check
+        uses: JohnnyMorganz/stylua-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --check .
+
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "luajit-2.1.0-beta3"
+
+      - name: Setup Luarocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install Luacheck & Busted
+        run: |
+          luarocks install luacheck
+          luarocks install busted
+
+      - name: Luacheck Lint Audit
+        run: luacheck .
+
+      - name: Run Test Suite
+        run: |
+          if [ -d "spec" ]; then
+            busted .
+          else
+            echo "No spec directory found; skipping tests."
+          fi

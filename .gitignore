@@ -1,0 +1,47 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Rust artifacts
+target/
+rust/target/
+**/*.rs.bk
+
+# Node & TypeScript artifacts
+node_modules/
+dist/
+build/
+.next/
+*.tsbuildinfo
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Swift artifacts
+.build/
+Packages/
+xcuserdata/
+DerivedData/
+*.xcodeproj/project.xcworkspace/
+
+# Kotlin / Gradle artifacts
+.gradle/
+**/build/
+!build.gradle.kts
+*.class
+.kotlin/
+
+# Testing & coverage
+coverage/
+coverage.out
+
+# Backups
+*.bak

@@ -1,4 +1,5 @@
 # Rustfmt Configuration Standard (Rust 2024 Edition)
+# Stable options adhering to the Rust 2024 Style Edition
 edition = "2024"
 style_edition = "2024"
 max_width = 100
@@ -9,8 +10,6 @@ use_try_shorthand = true
 reorder_imports = true
 reorder_modules = true
 merge_derives = true
-trailing_comma = "Vertical"
-wrap_comments = true
-comment_width = 100
-normalize_doc_attributes = true
-format_strings = true
+remove_nested_parens = true
+match_block_trailing_comma = true
+fn_params_layout = "Tall"

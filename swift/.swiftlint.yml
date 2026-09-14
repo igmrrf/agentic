@@ -1,0 +1,64 @@
+# SwiftLint Configuration Standard (Swift 6.0+)
+# Deeply aligned with swift/CODING.md rules, size caps, and safety invariants
+
+# Strict execution: Treat all warnings as errors in CI
+warning_threshold: 0
+
+opt_in_rules:
+  - force_unwrapping                      # Zero ! in production code paths
+  - force_try                             # Zero try! in production code paths
+  - fatal_error_message                   # Require descriptive message if fatalError is used
+  - empty_count                           # Prefer isEmpty over count == 0
+  - contains_over_first_not_nil           # Prefer contains over first != nil
+  - first_where                           # Prefer first(where:) over filter().first
+  - overridden_super_call                 # Ensure super is invoked on lifecycle overrides
+  - modifier_order                        # Consistent access control order
+  - multiline_parameters                  # Format multiline signatures cleanly
+  - prefer_self_in_static_references     # Self-reference discipline
+  - redundant_nil_coalescing              # Flag unnecessary ?? nil
+  - unneeded_parentheses_in_closure_argument
+  - vertical_whitespace_closing_braces
+
+disabled_rules:
+  - todo                                  # Managed via task tracking
+
+# Metrics & Caps aligned with swift/CODING.md Section 5
+line_length:
+  warning: 100
+  error: 120
+  ignores_comments: true
+  ignores_urls: true
+
+function_body_length:
+  warning: 50                             # Max 50 lines per method
+  error: 60
+
+type_body_length:
+  warning: 150                            # Max 150 lines per struct / class / actor body
+  error: 200
+
+file_length:
+  warning: 400                            # Max 400 lines per source file
+  error: 500
+
+cyclomatic_complexity:
+  warning: 10                             # Cognitive complexity ceiling
+  error: 15
+
+function_parameter_count:
+  warning: 3                              # Max 3 parameters (warns on 4+)
+  error: 4
+
+nesting:
+  type_level:
+    warning: 3
+  statement_level:
+    warning: 3                            # Max 3 indentation levels
+
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - .build
+  - DerivedData

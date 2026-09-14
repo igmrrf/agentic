@@ -36,7 +36,10 @@ jobs:
       - name: Test Suite
         run: cargo test --all-targets --all-features
 
-      - name: Security Audit
+      - name: Security Vulnerability Audit
         uses: rustsec/audit-check@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dependency License & Ban Policy (cargo-deny)
+        uses: EmbarkStudios/cargo-deny-action@v2

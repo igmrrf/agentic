@@ -1,17 +1,43 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.12/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
-  "organizeImports": {
-    "enabled": true
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!node_modules",
+      "!dist",
+      "!build",
+      "!.next",
+      "!coverage",
+      "!**/*.bak"
+    ]
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
+      "complexity": {
+        "noForEach": "error",
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 15
+          }
+        }
+      },
       "suspicious": {
         "noExplicitAny": "error",
         "noDoubleEquals": "error"
@@ -19,11 +45,14 @@
       "style": {
         "noNonNullAssertion": "error",
         "useConst": "error",
-        "useImportType": "error"
+        "useImportType": "error",
+        "noParameterProperties": "error"
       },
       "correctness": {
         "noUnusedVariables": "error",
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "useHookAtTopLevel": "error",
+        "useExhaustiveDependencies": "error"
       }
     }
   },
@@ -43,3 +72,4 @@
     }
   }
 }
+

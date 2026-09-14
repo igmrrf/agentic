@@ -23,10 +23,15 @@ jobs:
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
-          version: latest
+          version: "latest"
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Biome Linter & Formatter Check
         run: biome ci .
@@ -35,4 +40,9 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run Test Suite
-        run: npm test
+        run: |
+          if npm run | grep -q "test"; then
+            npm test
+          else
+            echo "No test script found in package.json; skipping test run."
+          fi

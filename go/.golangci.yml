@@ -1,4 +1,6 @@
-# GolangCI-Lint Configuration Standard
+# GolangCI-Lint Configuration Standard (Go 1.26)
+# Aligns with go/CODING.md rules, size caps, error wrapping, and structured logging
+
 run:
   timeout: 5m
   issues-exit-code: 1
@@ -7,29 +9,81 @@ run:
 linters:
   disable-all: true
   enable:
+    # Standard quality & bug detection
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - unused
     - bodyclose
-    - exhaustive
-    - gocritic
-    - gosec
     - noctx
-    - prealloc
-    - revive
     - rowserrcheck
     - unconvert
     - unparam
     - whitespace
+    - prealloc
+    - nilerr
+
+    # Security & correctness
+    - gosec
+
+    # Error handling & wrapping (%w, errors.Is, errors.As)
+    - errorlint
+
+    # Structured logging standards (log/slog)
+    - sloglint
+
+    # Concurrency & context rules
+    - containedctx
+    - tparallel
+
+    # Code style & naming
+    - revive
+    - gocritic
+    - exhaustive
+
+    # Size caps & complexity (CODING.md Section 5)
+    - funlen
+    - nestif
+
+    # Formatting & imports
+    - gofmt
+    - gci
 
 linters-settings:
   govet:
     enable-all: true
     disable:
       - fieldalignment
+
+  errorlint:
+    errorf: true
+    asserts: true
+    comparison: true
+
+  sloglint:
+    no-mixed-args: true
+    kv-only: false
+    attr-only: false
+    no-global: "all"
+    context: "all"
+
+  funlen:
+    lines: 50
+    statements: 40
+    ignore-comments: true
+
+  nestif:
+    min-complexity: 4
+
+  gci:
+    sections:
+      - standard
+      - default
+
+  gofmt:
+    simplify: true
+
   revive:
     rules:
       - name: exported
@@ -52,6 +106,7 @@ linters-settings:
       - name: indent-error-flow
       - name: superfluous-else
       - name: unreachable-code
+
   gocritic:
     enabled-tags:
       - diagnostic
@@ -59,6 +114,7 @@ linters-settings:
       - performance
     disabled-checks:
       - whyNoLint
+
   exhaustive:
     default-signifies-exhaustive: false
 

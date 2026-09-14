@@ -1,23 +1,30 @@
-[workspace]
-resolver = "3"
-members = []
-
-[workspace.package]
+[package]
+name = "rust-service"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85.0"
 authors = ["Agentic Engineering Team"]
 license = "MIT"
 
-[workspace.lints.rust]
-unsafe_code = "forbid"
+[dependencies]
+tokio = { version = "1.43", features = ["full"] }
+thiserror = "2.0"
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[lints.rust]
+# Deny by default; low-level crates/modules requiring unsafe must justify with // SAFETY: proof
+unsafe_code = "deny"
 missing_docs = "warn"
-rust_2018_idioms = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
 unused_must_use = "deny"
 unsafe_op_in_unsafe_fn = "warn"
 static_mut_refs = "deny"
 
-[workspace.lints.clippy]
+[lints.clippy]
 all = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
 nursery = { level = "warn", priority = -1 }

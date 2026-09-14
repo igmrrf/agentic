@@ -1,17 +1,43 @@
-# Clippy Configuration Standard
-too-many-arguments-threshold = 4
+# Clippy Configuration Standard (Rust 2024 Edition)
+# Deeply aligned with rust/CODING.md rules, size caps, and safety invariants
+
+# Parameter count: Maximum 3 positional parameters (warns on 4+)
+too-many-arguments-threshold = 3
+
+# Function size: Soft cap 60 lines
 too-many-lines-threshold = 60
+
+# Nesting depth: Maximum 3 levels of indentation
+excessive-nesting-threshold = 3
+
+# Complexity ceiling
 cognitive-complexity-threshold = 15
-cyclomatic-complexity-threshold = 10
-enum-size-threshold = 200
+
+# Control flow: Banish boolean behavior switches (CODING.md Section 4)
+max-fn-params-bools = 0
+
+# Memory & passing optimization
+enum-variant-size-threshold = 200
 pass-by-value-size-limit = 256
 trivial-copy-size-limit = 32
-disallowed-types = [
-    # Banning unconstrained bare channels or un-typed primitives where applicable
-]
+
+# Production-enforced method prohibitions
 disallowed-methods = [
-    # Examples of discouraged methods in production services
+    # Async safety: Never block async runtime worker threads with thread sleep
+    { path = "std::thread::sleep", reason = "Use tokio::time::sleep in async code to avoid blocking Tokio worker threads" },
+    # Concurrency hygiene: Unbounded channels are strictly forbidden to prevent memory exhaustion
+    { path = "tokio::sync::mpsc::unbounded_channel", reason = "Unbounded channels violate memory invariants; use bounded tokio::sync::mpsc::channel(capacity)" },
+    { path = "std::sync::mpsc::channel", reason = "std::sync::mpsc::channel is unbounded; use bounded crossbeam or tokio channel" },
+    # Process safety: Mutating environment in multi-threaded Rust is unsound (CVE hazard)
+    { path = "std::env::set_var", reason = "std::env::set_var is thread-unsafe; configure environment at process bootstrap" },
 ]
+
+# Production-enforced type prohibitions
+disallowed-types = [
+    { path = "std::sync::mpsc::Sender", reason = "Unbounded channel sender; use bounded tokio::sync::mpsc::Sender or crossbeam" },
+]
+
+# Accepted documentation identifiers
 doc-valid-idents = [
     "PostgreSQL",
     "Redis",

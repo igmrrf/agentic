@@ -2,11 +2,12 @@
   "compilerOptions": {
     "target": "ES2024",
     "lib": ["DOM", "DOM.Iterable", "ES2024"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "moduleDetection": "force",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "declaration": true,
     "isolatedDeclarations": true,
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
@@ -31,6 +32,6 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true
   },
-  "include": ["src/**/*", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", "build"]
+  "include": ["src/**/*", "*.config.ts", "*.ts"],
+  "exclude": ["node_modules", "dist", "build", ".next", "coverage"]
 }

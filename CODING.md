@@ -250,3 +250,5 @@ Before declaring any task complete or submitting a pull request, verify:
   - [**TypeScript Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/CODING.md)
   - [**Python Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/python/CODING.md)
   - [**Lua Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/CODING.md)
+  - [**Swift Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/CODING.md)
+  - [**Kotlin Standards**](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/CODING.md)
