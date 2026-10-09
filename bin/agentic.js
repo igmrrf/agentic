@@ -22,7 +22,7 @@ Run "agentic <command> --help" for command options.
 Examples:
   npx -y github:igmrrf/agentic init --lang=go --claude
   npx -y github:igmrrf/agentic skills --global
-  npx -y github:igmrrf/agentic#v1.1.0 skills --global`;
+  npx -y github:igmrrf/agentic#v1.2.0 skills --global`;
 
 function run(script, args) {
   const result = spawnSync("bash", [script, ...args], { stdio: "inherit" });

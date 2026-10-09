@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-09
+
 ### Changed
 - **`scripts/init.sh`**: split from one 868-line script into a 120-line entry point and focused files under `scripts/lib/init/` (`cli`, `language`, `files`, `toolchains`, `rules`, `run`). The per-language rules headers moved from heredocs into `templates/rules/<language>.md|.mdc`. All 70 characterization scenarios are unchanged.
 - **`scripts/init.sh`**: remote runs now execute the downloaded ref's own `init.sh`, so `--ref` always runs that version's code (including `v1.0.0` and `v1.1.0`).
 - **`scripts/init.sh`, `scripts/install-skills.sh`**: temporary downloads honour `TMPDIR` on macOS too.
+- **`/agentic:setup` skill**: reflects that existing files, including agent rules files, are kept unless the user agrees to `--force --backup`. Plugin version bumped to 1.2.0.
 
 ### Fixed
 - **`scripts/init.sh`**: existing agent rules files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, `.github/copilot-instructions.md`) were silently overwritten even without `--force`. They are now kept like every other existing file; pass `--force` (and `--backup` for `.bak` copies) to regenerate them, for example after updating the standards.
@@ -51,6 +54,7 @@ All notable changes to this project will be documented in this file.
 - **New Agents**: Out-of-the-box support for Cline (`.clinerules`), Windsurf (`.windsurfrules`), and GitHub Copilot (`.github/copilot-instructions.md`). These files automatically embed universal and language-specific coding standards just like Claude and Gemini files.
 - **Swift & Kotlin Standards**: Added full standards, toolchain configurations, starter templates, and CI workflows for Swift 6.0+ and Kotlin 2.0+ (K2 compiler).
 
-[Unreleased]: https://github.com/igmrrf/agentic/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/igmrrf/agentic/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/igmrrf/agentic/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/igmrrf/agentic/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/igmrrf/agentic/releases/tag/v1.0.0

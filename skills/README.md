@@ -60,7 +60,7 @@ The same installer runs through `npx` (Node 18+) or `curl` (bash only); options 
 
 ```bash
 npx -y github:igmrrf/agentic skills --global
-npx -y github:igmrrf/agentic#v1.1.0 skills --global --skill codinary,tdd
+npx -y github:igmrrf/agentic#v1.2.0 skills --global --skill codinary,tdd
 ```
 
 ```bash
@@ -74,7 +74,7 @@ curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scri
 curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --target /path/to/my-project
 
 # Pin to a tag, branch, or commit
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.1.0
+curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.2.0
 ```
 
 | Option | Effect |
@@ -148,6 +148,6 @@ Agent Platform | Where Skills Are Read From | How to Install
 ## Maintaining the Skills
 
 - Add a skill as `skills/<name>/SKILL.md` and list it under `skills` in [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json). CI fails if the two disagree.
-- Bump `version` in `marketplace.json` when you release changes so plugin users get the update, and tag the release (`git tag v1.1.0`) so `--ref` users can pin it.
+- Bump `version` in `marketplace.json` when you release changes so plugin users get the update, and tag the release (`git tag vX.Y.Z`) so `--ref` users can pin it.
 - Bump `version` in `package.json` alongside `marketplace.json`.
 - Run `scripts/test-install-skills.sh` and `scripts/test-init.sh` (set `TEST_BASH=/bin/bash` on macOS to test bash 3.2) and `claude plugin validate --strict .` before pushing.

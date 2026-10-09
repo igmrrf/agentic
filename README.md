@@ -16,7 +16,7 @@ Pick whichever fits your tools. All three apply the same standards, linter confi
 | **Node 18+** | `npx -y github:igmrrf/agentic init --lang=go --claude` |
 | **Only bash and curl** | `curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/main/scripts/init.sh \| bash -s -- --lang=go --claude` |
 
-Install the agent skills the same way: `npx -y github:igmrrf/agentic skills --global`. Pin a release with `npx -y github:igmrrf/agentic#v1.1.0 …` or `--ref v1.1.0` on the curl form.
+Install the agent skills the same way: `npx -y github:igmrrf/agentic skills --global`. Pin a release with `npx -y github:igmrrf/agentic#v1.2.0 …` or `--ref v1.2.0` on the curl form.
 
 ### From a Local Clone
 
@@ -51,6 +51,8 @@ Use the built-in initializer script [`scripts/init.sh`](scripts/init.sh) to boot
 # Safe adoption on an existing project (preview with dry-run and backup protection):
 # NOTE: By default, init.sh copies ONLY standards, linter/formatter configs, CI workflows,
 # and AI agent rules. It NEVER injects dummy code, sample entities, or sample tests.
+# Files that already exist, including CLAUDE.md and other agent rules files, are kept
+# unless --force is passed; add --backup to save .bak copies of anything replaced.
 ./scripts/init.sh --target=/path/to/existing-repo --dry-run
 ./scripts/init.sh --target=/path/to/existing-repo --backup --force
 
@@ -67,7 +69,7 @@ Every `./scripts/init.sh` example above works without a clone: replace `./script
 
 ```bash
 npx -y github:igmrrf/agentic init --lang=swift --target=.
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=swift --target=. --ref v1.1.0
+curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=swift --target=. --ref v1.2.0
 ```
 
 When piped, pass `--lang`: there is no keyboard to answer the language prompt unless a terminal is attached.
