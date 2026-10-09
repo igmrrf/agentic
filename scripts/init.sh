@@ -6,7 +6,7 @@
 #
 # Supports both:
 # 1. Local execution:  ./scripts/init.sh [OPTIONS]
-# 2. Remote cURL pipe: curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- [OPTIONS]
+# 2. Remote cURL pipe: curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- [OPTIONS]
 # ==============================================================================
 
 set -euo pipefail
@@ -33,7 +33,7 @@ DRY_RUN=false
 
 # Remote source repository configuration
 AGENTIC_BRANCH="${AGENTIC_BRANCH:-main}"
-REPO_RAW_BASE="${AGENTIC_REPO_RAW_BASE:-https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/${AGENTIC_BRANCH}}"
+REPO_RAW_BASE="${AGENTIC_REPO_RAW_BASE:-https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/${AGENTIC_BRANCH}}"
 
 # Determine if running locally from cloned repo or remotely via curl pipe
 IS_REMOTE=true
@@ -107,7 +107,7 @@ Examples:
   ./scripts/init.sh --lang=python --cursor
 
   # Remote execution via cURL
-  curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=rust --target=.
+  curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=rust --target=.
 EOF
 }
 
@@ -835,7 +835,7 @@ fi
 
 if [[ "$INCLUDE_SKILLS" == "true" ]]; then
     log_info "Installing agent skills into '$TARGET_DIR'..."
-    SKILL_ARGS=("--target" "$TARGET_DIR")
+    SKILL_ARGS=("--target" "$TARGET_DIR" "--ref" "$AGENTIC_BRANCH")
     if [[ "$FORCE_OVERWRITE" == "true" ]]; then
         SKILL_ARGS+=("--force")
     fi

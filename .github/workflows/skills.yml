@@ -1,0 +1,49 @@
+name: skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "scripts/install-skills.sh"
+      - "scripts/test-install-skills.sh"
+      - ".claude-plugin/**"
+      - ".github/workflows/skills.yml"
+  pull_request:
+    paths:
+      - "skills/**"
+      - "scripts/install-skills.sh"
+      - "scripts/test-install-skills.sh"
+      - ".claude-plugin/**"
+      - ".github/workflows/skills.yml"
+
+jobs:
+  installer:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: /bin/bash
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shellcheck
+        if: runner.os == 'Linux'
+        run: shellcheck scripts/install-skills.sh scripts/test-install-skills.sh
+      - name: Installer smoke tests
+        env:
+          TEST_BASH: ${{ matrix.shell }}
+        run: scripts/test-install-skills.sh
+
+  marketplace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate Claude Code marketplace
+        run: npx -y @anthropic-ai/claude-code plugin validate --strict .
