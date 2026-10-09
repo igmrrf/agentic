@@ -1,0 +1,12 @@
+---
+description: Lua engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_LUA.md`:
+- No explanatory comments.
+- Strict `local` variables; zero global namespace pollution.
+- Explicit `nil, err` error returns.
+- EmmyLua typing (`---@param`, `---@return`) and StyLua formatting.
+- Max nesting depth 3; `ipairs` for lists, `pairs` for tables.

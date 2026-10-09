@@ -39,7 +39,7 @@ jobs:
           node-version: 22
       - name: Shellcheck
         if: runner.os == 'Linux'
-        run: shellcheck scripts/install-skills.sh scripts/test-install-skills.sh scripts/test-init.sh
+        run: shellcheck scripts/*.sh scripts/lib/init/*.sh
       - name: Skills installer tests
         env:
           TEST_BASH: ${{ matrix.shell }}

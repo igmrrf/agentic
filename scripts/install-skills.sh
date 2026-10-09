@@ -159,7 +159,7 @@ resolve_skills_source() {
     command -v curl > /dev/null || die "curl is required for remote installation"
     command -v tar > /dev/null || die "tar is required for remote installation"
     local url="${TARBALL_URL_OVERRIDE:-https://github.com/igmrrf/agentic/archive/${AGENTIC_REF}.tar.gz}"
-    TEMP_WORK_DIR="$(mktemp -d)"
+    TEMP_WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/agentic.XXXXXX")"
     log_info "Fetching skills bundle ($AGENTIC_REF) from $url"
     curl -fsSL "$url" | tar -xz -C "$TEMP_WORK_DIR" --strip-components=1 \
         || die "Failed to download or extract $url"

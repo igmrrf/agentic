@@ -1,0 +1,12 @@
+---
+description: Swift 6.0+ engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_SWIFT.md`:
+- No explanatory comments.
+- Swift 6 strict concurrency: complete data-race safety, actor isolation, Sendable.
+- Zero `!` force unwraps or `try!`; guard let early returns.
+- Value semantics (struct/enum) over classes.
+- File <= 400 lines, Type <= 150 lines, Function <= 50 lines, Max 3 parameters.

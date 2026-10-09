@@ -96,7 +96,7 @@ When piped, pass `--lang`: there is no keyboard to answer the language prompt un
 - **Agent Skills Library:** [`skills/`](skills/) provides production-ready agent skills (`codinary`, `tdd`, `code-review`, `diagnosing-bugs`, `codebase-design`, `domain-modeling`). See [`skills/README.md`](skills/README.md) for full documentation.
 - **Skills Installation:** Claude Code users run `/plugin marketplace add igmrrf/agentic` then `/plugin install agentic@agentic`. Other agents use `npx skills add igmrrf/agentic` or [`scripts/install-skills.sh`](scripts/install-skills.sh), which installs to `.claude/skills/` and `.agents/skills/` (globally or per project). See [`skills/README.md`](skills/README.md#installing-the-skills).
 - **Architecture Review:** [`standards_review.md`](standards_review.md) contains the review summary, verified research findings, version matrix, and architecture references.
-- **Scaffolding Tool:** [`scripts/init.sh`](scripts/init.sh) provides automated project configuration.
+- **Scaffolding Tool:** [`scripts/init.sh`](scripts/init.sh) provides automated project configuration. Its implementation lives in [`scripts/lib/init/`](scripts/lib/init/), and the per-language headers of the generated agent rules files live in [`templates/rules/`](templates/rules/).
 
 ---
 
