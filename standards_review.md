@@ -4,17 +4,17 @@
 
 The `Agentic` repository establishes an uncompromising, production-ready baseline for multi-language software engineering. All standards and configurations have been researched and verified against the latest language releases (2026):
 
-- **Universal Core ([`CODING.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/CODING.md)):** Truly language-agnostic craft standards (no explanatory comments, no backwards-compatibility shims, pure core / impure edges, failure fast, strict size caps, parity-first refactoring, and ratcheted quality gates).
-- **Rust ([`rust/`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md)):** Targets the **Rust 2024 Edition** (stabilized in Rust 1.85.0 on February 20, 2025). Implements `style_edition = "2024"`, Cargo Resolver v3 (`resolver = "3"`), explicit `use<..>` lifetime capturing in RPIT, `unsafe_op_in_unsafe_fn` encapsulation, native async traits, and zero `.unwrap()` in production.
-- **Go ([`go/`](file:///Users/igmrrf/Desktop/tmp/Agentic/go/README.md)):** Targets **Go 1.26** (released February 2026). Implements `new(expr)` pointer initialization, Green Tea GC runtime, `testing/synctest` deterministic concurrency testing, `range-over-func` iterators (`iter.Seq`, `iter.Seq2`), `log/slog` structured logging, `errors.Join`, and race-detected testing.
-- **TypeScript ([`typescript/`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/README.md)):** Targets **TypeScript 7.0** (released July 2026 with native Go-powered compiler). Implements `erasableSyntaxOnly: true`, `isolatedDeclarations: true`, `verbatimModuleSyntax: true` (`import type`), strict property checks (`noUncheckedIndexedAccess`), `for...of` for side effects, `.map()` for transformations, standalone extracted hooks, and Biome linting/formatting.
+- **Universal Core ([`CODING.md`](CODING.md)):** Truly language-agnostic craft standards (no explanatory comments, no backwards-compatibility shims, pure core / impure edges, failure fast, strict size caps, parity-first refactoring, and ratcheted quality gates).
+- **Rust ([`rust/`](rust/README.md)):** Targets the **Rust 2024 Edition** (stabilized in Rust 1.85.0 on February 20, 2025). Implements `style_edition = "2024"`, Cargo Resolver v3 (`resolver = "3"`), explicit `use<..>` lifetime capturing in RPIT, `unsafe_op_in_unsafe_fn` encapsulation, native async traits, and zero `.unwrap()` in production.
+- **Go ([`go/`](go/README.md)):** Targets **Go 1.26** (released February 2026). Implements `new(expr)` pointer initialization, Green Tea GC runtime, `testing/synctest` deterministic concurrency testing, `range-over-func` iterators (`iter.Seq`, `iter.Seq2`), `log/slog` structured logging, `errors.Join`, and race-detected testing.
+- **TypeScript ([`typescript/`](typescript/README.md)):** Targets **TypeScript 7.0** (released July 2026 with native Go-powered compiler). Implements `erasableSyntaxOnly: true`, `isolatedDeclarations: true`, `verbatimModuleSyntax: true` (`import type`), strict property checks (`noUncheckedIndexedAccess`), `for...of` for side effects, `.map()` for transformations, standalone extracted hooks, and Biome linting/formatting.
 
 ---
 
 ## 2. Directory Layout Architecture
 
 ```
-/Users/igmrrf/Desktop/tmp/Agentic/
+agentic/
 ├── CODING.md                    # Universal language-agnostic engineering rules
 ├── README.md                    # Navigation index & standards summary
 ├── standards_review.md          # Architecture review & research specifications
@@ -57,8 +57,8 @@ The `Agentic` repository establishes an uncompromising, production-ready baselin
 
 | Architecture Pattern | Language / Stack | Key Characteristics | Reference Blueprint |
 |---|---|---|---|
-| **Feature-Driven Colocation** | TypeScript / React / Next.js | Self-contained domain vertical slices (`features/billing/`, `components/ui/`, `lib/`), suffix standards (`.schema.ts`, `.test.tsx`). | [`typescript/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/typescript/README.md#standard-project-layout-feature-driven-colocation) |
-| **Hexagonal Ports & Adapters** | Go 1.26 | Compiler-gated `internal/` encapsulation, pure `domain/`, application `service/` ports, and concrete `adapter/` (postgres, http). | [`go/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/go/README.md#standard-project-layout) |
-| **Modular Clean Architecture** | Rust 2024 (Single Crate) | Strict trait decoupling: pure `domain/` models $\leftarrow$ `application/` services $\leftarrow$ `infrastructure/` adapters. | [`rust/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md#option-a-modular-clean-architecture-single-crate) |
-| **Cargo Workspace Monorepo** | Rust 2024 (Multi-Crate) | Compile-time boundary enforcement across crates (`crates/domain`, `crates/application`, `crates/infra-*`, `crates/server`). | [`rust/README.md`](file:///Users/igmrrf/Desktop/tmp/Agentic/rust/README.md#option-b-cargo-workspace-multi-crate-monorepo) |
+| **Feature-Driven Colocation** | TypeScript / React / Next.js | Self-contained domain vertical slices (`features/billing/`, `components/ui/`, `lib/`), suffix standards (`.schema.ts`, `.test.tsx`). | [`typescript/README.md`](typescript/README.md#standard-project-layout-feature-driven-colocation) |
+| **Hexagonal Ports & Adapters** | Go 1.26 | Compiler-gated `internal/` encapsulation, pure `domain/`, application `service/` ports, and concrete `adapter/` (postgres, http). | [`go/README.md`](go/README.md#standard-project-layout) |
+| **Modular Clean Architecture** | Rust 2024 (Single Crate) | Strict trait decoupling: pure `domain/` models $\leftarrow$ `application/` services $\leftarrow$ `infrastructure/` adapters. | [`rust/README.md`](rust/README.md#option-a-modular-clean-architecture-single-crate) |
+| **Cargo Workspace Monorepo** | Rust 2024 (Multi-Crate) | Compile-time boundary enforcement across crates (`crates/domain`, `crates/application`, `crates/infra-*`, `crates/server`). | [`rust/README.md`](rust/README.md#option-b-cargo-workspace-multi-crate-monorepo) |
 

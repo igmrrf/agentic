@@ -74,7 +74,7 @@ python-service/
 
 ## Toolchain & Linter Configuration
 
-All settings are centralized in [`pyproject.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/python/pyproject.toml):
+All settings are centralized in [`pyproject.toml`](pyproject.toml):
 - **Ruff Linter & Formatter:** Line length 100, double quotes, automated import organization, and strict security / complexity rules.
 - **Mypy Strict Mode:** `strict = true`, `disallow_untyped_defs = true`, `warn_return_any = true`.
 - **Pytest:** Strict markers and automatic `src/` path resolution.
