@@ -32,8 +32,9 @@ CREATE_BACKUP=false
 DRY_RUN=false
 
 # Remote source repository configuration
-AGENTIC_BRANCH="${AGENTIC_BRANCH:-main}"
-REPO_RAW_BASE="${AGENTIC_REPO_RAW_BASE:-https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/${AGENTIC_BRANCH}}"
+AGENTIC_REF="${AGENTIC_REF:-${AGENTIC_BRANCH:-main}}"
+TARBALL_URL_OVERRIDE="${AGENTIC_TARBALL_URL:-}"
+TEMP_WORK_DIR=""
 
 # Determine if running locally from cloned repo or remotely via curl pipe
 IS_REMOTE=true
@@ -94,6 +95,7 @@ Options:
       --no-agent-rules        Skip setting up AI agent rules
   -s, --with-starter          Include sample starter code and test files (default: false, standards & linters only)
       --skills, --with-skills Include engineering agent skills (codinary, tdd, code-review, etc.)
+  -r, --ref <git-ref>         Branch, tag, or commit to fetch in remote mode (default: main; env AGENTIC_REF)
   -f, --force                 Overwrite existing configuration files
   -h, --help                  Show this help message
 
@@ -106,8 +108,9 @@ Examples:
   ./scripts/init.sh --lang=kotlin -a claude
   ./scripts/init.sh --lang=python --cursor
 
-  # Remote execution via cURL
+  # Remote execution via cURL or npx (no clone needed)
   curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=rust --target=.
+  npx -y github:igmrrf/agentic init --lang=rust
 EOF
 }
 
@@ -192,6 +195,14 @@ while [[ $# -gt 0 ]]; do
             INCLUDE_SKILLS=true
             shift
             ;;
+        -r|--ref)
+            AGENTIC_REF="$2"
+            shift 2
+            ;;
+        --ref=*)
+            AGENTIC_REF="${1#*=}"
+            shift
+            ;;
         -f|--force)
             FORCE_OVERWRITE=true
             shift
@@ -251,7 +262,12 @@ if [[ -z "$LANGUAGE" ]]; then
         echo "  6) Swift (Swift 6.0+, SwiftLint, SwiftFormat)"
         echo "  7) Kotlin (Kotlin 2.0+, K2 Compiler, Detekt)"
         echo "  8) All Languages (Multi-language repository)"
-        read -rp "Enter choice [1-8]: " CHOICE
+        if ! { exec 3< /dev/tty; } 2> /dev/null; then
+            log_error "No terminal available to choose a language. Pass --lang=<language>."
+            exit 1
+        fi
+        read -rp "Enter choice [1-8]: " CHOICE <&3
+        exec 3<&-
         case "$CHOICE" in
             1) LANGUAGE="rust" ;;
             2) LANGUAGE="go" ;;
@@ -323,52 +339,42 @@ copy_local_file() {
     fi
 }
 
-# Safe file download utility for remote cURL pipe execution
-download_remote_file() {
-    local url="$1"
-    local dest="$2"
-
-    if [[ -f "$dest" ]]; then
-        if [[ "$FORCE_OVERWRITE" == "false" ]]; then
-            log_warn "File already exists: $dest (use -f/--force to overwrite)"
-            return
-        elif [[ "$CREATE_BACKUP" == "true" ]]; then
-            if [[ "$DRY_RUN" == "true" ]]; then
-                log_info "[DRY RUN] Would backup: $dest -> ${dest}.bak"
-            else
-                cp "$dest" "${dest}.bak"
-                log_info "Backup created: ${dest}.bak"
-            fi
-        fi
-    fi
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log_info "[DRY RUN] Would download: $url -> $dest"
-    else
-        mkdir -p "$(dirname "$dest")"
-        if curl -fsSL "$url" -o "$dest"; then
-            log_success "Downloaded: $dest"
-        else
-            log_error "Failed to download $url"
-        fi
-    fi
-}
-
 # Unified installer router
 install_file() {
-    local rel_path="$1"
-    local dest="$2"
+    copy_local_file "$SCRIPT_SOURCE_DIR/$1" "$2"
+}
 
-    if [[ "$IS_REMOTE" == "false" ]]; then
-        copy_local_file "$SCRIPT_SOURCE_DIR/$rel_path" "$dest"
-    else
-        download_remote_file "$REPO_RAW_BASE/$rel_path" "$dest"
+cleanup_remote_source() {
+    if [[ -n "$TEMP_WORK_DIR" && -d "$TEMP_WORK_DIR" ]]; then
+        rm -rf "$TEMP_WORK_DIR"
     fi
 }
+
+fetch_remote_source() {
+    local url="${TARBALL_URL_OVERRIDE:-https://github.com/igmrrf/agentic/archive/${AGENTIC_REF}.tar.gz}"
+    command -v curl > /dev/null || { log_error "curl is required for remote execution"; exit 1; }
+    command -v tar > /dev/null || { log_error "tar is required for remote execution"; exit 1; }
+    TEMP_WORK_DIR="$(mktemp -d)"
+    trap cleanup_remote_source EXIT
+    log_info "Fetching standards bundle ($AGENTIC_REF) from $url"
+    if ! curl -fsSL "$url" | tar -xz -C "$TEMP_WORK_DIR" --strip-components=1; then
+        log_error "Failed to download or extract $url"
+        exit 1
+    fi
+    if [[ ! -f "$TEMP_WORK_DIR/CODING.md" ]]; then
+        log_error "Archive $url does not contain the Agentic standards"
+        exit 1
+    fi
+    SCRIPT_SOURCE_DIR="$TEMP_WORK_DIR"
+}
+
+if [[ "$IS_REMOTE" == "true" ]]; then
+    fetch_remote_source
+fi
 
 # Main Execution
 print_banner
-log_info "Execution Mode  : $(if [[ "$IS_REMOTE" == "false" ]]; then echo "Local Repository ($SCRIPT_SOURCE_DIR)"; else echo "Remote cURL ($REPO_RAW_BASE)"; fi)"
+log_info "Execution Mode  : $(if [[ "$IS_REMOTE" == "false" ]]; then echo "Local Repository ($SCRIPT_SOURCE_DIR)"; else echo "Remote ($AGENTIC_REF)"; fi)"
 log_info "Target Directory: $TARGET_DIR"
 log_info "Target Language : $LANGUAGE"
 log_info "Target Agent    : ${AGENTS[*]}"
@@ -385,14 +391,12 @@ fi
 
 # Helper to fetch file content directly
 fetch_file_content() {
-    local rel_path="$1"
-    if [[ "$IS_REMOTE" == "false" ]]; then
-        if [[ -f "$SCRIPT_SOURCE_DIR/$rel_path" ]]; then
-            cat "$SCRIPT_SOURCE_DIR/$rel_path"
-        fi
-    else
-        curl -fsSL "$REPO_RAW_BASE/$rel_path" 2>/dev/null || true
+    local src="$SCRIPT_SOURCE_DIR/$1"
+    if [[ ! -f "$src" ]]; then
+        log_error "Missing standards file: $src"
+        exit 1
     fi
+    cat "$src"
 }
 
 # 1. Base Universal Coding Rules
@@ -835,18 +839,14 @@ fi
 
 if [[ "$INCLUDE_SKILLS" == "true" ]]; then
     log_info "Installing agent skills into '$TARGET_DIR'..."
-    SKILL_ARGS=("--target" "$TARGET_DIR" "--ref" "$AGENTIC_BRANCH")
+    SKILL_ARGS=("--target" "$TARGET_DIR")
     if [[ "$FORCE_OVERWRITE" == "true" ]]; then
         SKILL_ARGS+=("--force")
     fi
     if [[ "$DRY_RUN" == "true" ]]; then
         SKILL_ARGS+=("--dry-run")
     fi
-    if [[ "$IS_REMOTE" == "false" ]]; then
-        "$SCRIPT_SOURCE_DIR/scripts/install-skills.sh" "${SKILL_ARGS[@]}"
-    else
-        curl -fsSL "$REPO_RAW_BASE/scripts/install-skills.sh" | bash -s -- "${SKILL_ARGS[@]}"
-    fi
+    bash "$SCRIPT_SOURCE_DIR/scripts/install-skills.sh" "${SKILL_ARGS[@]}"
 fi
 
 echo ""
