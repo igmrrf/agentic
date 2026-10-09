@@ -302,6 +302,23 @@ case "$LANGUAGE" in
         ;;
 esac
 
+claim_destination() {
+    local dest="$1"
+    [[ -f "$dest" ]] || return 0
+    if [[ "$FORCE_OVERWRITE" == "false" ]]; then
+        log_warn "File already exists: $dest (use -f/--force to overwrite)"
+        return 1
+    fi
+    if [[ "$CREATE_BACKUP" == "true" ]]; then
+        if [[ "$DRY_RUN" == "true" ]]; then
+            log_info "[DRY RUN] Would backup: $dest -> ${dest}.bak"
+        else
+            cp "$dest" "${dest}.bak"
+            log_info "Backup created: ${dest}.bak"
+        fi
+    fi
+}
+
 # Safe file copy utility for local execution
 copy_local_file() {
     local src="$1"
@@ -316,19 +333,7 @@ copy_local_file() {
         return
     fi
 
-    if [[ -f "$dest" ]]; then
-        if [[ "$FORCE_OVERWRITE" == "false" ]]; then
-            log_warn "File already exists: $dest (use -f/--force to overwrite)"
-            return
-        elif [[ "$CREATE_BACKUP" == "true" ]]; then
-            if [[ "$DRY_RUN" == "true" ]]; then
-                log_info "[DRY RUN] Would backup: $dest -> ${dest}.bak"
-            else
-                cp "$dest" "${dest}.bak"
-                log_info "Backup created: ${dest}.bak"
-            fi
-        fi
-    fi
+    claim_destination "$dest" || return 0
 
     if [[ "$DRY_RUN" == "true" ]]; then
         log_info "[DRY RUN] Would create/update: $dest"
@@ -553,6 +558,7 @@ if [[ "$INCLUDE_AGENT_RULES" == "true" ]]; then
     create_rule_file() {
         local file_path="$1"
         local content="$2"
+        claim_destination "$file_path" || return 0
         if [[ "$DRY_RUN" == "true" ]]; then
             log_info "[DRY RUN] Would create: $file_path"
         else

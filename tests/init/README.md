@@ -28,6 +28,6 @@ TEST_BASH=/bin/bash python3 tests/init/test_characterization.py   # macOS bash 3
 
 Alias scenarios (`alias-ts`, `alias-golang`, …) have no golden of their own; they must match their canonical language's golden.
 
-## Known behaviour captured here
+## Existing files
 
-`existing-no-force` records that agent rules files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, …) are overwritten even without `--force`, unlike linter and CI configs, which are kept.
+The `existing-*` scenarios record that every file `init.sh` writes, including agent rules files such as `CLAUDE.md`, is kept when it already exists unless `--force` is passed, and is copied to `.bak` first when `--backup` is added.
