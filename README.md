@@ -52,7 +52,7 @@ Use the built-in initializer script [`scripts/init.sh`](scripts/init.sh) to boot
 ### Remote Initialization via cURL
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=swift --target=.
+curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=swift --target=.
 ```
 
 ---
@@ -77,7 +77,7 @@ curl -fsSL https://raw.githubusercontent.com/igmrrf/Agentic/refs/heads/main/scri
 
 - **Root Rules:** [`CODING.md`](CODING.md) defines universal craft standards across all stacks (no explanatory comments, no backwards-compatibility `if`-branch shims, strict size caps, zero-swallowed errors, parity-first refactoring, folder/file design). Its §0 explains scope tags (`[service]`, `[app]`, `[lib]`), which rules are non-negotiable versus project-tunable, and how to adopt the standards into an existing repository.
 - **Agent Skills Library:** [`skills/`](skills/) provides production-ready agent skills (`codinary`, `tdd`, `code-review`, `diagnosing-bugs`, `codebase-design`, `domain-modeling`). See [`skills/README.md`](skills/README.md) for full documentation.
-- **Skills Installer:** [`scripts/install-skills.sh`](scripts/install-skills.sh) enables one-line local or remote cURL installation to `~/.agents/skills/` or any project.
+- **Skills Installation:** Claude Code users run `/plugin marketplace add igmrrf/agentic` then `/plugin install agentic@agentic`. Other agents use `npx skills add igmrrf/agentic` or [`scripts/install-skills.sh`](scripts/install-skills.sh), which installs to `.claude/skills/` and `.agents/skills/` (globally or per project). See [`skills/README.md`](skills/README.md#installing-the-skills).
 - **Architecture Review:** [`standards_review.md`](standards_review.md) contains the review summary, verified research findings, version matrix, and architecture references.
 - **Scaffolding Tool:** [`scripts/init.sh`](scripts/init.sh) provides automated project configuration.
 

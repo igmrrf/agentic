@@ -88,9 +88,9 @@ lua-project/
 ## Toolchain & Linter Configuration
 
 The configurations in this directory enforce quality across editors and CI:
-- [`.stylua.toml`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/.stylua.toml): 2-space indentation, 100-character line width, double quote preferences, required call parentheses.
-- [`.luarc.json`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/.luarc.json): LuaLS diagnostic configuration with strict undefined-global error levels.
-- [`.luacheckrc`](file:///Users/igmrrf/Desktop/tmp/Agentic/lua/.luacheckrc): Luacheck configuration restricting globals and enforcing zero-warning gates.
+- [`.stylua.toml`](.stylua.toml): 2-space indentation, 100-character line width, double quote preferences, required call parentheses.
+- [`.luarc.json`](.luarc.json): LuaLS diagnostic configuration with strict undefined-global error levels.
+- [`.luacheckrc`](.luacheckrc): Luacheck configuration restricting globals and enforcing zero-warning gates.
 
 ---
 

@@ -69,9 +69,9 @@ kotlin-service/
 ## Toolchain & Linter Configuration
 
 The configurations in this directory enforce rigorous quality standards:
-- [`detekt.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/detekt.yml): Strict static analysis banning `!!`, `GlobalScope`, `Thread.sleep` in coroutines, and enforcing size caps (50 lines/fn, 150 lines/class, max 3 parameters).
-- [`.editorconfig`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/.editorconfig): Official Ktlint formatting rules (4-space indent, 100-character line width).
-- [`build.gradle.kts`](file:///Users/igmrrf/Desktop/tmp/Agentic/kotlin/build.gradle.kts): Gradle build script with `allWarningsAsErrors = true` and `-Xjsr305=strict`.
+- [`detekt.yml`](detekt.yml): Strict static analysis banning `!!`, `GlobalScope`, `Thread.sleep` in coroutines, and enforcing size caps (50 lines/fn, 150 lines/class, max 3 parameters).
+- [`.editorconfig`](.editorconfig): Official Ktlint formatting rules (4-space indent, 100-character line width).
+- [`build.gradle.kts`](build.gradle.kts): Gradle build script with `allWarningsAsErrors = true` and `-Xjsr305=strict`.
 
 ---
 

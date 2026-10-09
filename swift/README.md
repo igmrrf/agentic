@@ -65,9 +65,9 @@ SwiftService/
 ## Toolchain & Linter Configuration
 
 The configurations in this directory enforce quality across Xcode, VS Code, and CI:
-- [`.swiftlint.yml`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/.swiftlint.yml): Strict lint rules with zero-warning threshold, banning force unwraps and enforcing size caps (50 lines/fn, 150 lines/type).
-- [`.swiftformat`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/.swiftformat): Automated formatter configuration (4-space indent, 100-character line width).
-- [`Package.swift`](file:///Users/igmrrf/Desktop/tmp/Agentic/swift/Package.swift): Package manifest enforcing Swift 6 language mode and warnings-as-errors.
+- [`.swiftlint.yml`](.swiftlint.yml): Strict lint rules with zero-warning threshold, banning force unwraps and enforcing size caps (50 lines/fn, 150 lines/type).
+- [`.swiftformat`](.swiftformat): Automated formatter configuration (4-space indent, 100-character line width).
+- [`Package.swift`](Package.swift): Package manifest enforcing Swift 6 language mode and warnings-as-errors.
 
 ---
 
