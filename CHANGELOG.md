@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-09
+
+### Added
+- **`/agentic:setup` skill**: applies the standards to the current project from inside Claude Code (dry run first, then write). Plugin version bumped to 1.1.0.
+- **`npx -y github:igmrrf/agentic`**: `bin/agentic.js` runs `init` and `skills` from npm without a clone or an npm publish.
+- **`scripts/init.sh`**: `--ref <branch|tag|commit>` for remote runs.
+- **`scripts/test-init.sh`**: initializer and npx launcher tests, run in CI on Linux and macOS bash 3.2.
+
+### Changed
+- **`scripts/init.sh`**: remote runs download the repository once as a tarball instead of one `curl` request per file, and `--skills` uses the downloaded installer.
+
+### Fixed
+- **`scripts/init.sh`**: when piped through bash, the language prompt read from the script itself; it now reads from the terminal, or exits asking for `--lang` when there is none.
+- **`scripts/init.sh`**: failed downloads and missing standards files now stop the run instead of writing empty agent rules.
+
 ## [1.0.0] - 2026-10-09
 
 ### Changed
@@ -25,5 +40,6 @@ All notable changes to this project will be documented in this file.
 - **New Agents**: Out-of-the-box support for Cline (`.clinerules`), Windsurf (`.windsurfrules`), and GitHub Copilot (`.github/copilot-instructions.md`). These files automatically embed universal and language-specific coding standards just like Claude and Gemini files.
 - **Swift & Kotlin Standards**: Added full standards, toolchain configurations, starter templates, and CI workflows for Swift 6.0+ and Kotlin 2.0+ (K2 compiler).
 
-[Unreleased]: https://github.com/igmrrf/agentic/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/igmrrf/agentic/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/igmrrf/agentic/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/igmrrf/agentic/releases/tag/v1.0.0

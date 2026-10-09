@@ -8,6 +8,7 @@ Modular, production-grade agent skills designed for autonomous pair programming,
 
 Skill | Focus | Description
 :--- | :--- | :---
+[`setup`](./setup/SKILL.md) | Project Setup | Applies the Agentic standards to the current project: previews with a dry run, picks the language and agent rules, then writes `CLAUDE.md`, linter configs, and CI. Invoke explicitly with `/agentic:setup` (plugin) or `/setup`.
 [`codinary`](./codinary/SKILL.md) | Multi-Agent Orchestration | Bounded three-step loop: fresh implementer subagent &rarr; independent QA reviewer &rarr; fixer &rarr; re-review. Prevents context degradation across long coding sessions.
 [`code-review`](./code-review/SKILL.md) | Independent QA Review | Dual-axis review comparing changes against documented repo standards and issue specs in parallel subagents.
 [`tdd`](./tdd/SKILL.md) | Test-Driven Development | Red &rarr; green &rarr; refactor discipline, seam discovery, interface-driven verification, and mock containment.
@@ -37,7 +38,7 @@ claude plugin marketplace add igmrrf/agentic
 claude plugin install agentic@agentic
 ```
 
-Plugin skills are namespaced: invoke them as `/agentic:codinary`, `/agentic:tdd`, and so on. Pull updates with `/plugin marketplace update agentic`. To make the skills available to everyone on a team, add the marketplace and plugin to the repo's `.claude/settings.json` (`extraKnownMarketplaces` and `enabledPlugins`).
+Plugin skills are namespaced: invoke them as `/agentic:codinary`, `/agentic:tdd`, and so on. Run `/agentic:setup` in a project to apply the coding standards there. Pull updates with `/plugin marketplace update agentic`. To make the skills available to everyone on a team, add the marketplace and plugin to the repo's `.claude/settings.json` (`extraKnownMarketplaces` and `enabledPlugins`).
 
 ---
 
@@ -53,7 +54,14 @@ npx skills add igmrrf/agentic --list             # list what is available
 
 ---
 
-### Method 3: One-Line Installer (No Node Required)
+### Method 3: One-Line Installer
+
+The same installer runs through `npx` (Node 18+) or `curl` (bash only); options are identical.
+
+```bash
+npx -y github:igmrrf/agentic skills --global
+npx -y github:igmrrf/agentic#v1.1.0 skills --global --skill codinary,tdd
+```
 
 ```bash
 # All skills, global, for Claude Code (~/.claude/skills) and other agents (~/.agents/skills)
@@ -66,7 +74,7 @@ curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scri
 curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --target /path/to/my-project
 
 # Pin to a tag, branch, or commit
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.0.0
+curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.1.0
 ```
 
 | Option | Effect |
@@ -91,6 +99,7 @@ Restart Claude Code (or start a new session) after installing, then check with `
 
 ```bash
 ./scripts/init.sh --skills
+npx -y github:igmrrf/agentic init --lang=typescript --skills
 curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=typescript --skills --target .
 ```
 
@@ -140,4 +149,5 @@ Agent Platform | Where Skills Are Read From | How to Install
 
 - Add a skill as `skills/<name>/SKILL.md` and list it under `skills` in [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json). CI fails if the two disagree.
 - Bump `version` in `marketplace.json` when you release changes so plugin users get the update, and tag the release (`git tag v1.1.0`) so `--ref` users can pin it.
-- Run `scripts/test-install-skills.sh` (set `TEST_BASH=/bin/bash` on macOS to test bash 3.2) and `claude plugin validate --strict .` before pushing.
+- Bump `version` in `package.json` alongside `marketplace.json`.
+- Run `scripts/test-install-skills.sh` and `scripts/test-init.sh` (set `TEST_BASH=/bin/bash` on macOS to test bash 3.2) and `claude plugin validate --strict .` before pushing.

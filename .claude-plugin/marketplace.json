@@ -6,24 +6,31 @@
   },
   "metadata": {
     "description": "Engineering agent skills from the Agentic standards repository.",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "agentic",
-      "description": "Engineering skills: codinary (implement, QA, fix loop), code-review, tdd, diagnosing-bugs, codebase-design, domain-modeling.",
+      "description": "Engineering skills: setup (apply the standards to a project), codinary (implement, QA, fix loop), code-review, tdd, diagnosing-bugs, codebase-design, domain-modeling.",
       "source": "./",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "igmrrf"
       },
       "homepage": "https://github.com/igmrrf/agentic",
       "repository": "https://github.com/igmrrf/agentic",
       "license": "MIT",
-      "keywords": ["skills", "tdd", "code-review", "debugging", "architecture"],
+      "keywords": [
+        "skills",
+        "tdd",
+        "code-review",
+        "debugging",
+        "architecture"
+      ],
       "category": "development",
       "strict": false,
       "skills": [
+        "./skills/setup",
         "./skills/codinary",
         "./skills/code-review",
         "./skills/tdd",

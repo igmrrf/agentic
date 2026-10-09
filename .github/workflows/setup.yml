@@ -1,24 +1,26 @@
-name: skills
+name: setup
 
 on:
   push:
     branches: [main]
     paths:
       - "skills/**"
-      - "scripts/install-skills.sh"
-      - "scripts/test-install-skills.sh"
+      - "scripts/**"
+      - "bin/**"
+      - "package.json"
       - ".claude-plugin/**"
-      - ".github/workflows/skills.yml"
+      - ".github/workflows/setup.yml"
   pull_request:
     paths:
       - "skills/**"
-      - "scripts/install-skills.sh"
-      - "scripts/test-install-skills.sh"
+      - "scripts/**"
+      - "bin/**"
+      - "package.json"
       - ".claude-plugin/**"
-      - ".github/workflows/skills.yml"
+      - ".github/workflows/setup.yml"
 
 jobs:
-  installer:
+  scripts:
     strategy:
       fail-fast: false
       matrix:
@@ -30,13 +32,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Shellcheck
         if: runner.os == 'Linux'
-        run: shellcheck scripts/install-skills.sh scripts/test-install-skills.sh
-      - name: Installer smoke tests
+        run: shellcheck scripts/install-skills.sh scripts/test-install-skills.sh scripts/test-init.sh
+      - name: Skills installer tests
         env:
           TEST_BASH: ${{ matrix.shell }}
         run: scripts/test-install-skills.sh
+      - name: Initializer and npx launcher tests
+        env:
+          TEST_BASH: ${{ matrix.shell }}
+        run: scripts/test-init.sh
 
   marketplace:
     runs-on: ubuntu-latest
