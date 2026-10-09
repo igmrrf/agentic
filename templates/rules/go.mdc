@@ -1,0 +1,11 @@
+---
+description: Go 1.26 engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+- No explanatory comments.
+- `ctx context.Context` first argument; zero unmanaged goroutines.
+- Errors wrapped with `%w`; zero swallowed errors.
+- Small consumer-driven interfaces; concrete return structs.
+- Type file <= 200 lines, Function <= 50 lines, File <= 400 lines.

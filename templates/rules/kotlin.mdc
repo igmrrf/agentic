@@ -1,0 +1,14 @@
+---
+description: Kotlin 2.0+ engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_KOTLIN.md`:
+- No explanatory comments.
+- Target Kotlin 2.0+ K2 compiler with warnings as errors.
+- Zero `!!` force unwraps; Elvis operator and smart casting.
+- `val` and read-only collections by default.
+- Sealed interfaces for domain types and exhaustive when expressions.
+- Structured concurrency (managed CoroutineScope, no GlobalScope).
+- File <= 400 lines, Class <= 150 lines, Function <= 50 lines.

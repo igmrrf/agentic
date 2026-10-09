@@ -59,7 +59,8 @@ proj_is_empty() {
 
 test_piped_init() {
     fresh
-    quietly run_piped --lang=go --claude --target "$WORK/proj"
+    run_piped --lang=go --claude --target "$WORK/proj" > "$WORK/piped.log" 2>&1 || true
+    check "piped init reports remote mode" grep -q "Execution Mode  : Remote" "$WORK/piped.log"
     check "piped init writes CLAUDE.md" test -s "$WORK/proj/CLAUDE.md"
     check "CLAUDE.md embeds the Go standards" grep -qF "# Go Coding Rules & Standards" "$WORK/proj/CLAUDE.md"
     check "piped init copies linter config" test -f "$WORK/proj/.golangci.yml"

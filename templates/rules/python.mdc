@@ -1,0 +1,12 @@
+---
+description: Python 3.12+ engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_PYTHON.md`:
+- No explanatory comments.
+- Mandatory type hints (3.12+ pipe unions); zero `Any` escapes in production.
+- Granular exception handling; no bare `except Exception:`.
+- Ruff format and lint ratchet; Mypy strict mode.
+- Function <= 50 statements, Max 3 positional arguments.

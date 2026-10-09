@@ -1,0 +1,12 @@
+---
+description: TypeScript and React engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+- No explanatory comments.
+- Use `for...of` loops for side effects / no-return operations; `.map()` strictly for transformations.
+- Extract standalone hooks (`use*.ts`) when hook logic is reused >2 times.
+- Component body cap <= 150 lines, Function <= 60 lines, File <= 400 lines.
+- Zero `any`, schema-first validation (Zod), explicit `import type`.
+- No TypeScript `enum` or `namespace` (use `object-as-const` and ES modules).

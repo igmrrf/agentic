@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **`scripts/init.sh`**: split from one 868-line script into a 120-line entry point and focused files under `scripts/lib/init/` (`cli`, `language`, `files`, `toolchains`, `rules`, `run`). The per-language rules headers moved from heredocs into `templates/rules/<language>.md|.mdc`. All 70 characterization scenarios are unchanged.
+- **`scripts/init.sh`**: remote runs now execute the downloaded ref's own `init.sh`, so `--ref` always runs that version's code (including `v1.0.0` and `v1.1.0`).
+- **`scripts/init.sh`, `scripts/install-skills.sh`**: temporary downloads honour `TMPDIR` on macOS too.
+
 ### Fixed
 - **`scripts/init.sh`**: existing agent rules files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, `.github/copilot-instructions.md`) were silently overwritten even without `--force`. They are now kept like every other existing file; pass `--force` (and `--backup` for `.bak` copies) to regenerate them, for example after updating the standards.
 

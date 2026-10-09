@@ -1,0 +1,11 @@
+---
+description: Rust 2024 engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+- No explanatory comments.
+- Zero `.unwrap()` / `.expect()` in production (enforce typed `Result<T, E>`).
+- Rust 2024: explicit `unsafe { ... }` blocks, `use<..>` lifetime capturing.
+- Borrowed slices over owned types; typestate and newtypes for domain safety.
+- Struct `impl` <= 150 lines, Function <= 60 lines, File <= 400 lines.

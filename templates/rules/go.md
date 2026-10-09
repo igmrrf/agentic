@@ -1,0 +1,16 @@
+# Repository Coding Standards (Go 1.26)
+
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Context & Goroutines:**
+  - Pass `ctx context.Context` as the first argument in all I/O and DB calls. Never store `context.Context` in a struct.
+  - Every goroutine must have an explicit exit lifecycle (`sync.WaitGroup`, `errgroup.Group`, or `ctx.Done()`). No goroutine leaks.
+- **Error Handling:**
+  - Errors are values; never ignore them (`_ = fn()`).
+  - Wrap errors with `%w`: `fmt.Errorf("...: %w", err)`.
+  - Use `errors.Join` for multi-error aggregation and `errors.Is` / `errors.As` for inspection.
+- **Idioms & Structs:**
+  - Accept interfaces, return concrete structs. Small, consumer-driven interfaces (1-3 methods).
+  - Use `new(expr)` for direct pointer initialization.
+  - Use `iter.Seq` / `iter.Seq2` with `range-over-func` for collection streaming.
+- **Size Caps:** File <= 400 lines, Type file <= 200 lines, Function <= 50 lines.
+- **Refactoring:** Parity-first refactoring with table-driven tests and `-race` detection.
