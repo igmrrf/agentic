@@ -1,0 +1,33 @@
+{
+  "skill_name": "codinary",
+  "evals": [
+    {
+      "id": 0,
+      "name": "happy-path",
+      "prompt": "Fix parseDuration in src/duration.js so it correctly parses duration strings. It must return the total number of seconds for formats like '2h' (hours only), '45m' (minutes only), and '1h30m' (hours and minutes). The test suite is currently failing. Run `npm test` and make it pass. Do not change the tests.",
+      "expected_output": "src/duration.js parses hours-only, minutes-only, and combined formats into seconds; npm test passes. Codinary should reach a first-review pass with 0 fix cycles.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "edge-cases",
+      "prompt": "Implement paginate(items, limit = 10, offset = 0) in src/paginate.js. It returns a new array containing up to `limit` items starting at `offset`. Requirements: (1) the default limit is 10; (2) an offset below 0 is treated as 0; (3) an offset at or beyond items.length returns an empty array; (4) a limit of 0 or below returns an empty array; (5) a limit above 100 is clamped to 100; (6) the input array must not be mutated. Run `npm test`.",
+      "expected_output": "paginate implemented with all clamping rules; codinary should surface any missed in-scope edge cases via review and fix them within the 2-cycle cap.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "scope-and-fix",
+      "prompt": "Implement slugify(title) in src/slugify.js. Requirements: (1) lowercase the title; (2) trim leading/trailing whitespace; (3) replace runs of whitespace with a single hyphen; (4) remove punctuation; (5) collapse consecutive hyphens into one; (6) strip diacritics so 'Héllo' becomes 'hello'; (7) cap the slug at 40 characters - if longer, truncate at the last hyphen at or before position 40 so no partial word remains, and the result must never end with a hyphen (if there is no hyphen within the first 40 characters, truncate to exactly 40 characters). Run `node --test test/slugify.test.js` (only the slugify tests). Note: test/legacy.test.js is a known pre-existing unrelated failure - do NOT touch src/legacy.js or test/legacy.test.js.",
+      "expected_output": "slugify implemented and the slugify tests pass, including rule 7 truncation. The pre-existing legacy failure must be reported as out_of_scope and must never trigger a fix cycle; any missed in-scope rule (e.g. truncation) should be caught by review and fixed within the 2-cycle cap.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "transliteration-fix",
+      "prompt": "Implement toAscii(text) in src/ascii.js. It lowercases the text and transliterates non-ASCII letters to their ASCII equivalents: NFD-decomposable accents are stripped (e acute -> e, n tilde -> n, u umlaut -> u), and the special letters must map as follows: sharp s -> 'ss', o slash -> 'o', ae ligature -> 'ae', oe ligature -> 'oe', l stroke -> 'l', d stroke -> 'd', thorn -> 'th', eth -> 'd', a ring -> 'a', c cedilla -> 'c'. Any character that is still non-ASCII after transliteration is removed. Run `npm test`.",
+      "expected_output": "toAscii handles BOTH NFD-decomposable accents and the special letters (sharp s, o slash, ae/oe ligatures, l/d stroke, thorn, eth). npm test passes. If the first implementation uses only normalize('NFD'), review must catch the special letters as an in-scope medium and a fix cycle must resolve them.",
+      "files": []
+    }
+  ]
+}

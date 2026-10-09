@@ -26,6 +26,7 @@ AGENTS=()
 INCLUDE_CI=true
 INCLUDE_AGENT_RULES=true
 INCLUDE_STARTER=false
+INCLUDE_SKILLS=false
 FORCE_OVERWRITE=false
 CREATE_BACKUP=false
 DRY_RUN=false
@@ -92,6 +93,7 @@ Options:
       --no-ci                 Skip copying GitHub Actions CI workflows
       --no-agent-rules        Skip setting up AI agent rules
   -s, --with-starter          Include sample starter code and test files (default: false, standards & linters only)
+      --skills, --with-skills Include engineering agent skills (codinary, tdd, code-review, etc.)
   -f, --force                 Overwrite existing configuration files
   -h, --help                  Show this help message
 
@@ -184,6 +186,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -s|--with-starter|--starter)
             INCLUDE_STARTER=true
+            shift
+            ;;
+        --skills|--with-skills)
+            INCLUDE_SKILLS=true
             shift
             ;;
         -f|--force)
@@ -824,6 +830,22 @@ EOF
     fi
     if has_agent "copilot"; then
         create_rule_file "$TARGET_DIR/.github/copilot-instructions.md" "$RULES_MD"
+    fi
+fi
+
+if [[ "$INCLUDE_SKILLS" == "true" ]]; then
+    log_info "Installing agent skills into '$TARGET_DIR'..."
+    SKILL_ARGS=("--target" "$TARGET_DIR")
+    if [[ "$FORCE_OVERWRITE" == "true" ]]; then
+        SKILL_ARGS+=("--force")
+    fi
+    if [[ "$DRY_RUN" == "true" ]]; then
+        SKILL_ARGS+=("--dry-run")
+    fi
+    if [[ "$IS_REMOTE" == "false" ]]; then
+        "$SCRIPT_SOURCE_DIR/scripts/install-skills.sh" "${SKILL_ARGS[@]}"
+    else
+        curl -fsSL "$REPO_RAW_BASE/scripts/install-skills.sh" | bash -s -- "${SKILL_ARGS[@]}"
     fi
 fi
 

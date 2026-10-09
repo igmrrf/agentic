@@ -1,0 +1,5 @@
+interface:
+  display_name: "Codinary"
+  short_description: "Implement, QA, and fix in a bounded loop"
+policy:
+  allow_implicit_invocation: false
