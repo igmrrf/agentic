@@ -6,6 +6,7 @@ exit: 0
 .golangci.yml  [copy of go/.golangci.yml]
 .golangci.yml.bak  [generated, same as .github/workflows/go-ci.yml.bak]
 CLAUDE.md  [generated]
+CLAUDE.md.bak  [generated, same as .github/workflows/go-ci.yml.bak]
 
 --- .github/workflows/go-ci.yml.bak
 USER

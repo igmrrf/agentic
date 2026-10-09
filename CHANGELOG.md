@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- **`scripts/init.sh`**: existing agent rules files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, `.github/copilot-instructions.md`) were silently overwritten even without `--force`. They are now kept like every other existing file; pass `--force` (and `--backup` for `.bak` copies) to regenerate them, for example after updating the standards.
+
 ### Added
 - **`tests/init/`**: 70 characterization scenarios for `scripts/init.sh` (every language, starter, flag, alias, agent selection, conflict, starter-skip and auto-detection path), run in CI under Linux bash and macOS bash 3.2. They pin the current behaviour before `init.sh` is split into smaller files.
 
