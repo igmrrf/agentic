@@ -1,0 +1,6 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': go
+== files
+.golangci.yml  [copy of go/.golangci.yml]
+go.mod  [untouched pre-existing]

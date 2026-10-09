@@ -1,0 +1,46 @@
+exit: 0
+== log
+== files
+.clinerules  [generated]
+.cursor/rules/coding.mdc  [generated]
+.github/copilot-instructions.md  [generated, same as .clinerules]
+.github/workflows/python-ci.yml  [copy of templates/ci/python-ci.yml]
+.windsurfrules  [generated, same as .clinerules]
+CLAUDE.md  [generated, same as .clinerules]
+GEMINI.md  [generated, same as .clinerules]
+pyproject.toml  [copy of python/pyproject.toml]
+
+--- .clinerules
+# Repository Coding Standards (Python 3.12+)
+
+Always adhere to `CODING.md` and `docs/CODING_PYTHON.md`:
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Mandatory Static Typing:** Modern Python 3.12+ type hints (`str | None`, `type Alias = ...`) on all signatures. Zero untyped escapes.
+- **Fail Fast & Explicitly:** Never catch broad `Exception` or swallow errors. Use granular custom domain exceptions.
+- **Toolchain Authority:** Ruff is the sole authority for formatting and linting (`ruff format`, `ruff check`). Mypy strict mode enforced.
+- **Size Caps:** File <= 400 lines, Function <= 50 statements, Max 3 positional arguments.
+- **Architecture:** Pure core domain logic separated from impure I/O adapters.
+
+<<embedded CODING.md>>
+
+<<embedded python/CODING.md>>
+
+
+
+--- .cursor/rules/coding.mdc
+---
+description: Python 3.12+ engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+Always adhere to `CODING.md` and `docs/CODING_PYTHON.md`:
+- No explanatory comments.
+- Mandatory type hints (3.12+ pipe unions); zero `Any` escapes in production.
+- Granular exception handling; no bare `except Exception:`.
+- Ruff format and lint ratchet; Mypy strict mode.
+- Function <= 50 statements, Max 3 positional arguments.
+
+<<embedded CODING.md>>
+
+<<embedded python/CODING.md>>

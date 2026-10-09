@@ -1,0 +1,7 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': swift
+== files
+.swiftformat  [copy of swift/.swiftformat]
+.swiftlint.yml  [copy of swift/.swiftlint.yml]
+Package.swift  [untouched pre-existing]

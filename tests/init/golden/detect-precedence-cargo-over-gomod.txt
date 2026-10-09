@@ -1,0 +1,8 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': rust
+== files
+Cargo.toml  [untouched pre-existing]
+clippy.toml  [copy of rust/clippy.toml]
+go.mod  [untouched pre-existing]
+rustfmt.toml  [copy of rust/rustfmt.toml]

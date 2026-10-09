@@ -1,0 +1,8 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': lua
+[WARN] File already exists: <TARGET>/.luarc.json (use -f/--force to overwrite)
+== files
+.luacheckrc  [copy of lua/.luacheckrc]
+.luarc.json  [untouched pre-existing]
+.stylua.toml  [copy of lua/.stylua.toml]

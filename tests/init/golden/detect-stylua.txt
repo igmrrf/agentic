@@ -1,0 +1,8 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': lua
+== files
+.luacheckrc  [copy of lua/.luacheckrc]
+.luarc.json  [copy of lua/.luarc.json]
+.stylua.toml  [copy of lua/.stylua.toml]
+stylua.toml  [untouched pre-existing]

@@ -1,0 +1,4 @@
+exit: 1
+== log
+[ERROR] Unsupported language: cobol. Choose rust, go, ts, python, lua, swift, kotlin, or all.
+== files

@@ -1,0 +1,6 @@
+exit: 0
+== log
+== files
+.swiftformat  [copy of swift/.swiftformat]
+.swiftlint.yml  [copy of swift/.swiftlint.yml]
+Package.swift  [copy of swift/Package.swift]

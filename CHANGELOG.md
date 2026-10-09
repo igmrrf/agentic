@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **`tests/init/`**: 70 characterization scenarios for `scripts/init.sh` (every language, starter, flag, alias, agent selection, conflict, starter-skip and auto-detection path), run in CI under Linux bash and macOS bash 3.2. They pin the current behaviour before `init.sh` is split into smaller files.
+
 ## [1.1.0] - 2026-10-09
 
 ### Added

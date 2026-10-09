@@ -1,0 +1,7 @@
+exit: 0
+== log
+== files
+Cargo.toml  [untouched pre-existing]
+clippy.toml  [copy of rust/clippy.toml]
+rustfmt.toml  [copy of rust/rustfmt.toml]
+src/main.rs  [untouched pre-existing]

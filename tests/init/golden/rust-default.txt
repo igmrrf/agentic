@@ -1,0 +1,49 @@
+exit: 0
+== log
+== files
+.clinerules  [generated]
+.cursor/rules/coding.mdc  [generated]
+.github/copilot-instructions.md  [generated, same as .clinerules]
+.github/workflows/rust-ci.yml  [copy of templates/ci/rust-ci.yml]
+.windsurfrules  [generated, same as .clinerules]
+CLAUDE.md  [generated, same as .clinerules]
+GEMINI.md  [generated, same as .clinerules]
+clippy.toml  [copy of rust/clippy.toml]
+rustfmt.toml  [copy of rust/rustfmt.toml]
+
+--- .clinerules
+# Repository Coding Standards (Rust 2024)
+
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Zero Panics in Production:** Zero `.unwrap()` or `.expect()` calls in production paths. Propagate all errors via `Result<T, E>`.
+- **Rust 2024 Idioms:**
+  - Explicit `unsafe { ... }` blocks inside `unsafe fn` bodies (`unsafe_op_in_unsafe_fn`).
+  - Use `use<..>` syntax for precise lifetime capturing in RPIT.
+  - Native `async fn` in traits.
+- **Error Modeling:** Strongly typed `thiserror` for libraries/domain; `anyhow` restricted to CLI/main.
+- **Borrowing & Invariants:** Borrowed slices (`&str`, `&[T]`, `&Path`) over owned allocations; typestate pattern and newtypes (`AccountId(Uuid)`).
+- **Size Caps:** File <= 400 lines, Struct `impl` <= 150 lines, Function <= 60 lines.
+- **Refactoring:** Parity-first refactoring with characterization tests.
+
+<<embedded CODING.md>>
+
+<<embedded rust/CODING.md>>
+
+
+
+--- .cursor/rules/coding.mdc
+---
+description: Rust 2024 engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+- No explanatory comments.
+- Zero `.unwrap()` / `.expect()` in production (enforce typed `Result<T, E>`).
+- Rust 2024: explicit `unsafe { ... }` blocks, `use<..>` lifetime capturing.
+- Borrowed slices over owned types; typestate and newtypes for domain safety.
+- Struct `impl` <= 150 lines, Function <= 60 lines, File <= 400 lines.
+
+<<embedded CODING.md>>
+
+<<embedded rust/CODING.md>>

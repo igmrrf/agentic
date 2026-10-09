@@ -1,0 +1,8 @@
+exit: 0
+== log
+== files
+pyproject.toml  [copy of python/pyproject.toml]
+src/service/__init__.py  [copy of python/src/service/__init__.py]
+src/service/domain/__init__.py  [copy of python/src/service/domain/__init__.py]
+src/service/domain/account.py  [copy of python/src/service/domain/account.py]
+tests/test_account.py  [copy of python/tests/test_account.py]

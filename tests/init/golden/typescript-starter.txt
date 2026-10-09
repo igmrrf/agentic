@@ -1,0 +1,6 @@
+exit: 0
+== log
+== files
+biome.json  [copy of typescript/biome.json]
+src/index.ts  [copy of typescript/src/index.ts]
+tsconfig.json  [copy of typescript/tsconfig.json]

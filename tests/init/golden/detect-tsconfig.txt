@@ -1,0 +1,7 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': typescript
+[WARN] File already exists: <TARGET>/tsconfig.json (use -f/--force to overwrite)
+== files
+biome.json  [copy of typescript/biome.json]
+tsconfig.json  [untouched pre-existing]

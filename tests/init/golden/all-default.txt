@@ -1,0 +1,84 @@
+exit: 0
+== log
+== files
+.clinerules  [generated]
+.cursor/rules/coding.mdc  [generated]
+.editorconfig  [copy of kotlin/.editorconfig]
+.github/copilot-instructions.md  [generated, same as .clinerules]
+.github/workflows/go-ci.yml  [copy of templates/ci/go-ci.yml]
+.github/workflows/kotlin-ci.yml  [copy of templates/ci/kotlin-ci.yml]
+.github/workflows/lua-ci.yml  [copy of templates/ci/lua-ci.yml]
+.github/workflows/python-ci.yml  [copy of templates/ci/python-ci.yml]
+.github/workflows/rust-ci.yml  [copy of templates/ci/rust-ci.yml]
+.github/workflows/swift-ci.yml  [copy of templates/ci/swift-ci.yml]
+.github/workflows/typescript-ci.yml  [copy of templates/ci/typescript-ci.yml]
+.golangci.yml  [copy of go/.golangci.yml]
+.luacheckrc  [copy of lua/.luacheckrc]
+.luarc.json  [copy of lua/.luarc.json]
+.stylua.toml  [copy of lua/.stylua.toml]
+.swiftformat  [copy of swift/.swiftformat]
+.swiftlint.yml  [copy of swift/.swiftlint.yml]
+.windsurfrules  [generated, same as .clinerules]
+CLAUDE.md  [generated, same as .clinerules]
+GEMINI.md  [generated, same as .clinerules]
+biome.json  [copy of typescript/biome.json]
+clippy.toml  [copy of rust/clippy.toml]
+detekt.yml  [copy of kotlin/detekt.yml]
+pyproject.toml  [copy of python/pyproject.toml]
+rustfmt.toml  [copy of rust/rustfmt.toml]
+tsconfig.json  [copy of typescript/tsconfig.json]
+
+--- .clinerules
+# Repository Coding Standards (Multi-Language)
+
+- **Zero Explanatory Comments:** Write self-documenting code.
+- **Fail Fast & Explicitly:** Never swallow errors or use empty catches.
+- **Strict Size Caps:** File <= 400 lines, Component/Struct <= 150 lines, Function <= 50-60 lines.
+- **Pure Core, Impure Edges:** Decouple business entities from delivery and persistence layers.
+- **Refactoring:** Zero behavior/contract changes without characterization tests.
+
+<<embedded CODING.md>>
+
+<<embedded rust/CODING.md>>
+
+<<embedded go/CODING.md>>
+
+<<embedded typescript/CODING.md>>
+
+<<embedded python/CODING.md>>
+
+<<embedded lua/CODING.md>>
+
+<<embedded swift/CODING.md>>
+
+<<embedded kotlin/CODING.md>>
+
+
+
+--- .cursor/rules/coding.mdc
+---
+description: Universal repository engineering and coding standards
+globs: *
+alwaysApply: true
+---
+
+- No explanatory comments.
+- No backwards-compatibility `if`-branch shims.
+- Single responsibility, early returns, max nesting depth 3.
+- Strict typing (zero `any`, schema-first boundaries).
+
+<<embedded CODING.md>>
+
+<<embedded rust/CODING.md>>
+
+<<embedded go/CODING.md>>
+
+<<embedded typescript/CODING.md>>
+
+<<embedded python/CODING.md>>
+
+<<embedded lua/CODING.md>>
+
+<<embedded swift/CODING.md>>
+
+<<embedded kotlin/CODING.md>>

@@ -1,0 +1,7 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': kotlin
+== files
+.editorconfig  [copy of kotlin/.editorconfig]
+build.gradle.kts  [untouched pre-existing]
+detekt.yml  [copy of kotlin/detekt.yml]

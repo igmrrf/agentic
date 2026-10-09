@@ -1,0 +1,4 @@
+exit: 0
+== log
+== files
+.golangci.yml  [copy of go/.golangci.yml]

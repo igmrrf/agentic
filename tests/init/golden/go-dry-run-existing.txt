@@ -1,0 +1,5 @@
+exit: 0
+== log
+== files
+.golangci.yml  [untouched pre-existing]
+CLAUDE.md  [untouched pre-existing]

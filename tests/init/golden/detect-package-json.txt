@@ -1,0 +1,7 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': typescript
+== files
+biome.json  [copy of typescript/biome.json]
+package.json  [untouched pre-existing]
+tsconfig.json  [copy of typescript/tsconfig.json]
