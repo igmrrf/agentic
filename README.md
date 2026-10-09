@@ -18,61 +18,22 @@ Pick whichever fits your tools. All three apply the same standards, linter confi
 
 Install the agent skills the same way: `npx -y github:igmrrf/agentic skills --global`. Pin a release with `npx -y github:igmrrf/agentic#v1.2.0 …` or `--ref v1.2.0` on the curl form.
 
-### From a Local Clone
+### Common Options
 
-Use the built-in initializer script [`scripts/init.sh`](scripts/init.sh) to bootstrap standards, linter configs, CI workflows, and AI agent rules into any new or existing project.
-
-> **Note:** The setup script directly embeds the coding standards into agent-based instruction files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, and `.github/copilot-instructions.md`), instead of generating separate raw `CODING.md` files in the target directory. This ensures that LLM agents natively parse and adhere to the guidelines.
+Each command writes the standards into the agent rules files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, `.github/copilot-instructions.md`), plus linter configs and CI workflows. It never adds sample code unless you ask for it with `--with-starter`. The same flags work with the curl form.
 
 ```bash
-# Interactive setup (auto-detects project language in existing repositories):
-./scripts/init.sh
-
-# Target a specific language and project folder:
-./scripts/init.sh --lang=rust --target=/path/to/my-service
-./scripts/init.sh --lang=go --target=/path/to/my-service
-./scripts/init.sh --lang=typescript --target=/path/to/my-service
-./scripts/init.sh --lang=python --target=/path/to/my-service
-./scripts/init.sh --lang=lua --target=/path/to/my-plugin
-./scripts/init.sh --lang=swift --target=/path/to/my-service
-./scripts/init.sh --lang=kotlin --target=/path/to/my-service
-
-# Target a specific AI agent for rules:
-./scripts/init.sh --gemini
-./scripts/init.sh -a claude
-./scripts/init.sh --cursor
-./scripts/init.sh --cline
-./scripts/init.sh --windsurf
-./scripts/init.sh --copilot
-
-# Target multiple AI agents simultaneously:
-./scripts/init.sh --claude --gemini --cursor
-
-# Safe adoption on an existing project (preview with dry-run and backup protection):
-# NOTE: By default, init.sh copies ONLY standards, linter/formatter configs, CI workflows,
-# and AI agent rules. It NEVER injects dummy code, sample entities, or sample tests.
-# Files that already exist, including CLAUDE.md and other agent rules files, are kept
-# unless --force is passed; add --backup to save .bak copies of anything replaced.
-./scripts/init.sh --target=/path/to/existing-repo --dry-run
-./scripts/init.sh --target=/path/to/existing-repo --backup --force
-
-# Greenfield bootstrap with starter domain entities, manifests, and test suites:
-./scripts/init.sh --target=/path/to/new-service --lang=go --with-starter
-
-# Multi-language / monorepo setup:
-./scripts/init.sh --lang=all --target=.
+npx -y github:igmrrf/agentic init                          # auto-detect the language, all agents
+npx -y github:igmrrf/agentic init --lang=python --claude   # one language, Claude only
+npx -y github:igmrrf/agentic init --claude --cursor        # several agents
+npx -y github:igmrrf/agentic init --lang=all               # multi-language repository
+npx -y github:igmrrf/agentic init --dry-run                # preview without writing
+npx -y github:igmrrf/agentic init --force --backup         # replace existing files, keeping .bak copies
+npx -y github:igmrrf/agentic init --lang=go --with-starter # new project with starter code and tests
+npx -y github:igmrrf/agentic init --help                   # every option
 ```
 
-### Remote Initialization
-
-Every `./scripts/init.sh` example above works without a clone: replace `./scripts/init.sh` with `npx -y github:igmrrf/agentic init` or pipe the script through bash. Remote runs download the repository once as a tarball (`--ref` picks a branch, tag, or commit).
-
-```bash
-npx -y github:igmrrf/agentic init --lang=swift --target=.
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=swift --target=. --ref v1.2.0
-```
-
-When piped, pass `--lang`: there is no keyboard to answer the language prompt unless a terminal is attached.
+Existing files, including `CLAUDE.md`, are kept unless you pass `--force`. When piping through curl, pass `--lang`; there is no terminal to answer the language prompt.
 
 ---
 
