@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-09
+
 ### Changed
 - **Repository renamed** from `igmrrf/Agentic` to `igmrrf/agentic`; all install URLs now use the lowercase name (GitHub redirects the old one).
 - **`scripts/init.sh`**: Updated the scaffold script to directly embed the universal and language-specific coding standards into the generated agent files (`CLAUDE.md`, `GEMINI.md`, and `.cursor/rules/coding.mdc`).
@@ -22,3 +24,6 @@ All notable changes to this project will be documented in this file.
 - **`scripts/init.sh`**: Added support for generating multiple agent rule files in a single run (e.g. `--claude --gemini` or `-a claude,gemini`).
 - **New Agents**: Out-of-the-box support for Cline (`.clinerules`), Windsurf (`.windsurfrules`), and GitHub Copilot (`.github/copilot-instructions.md`). These files automatically embed universal and language-specific coding standards just like Claude and Gemini files.
 - **Swift & Kotlin Standards**: Added full standards, toolchain configurations, starter templates, and CI workflows for Swift 6.0+ and Kotlin 2.0+ (K2 compiler).
+
+[Unreleased]: https://github.com/igmrrf/agentic/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/igmrrf/agentic/releases/tag/v1.0.0
