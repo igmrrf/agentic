@@ -1,0 +1,6 @@
+exit: 0
+== log
+[INFO] Existing pyproject.toml detected; leaving configuration intact.
+== files
+.github/workflows/python-ci.yml  [copy of templates/ci/python-ci.yml]
+pyproject.toml  [untouched pre-existing]

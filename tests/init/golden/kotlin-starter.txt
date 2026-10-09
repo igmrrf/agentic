@@ -1,0 +1,8 @@
+exit: 0
+== log
+== files
+.editorconfig  [copy of kotlin/.editorconfig]
+build.gradle.kts  [copy of kotlin/build.gradle.kts]
+detekt.yml  [copy of kotlin/detekt.yml]
+src/main/kotlin/com/agentic/service/domain/Account.kt  [copy of kotlin/src/main/kotlin/com/agentic/service/domain/Account.kt]
+src/test/kotlin/com/agentic/service/domain/AccountTest.kt  [copy of kotlin/src/test/kotlin/com/agentic/service/domain/AccountTest.kt]

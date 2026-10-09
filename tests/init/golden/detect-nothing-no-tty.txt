@@ -1,0 +1,4 @@
+exit: 1
+== log
+[ERROR] No terminal available to choose a language. Pass --lang=<language>.
+== files

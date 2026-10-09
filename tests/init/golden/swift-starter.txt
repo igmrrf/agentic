@@ -1,0 +1,8 @@
+exit: 0
+== log
+== files
+.swiftformat  [copy of swift/.swiftformat]
+.swiftlint.yml  [copy of swift/.swiftlint.yml]
+Package.swift  [copy of swift/Package.swift]
+Sources/SwiftService/Account.swift  [copy of swift/Sources/SwiftService/Account.swift]
+Tests/SwiftServiceTests/AccountTests.swift  [copy of swift/Tests/SwiftServiceTests/AccountTests.swift]

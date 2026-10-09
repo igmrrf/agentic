@@ -1,0 +1,7 @@
+exit: 0
+== log
+== files
+Cargo.toml  [copy of rust/Cargo.toml]
+clippy.toml  [copy of rust/clippy.toml]
+rustfmt.toml  [copy of rust/rustfmt.toml]
+src/lib.rs  [copy of rust/src/lib.rs]

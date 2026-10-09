@@ -1,0 +1,6 @@
+exit: 0
+== log
+[INFO] Auto-detected project type in '<TARGET>': python
+== files
+pyproject.toml  [copy of python/pyproject.toml]
+setup.py  [untouched pre-existing]

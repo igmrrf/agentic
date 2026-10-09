@@ -1,0 +1,7 @@
+exit: 0
+== log
+== files
+.golangci.yml  [copy of go/.golangci.yml]
+go.mod  [copy of go/go.mod]
+internal/domain/account.go  [copy of go/internal/domain/account.go]
+internal/domain/account_test.go  [copy of go/internal/domain/account_test.go]

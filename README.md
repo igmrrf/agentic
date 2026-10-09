@@ -113,3 +113,15 @@ Each language guide offers several layouts and expects you to pick the one match
 | **Multi-crate monorepo** | [Rust §10 Option C](rust/CODING.md#10-folder--file-design-architecture) |
 
 The universal rule behind all of them ([`CODING.md` §8](CODING.md#8-module-boundaries-layering--folder-architecture)): dependencies point inward, and the pure core never imports the impure edge.
+
+---
+
+## Testing the Tooling
+
+| Suite | Covers | Run |
+| :--- | :--- | :--- |
+| [`tests/init/`](tests/init/README.md) | Characterization (golden-file) tests for every `init.sh` path | `python3 tests/init/test_characterization.py` |
+| [`scripts/test-init.sh`](scripts/test-init.sh) | Remote `init.sh` runs and the `npx` launcher | `scripts/test-init.sh` |
+| [`scripts/test-install-skills.sh`](scripts/test-install-skills.sh) | The skills installer and marketplace manifest | `scripts/test-install-skills.sh` |
+
+Set `TEST_BASH=/bin/bash` on macOS to run them under bash 3.2, as CI does.

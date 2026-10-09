@@ -6,6 +6,7 @@ on:
     paths:
       - "skills/**"
       - "scripts/**"
+      - "tests/**"
       - "bin/**"
       - "package.json"
       - ".claude-plugin/**"
@@ -14,6 +15,7 @@ on:
     paths:
       - "skills/**"
       - "scripts/**"
+      - "tests/**"
       - "bin/**"
       - "package.json"
       - ".claude-plugin/**"
@@ -46,6 +48,13 @@ jobs:
         env:
           TEST_BASH: ${{ matrix.shell }}
         run: scripts/test-init.sh
+      - name: Initializer characterization tests
+        env:
+          TEST_BASH: ${{ matrix.shell }}
+        run: python3 tests/init/test_characterization.py
+      - name: Lint characterization tests
+        if: runner.os == 'Linux'
+        run: pipx run ruff check --config python/pyproject.toml tests/
 
   marketplace:
     runs-on: ubuntu-latest

@@ -32,6 +32,7 @@ Below, `INIT` means whichever command you picked.
 ## 3. Preview, confirm, apply
 
 1. Run `INIT <flags> --dry-run` and show the user which files would be created or skipped.
-2. Files that already exist are skipped. If the user wants them replaced, add `--force --backup` (keeps `.bak` copies). Never add `--force` without their agreement — it overwrites their `CLAUDE.md` and linter configs.
-3. Run `INIT <flags>` without `--dry-run`.
-4. Report the files written and skipped, and suggest reviewing `CLAUDE.md` before committing.
+2. Existing linter and CI files are skipped unless `--force` is passed; add `--force --backup` (keeps `.bak` copies) only if the user wants them replaced.
+3. Agent rules files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, …) are **always rewritten**, even without `--force`. If any selected one already exists, tell the user and get their agreement first; copy it to `<file>.bak` before running.
+4. Run `INIT <flags>` without `--dry-run`.
+5. Report the files written and skipped, and suggest reviewing `CLAUDE.md` before committing.

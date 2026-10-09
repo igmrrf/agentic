@@ -1,0 +1,6 @@
+exit: 0
+== log
+== files
+.editorconfig  [copy of kotlin/.editorconfig]
+build.gradle  [untouched pre-existing]
+detekt.yml  [copy of kotlin/detekt.yml]
