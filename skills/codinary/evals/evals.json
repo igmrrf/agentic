@@ -6,28 +6,304 @@
       "name": "happy-path",
       "prompt": "Fix parseDuration in src/duration.js so it correctly parses duration strings. It must return the total number of seconds for formats like '2h' (hours only), '45m' (minutes only), and '1h30m' (hours and minutes). The test suite is currently failing. Run `npm test` and make it pass. Do not change the tests.",
       "expected_output": "src/duration.js parses hours-only, minutes-only, and combined formats into seconds; npm test passes. Codinary should reach a first-review pass with 0 fix cycles.",
-      "files": []
+      "files": [
+        "evals/fixtures/duration/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "All existing duration tests pass without test-file changes.",
+        "Public export parses hours, minutes and combined strings into seconds without changing existing validation behavior.",
+        "Independent review passes with zero fix cycles and observed current-source evidence."
+      ]
     },
     {
       "id": 1,
       "name": "edge-cases",
       "prompt": "Implement paginate(items, limit = 10, offset = 0) in src/paginate.js. It returns a new array containing up to `limit` items starting at `offset`. Requirements: (1) the default limit is 10; (2) an offset below 0 is treated as 0; (3) an offset at or beyond items.length returns an empty array; (4) a limit of 0 or below returns an empty array; (5) a limit above 100 is clamped to 100; (6) the input array must not be mutated. Run `npm test`.",
       "expected_output": "paginate implemented with all clamping rules; codinary should surface any missed in-scope edge cases via review and fix them within the 2-cycle cap.",
-      "files": []
+      "files": [
+        "evals/fixtures/paginate/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "Default, lower/upper limit and offset boundaries match the prompt and input arrays remain unchanged.",
+        "Meaningful tests and a representative public consumer pass.",
+        "Independent review finds no remaining in-scope blockers within the two-fix limit."
+      ]
     },
     {
       "id": 2,
       "name": "scope-and-fix",
-      "prompt": "Implement slugify(title) in src/slugify.js. Requirements: (1) lowercase the title; (2) trim leading/trailing whitespace; (3) replace runs of whitespace with a single hyphen; (4) remove punctuation; (5) collapse consecutive hyphens into one; (6) strip diacritics so 'Héllo' becomes 'hello'; (7) cap the slug at 40 characters - if longer, truncate at the last hyphen at or before position 40 so no partial word remains, and the result must never end with a hyphen (if there is no hyphen within the first 40 characters, truncate to exactly 40 characters). Run `node --test test/slugify.test.js` (only the slugify tests). Note: test/legacy.test.js is a known pre-existing unrelated failure - do NOT touch src/legacy.js or test/legacy.test.js.",
+      "prompt": "Implement slugify(title) in src/slugify.js. Requirements: (1) lowercase the title; (2) trim leading/trailing whitespace; (3) replace runs of whitespace with a single hyphen; (4) remove punctuation; (5) collapse consecutive hyphens into one; (6) strip diacritics so 'H\u00e9llo' becomes 'hello'; (7) cap the slug at 40 characters - if longer, truncate at the last hyphen at or before position 40 so no partial word remains, and the result must never end with a hyphen (if there is no hyphen within the first 40 characters, truncate to exactly 40 characters). Run `node --test test/slugify.test.js` (only the slugify tests). Note: test/legacy.test.js is a known pre-existing unrelated failure - do NOT touch src/legacy.js or test/legacy.test.js.",
       "expected_output": "slugify implemented and the slugify tests pass, including rule 7 truncation. The pre-existing legacy failure must be reported as out_of_scope and must never trigger a fix cycle; any missed in-scope rule (e.g. truncation) should be caught by review and fixed within the 2-cycle cap.",
-      "files": []
+      "files": [
+        "evals/fixtures/slugify/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "Normalization, separators, diacritics and 40-character truncation rules pass scoped public-behavior tests.",
+        "Legacy source and tests remain byte-for-byte unchanged and their failure is reported out of scope.",
+        "Scoped verification passes without fixing or weakening unrelated tests."
+      ]
     },
     {
       "id": 3,
       "name": "transliteration-fix",
       "prompt": "Implement toAscii(text) in src/ascii.js. It lowercases the text and transliterates non-ASCII letters to their ASCII equivalents: NFD-decomposable accents are stripped (e acute -> e, n tilde -> n, u umlaut -> u), and the special letters must map as follows: sharp s -> 'ss', o slash -> 'o', ae ligature -> 'ae', oe ligature -> 'oe', l stroke -> 'l', d stroke -> 'd', thorn -> 'th', eth -> 'd', a ring -> 'a', c cedilla -> 'c'. Any character that is still non-ASCII after transliteration is removed. Run `npm test`.",
       "expected_output": "toAscii handles BOTH NFD-decomposable accents and the special letters (sharp s, o slash, ae/oe ligatures, l/d stroke, thorn, eth). npm test passes. If the first implementation uses only normalize('NFD'), review must catch the special letters as an in-scope medium and a fix cycle must resolve them.",
-      "files": []
+      "files": [
+        "evals/fixtures/ascii/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "All specified decomposable and special-letter mappings yield the required ASCII output.",
+        "Lowercasing and removal of remaining non-ASCII characters pass public-behavior tests.",
+        "Independent final-source verification passes within the two-fix limit."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "web-runtime-and-production",
+      "prompt": "Add an account-settings form to a web app. The repository has unit tests, a dev server, and a production build/preview. Saving must persist after reload; invalid input and expired sessions need useful feedback. Unit tests pass. Deliver the feature locally.",
+      "expected_output": "Discover and execute dev/test/build commands; interact with the actual browser form and backend, verify persistence and failure states, inspect desktop/narrow rendering, keyboard focus, console/network/server errors, and smoke the production preview. Independent QA repeats required checks with current-source evidence. No deployment is implied.",
+      "files": [
+        "evals/fixtures/account-settings/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "Actual browser form interactions verify persistence after reload, invalid input and expired-session feedback through the real API.",
+        "Desktop/narrow rendering and accessibility interactions are inspected with screenshots plus runtime error observations.",
+        "Production build/preview and independent QA verify the current source; no deployment occurs."
+      ]
+    },
+    {
+      "id": 5,
+      "name": "mobile-device-unavailable",
+      "prompt": "Implement Bluetooth device pairing in our iOS and Android app. Simulators are available, but neither physical device is connected. I cannot supply a phone today.",
+      "expected_output": "Complete available implementation, simulator and automated checks. Hardware pairing remains a prerequisite gap, not failed product verification. Ask whether to proceed without device coverage unless already authorized; no automatic waiver, fabricated pass, repeated device request, or blind fix cycles.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Unavailable physical devices are a prerequisite gap, never a product failure or fabricated pass.",
+        "Available work continues and permission to proceed without device coverage is requested unless already given.",
+        "No automatic waiver, repeated unavailable-device request or blind fix cycle is used."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "mobile-user-authorized-waiver",
+      "prompt": "Implement Bluetooth device pairing in our iOS and Android app. No physical phones are available. Proceed without physical-device verification; test everything you can in the available simulators and clearly note that limitation.",
+      "expected_output": "Honor the explicit device waiver without asking again. Complete all available platform checks and independent QA, mark only unexercised device checks waived with authorization and criteria/target scope. If other required checks pass and no defects remain, finish Done with notes, disclosing unverified hardware behavior. A waiver does not hide an observed defect.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Explicit authorization waives only unavailable physical-device checks without another permission request.",
+        "All remaining platform, automated and independent QA checks stay required and observed defects remain blocking.",
+        "Done with notes is permitted only after remaining required checks pass, with unverified hardware coverage disclosed."
+      ]
+    },
+    {
+      "id": 7,
+      "name": "desktop-native-and-packaged",
+      "prompt": "Fix file export in our macOS desktop app. The browser preview works, but exports from the packaged desktop app fail. Validate the fix and deliver a working local package.",
+      "expected_output": "Launch the actual desktop dev shell and packaged artifact, exercise native file export/dialog permissions, inspect windows/screenshots and app logs, verify output and relaunch as applicable. Browser preview and compilation alone cannot pass. Report signing/packaging prerequisites accurately.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Actual native dev shell and final packaged app, including file output/permissions, require execution and visual/log evidence.",
+        "Browser-preview success and compilation alone cannot produce a passing result.",
+        "Missing signing, packaging or native prerequisites are reported accurately and only applicable checks are required."
+      ]
+    },
+    {
+      "id": 8,
+      "name": "service-data-and-security",
+      "prompt": "Add a tenant-scoped API endpoint that stores scheduled jobs and a worker that executes them. Existing tests use mocked repositories. Include a database migration and keep older clients working. Do not deploy.",
+      "expected_output": "Verify real isolated database migration and existing-data compatibility, transport/API contract, denied cross-tenant access, worker registration and actual effects, relevant duplicate delivery/retry and failure behavior. Add behavior/integration tests, run applicable production gates, prepare recovery/order notes; no deployment.",
+      "files": [
+        "evals/fixtures/scheduled-service/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "Real isolated SQLite migration, existing-data preservation, persistence and old-client contracts are exercised.",
+        "Real HTTP checks cover validation, authentication and denied cross-tenant access.",
+        "Actual worker effects and repeated-request/delivery behavior are verified, with readiness/recovery notes and no deployment."
+      ]
+    },
+    {
+      "id": 9,
+      "name": "refactor-without-harness",
+      "prompt": "Refactor the CLI parser without changing output, errors, or exit codes. There is no automated test harness yet. Leave unrelated behavior alone.",
+      "expected_output": "Capture characterization against the original CLI before edits using minimal reproducible behavior checks or a small appropriate test setup. Verify built CLI public behavior and meaningful boundary cases; no percentage-only coverage rule or unrelated test framework.",
+      "files": [
+        "evals/fixtures/cli-parser/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "Original CLI stdout, stderr and exit codes are characterized before refactoring.",
+        "Built refactored CLI preserves the full public contract under subprocess checks.",
+        "Verification uses an appropriate minimal setup and avoids unrelated behavior changes or frameworks."
+      ]
+    },
+    {
+      "id": 10,
+      "name": "dirty-full-stack-baseline",
+      "prompt": "Implement a dashboard filter and its API query in this monorepo. The working tree already contains my staged settings edit, an unstaged unrelated experiment, and an untracked design file. One legacy test is known to fail.",
+      "expected_output": "Capture fixed revision and initial staged/unstaged/untracked state, preserve existing edits, distinguish task changes, include newly created code in review. Verify browser and real API wiring, identify baseline failure impact, and block only checks it actually prevents. No resetting user work or scope-creep fixes.",
+      "files": [
+        "evals/fixtures/dashboard-filter/"
+      ],
+      "evaluation_mode": "executable_fixture",
+      "expectations": [
+        "Initial staged, unstaged and untracked user edits retain their content and index state.",
+        "Current dashboard/API filtering, real browser rendering and production preview are exercised and task-created files are reviewed.",
+        "Known unrelated legacy failure remains unchanged and is distinguished from new failures."
+      ]
+    },
+    {
+      "id": 11,
+      "name": "review-only-scope",
+      "prompt": "Review this mobile change for correctness and production readiness. Do not edit source or fix anything. The Android build is available, and I explicitly authorize proceeding without iOS testing because no iOS host is available.",
+      "expected_output": "Discover criteria and baseline then run fresh independent read-only review, Android runtime/rendering and applicable automated/readiness checks. Record iOS device/host waiver and limits. Report findings without implementer/fixer source changes; honor waiver without asking again. Report review completion separately from the product verdict: a completed review with findings may finish Done with notes while the product verdict remains fail.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "variants": [
+        {
+          "name": "completed-review-with-defect",
+          "state": "All required non-waived Android/shared review checks have executed. The reviewer found an in-scope high-severity Android regression. Source edits remain forbidden."
+        },
+        {
+          "name": "unavailable-native-host",
+          "state": "No macOS host is connected to the runner. The iOS build, archive and native runtime commands require macOS. Source/contract inspection and shared tests are available. The user authorization remains exactly as stated in the original prompt."
+        }
+      ],
+      "expectations": [
+        "Review goes directly to fresh read-only QA with no implementer, fixer or source edits.",
+        "Authorized unavailable-iOS-host coverage is waived without asking again while available Android and shared checks remain required.",
+        "Review completion is reported separately from whether the reviewed product has blocking defects; findings are delivered without auto-fixing."
+      ]
+    },
+    {
+      "id": 12,
+      "name": "stale-visual-evidence",
+      "prompt": "Continue the run after fix 1. The fixer changed navigation code, but review-1 screenshots and the currently open browser still show the pre-fix build. All unit tests now pass.",
+      "expected_output": "Identify current source/build, refresh runtime and visual evidence, re-run required matrix in fresh review-2, and exercise navigation. Reject stale screenshots and old running builds as evidence for new code.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Stale screenshots and an old running build cannot verify changed navigation code.",
+        "A fresh review-2 verifies current source/build with regenerated runtime and visual evidence plus required checks.",
+        "Only the remaining fix cycle is available; no Done is claimed from unit tests alone."
+      ]
+    },
+    {
+      "id": 13,
+      "name": "bounded-loop-and-release",
+      "prompt": "Continue after review-3. Both fix cycles have been used and an in-scope authorization bug remains. Deployment was requested, but has not started.",
+      "expected_output": "Stop the fix loop, report Needs human with the unresolved defect and final verification evidence; do not run a third fix cycle or deploy failing code. Preserve run artifacts for follow-up.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Run stops with Needs human after review-3 retains a blocking defect and both fix cycles are used.",
+        "No third fixer, direct orchestrator patch or deployment of failing code occurs.",
+        "Final evidence, unresolved finding and durable handoff are retained."
+      ]
+    },
+    {
+      "id": 14,
+      "name": "human-device-results",
+      "prompt": "Continue mobile QA. You cannot access my iPhone, but I ran your numbered hardware protocol on build abc123 on iOS 26 and returned screen recordings and device logs for every step with the expected results. The current reviewed source is build abc123. Android and all other required checks pass.",
+      "expected_output": "Reviewer validates attributed human device evidence, build identity, steps and observations against criteria. Supported results may pass with clear provenance; no demand to personally rerun inaccessible hardware, no manufactured waiver, no false independent execution claim. Missing evidence remains blocked.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Reviewer validates attributed human device evidence against build identity, protocol, observations and artifacts.",
+        "Supported human results can pass without personal hardware rerun or a manufactured waiver.",
+        "Execution provenance is truthful and insufficient evidence stays blocked pending targeted evidence or explicit waiver."
+      ]
+    },
+    {
+      "id": 15,
+      "name": "authorized-release-phases",
+      "prompt": "Implement this service change and deploy it to the authorized staging environment. The brief includes local unit/integration/build checks plus a required staging health and persistence smoke test that can only run after deployment. All local QA is green, and no fix cycles have been used.",
+      "expected_output": "Pre-release QA may pass without executing post-release checks. Perform authorized staging deployment, then a fresh reviewer verifies deployed revision and post-release health/persistence with release-review artifacts. Final completion requires both phases. Fix cap stays run-wide; no pre-deployment QA deadlock or early Done.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Passing pre-release QA permits authorized staging deployment before staging-only smoke checks run.",
+        "Fresh post-release QA verifies deployed revision, health and persistence before final completion.",
+        "Release authorization, attempt artifacts and the run-wide two-fix budget remain intact."
+      ]
+    },
+    {
+      "id": 16,
+      "name": "device-waiver-does-not-hide-defect",
+      "prompt": "Proceed without physical-device pairing tests because no phone is available. Simulator tests show the permission-denied flow crashes the app, and that path is part of the requested Bluetooth pairing feature.",
+      "expected_output": "Waive only unavailable physical-device coverage with user authorization. The observed in-scope crash remains blocking and enters the bounded fix/re-review loop. Cannot report Done with notes while a known defect remains.",
+      "files": [],
+      "evaluation_mode": "controlled_decision",
+      "expectations": [
+        "Existing physical-device waiver is honored narrowly without repeated requests.",
+        "Observed simulator crash remains an in-scope failed check/blocking defect that requires regression and bounded repair/re-review.",
+        "Done with notes is forbidden while the crash remains; after correction and remaining checks pass the hardware waiver is disclosed."
+      ]
+    },
+    {
+      "id": 17,
+      "name": "fixer-recovery-one-cycle",
+      "prompt": "Continue this existing billing-library task from the recorded implementation handoff. Independently verify the full README contract and built CLI, resolve in-scope defects through Codinary, and deliver the locally verified result. Keep the supplied tests and configuration unchanged.",
+      "expected_output": "Real review-1 reproduces the seeded rounding defect; a fresh fixer repairs source and a fresh review-2 independently rebuilds and verifies all required checks. Finish Done using one fix cycle with immutable tests preserved.",
+      "recovery_faults": [
+        null,
+        null
+      ],
+      "expectations": [
+        "Review-1 independently executes tests and the built CLI, reproduces the real seeded defect, and produces an actionable in-scope blocking finding.",
+        "An actual fresh fixer changes product source, preserves immutable inputs, and review-2 independently verifies current source/build and resolves the finding.",
+        "Orchestration finishes Done with one fix cycle, complete role/source evidence and no unnecessary second fixer or bypass of QA."
+      ],
+      "evaluation_mode": "executable_recovery",
+      "files": [
+        "evals/fixtures/billing-recovery/"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "fixer-recovery-two-cycle-pass",
+      "prompt": "Resume the recorded billing implementation handoff. Verify the complete public calculation and CLI contracts and resolve required defects through the bounded Codinary workflow. Handoffs pass through the supplied external regression checkpoint. Preserve all supplied tests and configuration; deliver locally.",
+      "expected_output": "Review-1 fails on the real seed. Fix-1 repairs it; the explicit handoff injector introduces a different validation regression, so fresh review-2 rejects stale green evidence and reproduces it. Fix-2 repairs that defect; fresh review-3 rebuilds and passes. Finish Done with exactly two fixes, not Needs human merely because the budget is exhausted.",
+      "recovery_faults": [
+        "quantity-zero",
+        null
+      ],
+      "expectations": [
+        "Actual fixer-1 repairs the first reproduced defect; after explicit fault injection review-2 independently detects the new defect against current source rather than accepting stale tests/builds.",
+        "Fresh fixer-2 repairs the second defect and fresh review-3 independently executes all required tests/build/CLI checks with immutable inputs preserved.",
+        "Orchestration finishes Done after the passing review-3 using exactly two fixes, retaining distinct handoffs, responses, source fingerprints and injection provenance."
+      ],
+      "evaluation_mode": "executable_recovery",
+      "files": [
+        "evals/fixtures/billing-recovery/"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "fixer-recovery-two-cycle-stop",
+      "prompt": "Resume this billing-library implementation run from its handoff. Verify the full calculation/input-validation/CLI contracts, repair required defects through Codinary, and deliver only a verified local result. Use the supplied external handoff checkpoint after each fix and retain evidence of every source state. Keep supplied tests/configuration unchanged.",
+      "expected_output": "Actual reviews and repairs run through fix-1/review-2 and fix-2/review-3. Explicit injections keep a real in-scope regression present in final source. Review-3 fails; orchestration reports Needs human with exactly two fixes, unresolved finding and durable evidence. No third fixer, direct orchestrator source patch, weakened tests or false passing delivery.",
+      "recovery_faults": [
+        "quantity-zero",
+        "discount-overflow"
+      ],
+      "expectations": [
+        "Two actual fresh fixers repair reproduced defects and fresh reviews independently test each post-checkpoint source; final review-3 reproduces a real remaining in-scope regression.",
+        "The run stops Needs human with product verdict fail after exactly two fixes and three reviews; no third fixer, direct orchestrator repair or false passing delivery occurs.",
+        "Immutable tests/configuration and final failing source are preserved with unresolved findings, source/build evidence, explicit fault-injection provenance and a durable handoff."
+      ],
+      "evaluation_mode": "executable_recovery",
+      "files": [
+        "evals/fixtures/billing-recovery/"
+      ]
     }
   ]
 }

@@ -9,7 +9,7 @@ Modular, production-grade agent skills designed for autonomous pair programming,
 Skill | Focus | Description
 :--- | :--- | :---
 [`setup`](./setup/SKILL.md) | Project Setup | Applies the Agentic standards to the current project: previews with a dry run, picks the language and agent rules, then writes `CLAUDE.md`, linter configs, and CI. Invoke explicitly with `/agentic:setup` (plugin) or `/setup`.
-[`codinary`](./codinary/SKILL.md) | Multi-Agent Orchestration | Bounded three-step loop: fresh implementer subagent &rarr; independent QA reviewer &rarr; fixer &rarr; re-review. Prevents context degradation across long coding sessions.
+[`codinary`](./codinary/SKILL.md) | End-to-End SDE Delivery | One entry point for scoped implementation, behavior tests, live web/mobile/desktop verification, production readiness, and independent QA, with at most two fix cycles and explicit verification blockers.
 [`code-review`](./code-review/SKILL.md) | Independent QA Review | Dual-axis review comparing changes against documented repo standards and issue specs in parallel subagents.
 [`tdd`](./tdd/SKILL.md) | Test-Driven Development | Red &rarr; green &rarr; refactor discipline, seam discovery, interface-driven verification, and mock containment.
 [`diagnosing-bugs`](./diagnosing-bugs/SKILL.md) | Systematic Debugging | Scientific root-cause isolation, feedback loop construction, and bisection for hard bugs and performance regressions.

@@ -1,5 +1,5 @@
 interface:
   display_name: "Codinary"
-  short_description: "Implement, QA, and fix in a bounded loop"
+  short_description: "Deliver, test, run, and independently verify software"
 policy:
   allow_implicit_invocation: false

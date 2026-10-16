@@ -1,0 +1,12 @@
+{
+  "name": "codinary-account-settings",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "dev": "node server.js",
+    "build": "node scripts/build.js",
+    "preview": "PUBLIC_DIR=dist node server.js"
+  }
+}

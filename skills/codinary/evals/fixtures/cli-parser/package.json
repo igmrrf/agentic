@@ -1,0 +1,13 @@
+{
+  "name": "codinary-cli-parser-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "start": "node dist/cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "codinary-billing-recovery-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/billing.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "pretest": "node scripts/build.js",
+    "test": "node --test test/*.test.js",
+    "presmoke": "node scripts/build.js",
+    "smoke": "node scripts/smoke.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

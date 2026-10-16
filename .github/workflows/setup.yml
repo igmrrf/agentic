@@ -52,6 +52,8 @@ jobs:
         env:
           TEST_BASH: ${{ matrix.shell }}
         run: python3 tests/init/test_characterization.py
+      - name: Codinary recovery harness regression tests
+        run: node --test skills/codinary/evals/scripts/recovery.test.mjs
       - name: Lint characterization tests
         if: runner.os == 'Linux'
         run: pipx run ruff check --config python/pyproject.toml tests/
