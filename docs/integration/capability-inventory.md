@@ -126,3 +126,9 @@ The seven reviewer personas are strictly read-only; synthesizer and bootstrap ar
 | `TESTING.md`, `pyproject.toml`, `requirements-dev.txt`, `.github/workflows/tests.yml` | Python >=3.10, pytest/PyYAML test dependencies, Linux/Windows offline CI; source-reported native results are not Agentic runtime proof |
 
 EGM's pinned record reports native fixtures for Antigravity, Claude and Codex, but incomplete Cowork/ChatGPT cloud traces and install-only omp verification. Any Agentic claim requires its own installed-candidate evidence. `fork_turns: "none"` or `fork_context: false` is required when those options exist. Fresh context does not isolate filesystem, managed instructions or memory connectors. No delegation means design review is blocked, not a simulated Goldfish review.
+
+## Caveman and Security Audit extension (2026-10-29)
+
+- Caveman: explicit optional conversational presentation, persistent session mode, truthful status without hooks, full artifact/evidence preservation. No CLI/proxy/routing/telemetry/cloud/middleware/compression/hooks or additional skill collection.
+- Security Audit: focused guidance and explicit six-phase audits; deterministic additive coverage, coverage critics, adversarial candidate validation, structured records/schema/validators, final independent source verification and record-derived reports. All attack companions and both validator test suites ship locally.
+- Installation is supported through existing directory-based channels. Actual fresh role execution, OS sandbox controls and trusted evidence promotion are runtime prerequisites with explicit blockers, not capabilities established by discovery metadata. See [verification](caveman-security-verification.md).

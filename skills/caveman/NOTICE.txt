@@ -1,0 +1,18 @@
+Caveman
+Copyright 2026 Julius Brussee
+
+Before Caveman 3.0.0, the parts of this repository outside the Engine-linked
+runtime were licensed under the MIT License (see upstream LICENSING.md).
+Contributions made to those parts before 3.0.0 were received under the MIT
+License and remain available under it. Its copyright and permission notice
+is retained in LICENSE-Upstream-MIT.txt.
+
+Agentic distributes only the adapted core skills/caveman/SKILL.md from
+9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4. The current upstream license is
+Apache-2.0, included in LICENSE-Upstream-Apache-2.0.txt. Agentic changed
+activation, status, alias handling, precedence, and artifact/evidence rules.
+
+This NOTICE retains the applicable upstream attribution. Notices for the
+excluded runtime, CLI, browser, fonts, SDKs, and other third-party components
+are omitted because those components are not distributed here. No sponsorship
+or endorsement by Julius Brussee is implied.

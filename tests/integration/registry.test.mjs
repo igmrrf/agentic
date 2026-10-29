@@ -12,7 +12,7 @@ const registry = JSON.parse(await readFile(path.join(ROOT, 'registry/skills.json
 test('all canonical metadata, complete bundles and marketplace agree', async () => {
   const result = runCli(['registry', 'check']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(registry.skills.length, 15);
+  assert.equal(registry.skills.length, 17);
   await validateRegistry(ROOT, registry);
 });
 
@@ -75,7 +75,7 @@ test('generated bundle, metadata and marketplace drift is detected in isolated c
   const check = () => spawnSync(process.execPath, [path.join(directory, 'scripts/registry.mjs'), 'check'], { encoding: 'utf8' });
   const baseline = check();
   assert.equal(baseline.status, 0, baseline.stderr);
-  for (const filename of ['skills/egm-review/bundle/agents/comprehension.md', 'skills/egm-review/agents/openai.yaml', '.claude-plugin/marketplace.json']) {
+  for (const filename of ['skills/egm-review/bundle/agents/comprehension.md', 'skills/egm-review/agents/openai.yaml', 'skills/caveman/agents/openai.yaml', 'skills/security-audit/dependencies.txt', '.claude-plugin/marketplace.json']) {
     const target = path.join(directory, filename);
     const original = await readFile(target);
     await writeFile(target, 'drift');

@@ -62,3 +62,18 @@ Matt's `skills/engineering/pr/SKILL.md` includes credits to Dex Horthy/Humanlaye
 6. Record upstream behavioral evidence separately from native Agentic runtime proof. No automatic source tracking, global installs or release publication is authorized by this procedure.
 
 The single Agentic marketplace registers nine thin Claude wrappers exactly once. No upstream EGM plugin identity/icon is imported. Own Agentic code retains root MIT and standalone LICENSE-Agentic.txt; Matt MIT accompanies all existing adaptations/new requirements/planning material; EGM Apache license and modification notices accompany every self-contained bundle. Actual native execution remains separate from source provenance.
+
+## Caveman and Security Audit extension (2026-10-29)
+
+| Source | Revision | Licensing treatment |
+| --- | --- | --- |
+| [Caveman core](https://github.com/juliusbrussee/caveman/tree/9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4/skills/caveman) | `9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4` | Current Apache-2.0 plus retained historical MIT contributions. Both full texts and applicable NOTICE accompany the standalone skill; adapted SKILL.md carries a prominent modification notice. |
+| [Cloudflare Security Audit](https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit) | `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8` | MIT, Copyright (c) 2025-2026 Cloudflare, Inc.; full notice in standalone directory; no upstream NOTICE file found. |
+
+Source Git origins/HEAD and licenses were inspected in separate read-only checkouts under `/private/tmp/agentic-{caveman,security}-upstream`. No upstream installer was executed. The earlier audit date and source anchors above remain historical; these new source records carry their own date. Exact mappings extend the existing JSON manifest with 21 source files and four notice mappings.
+
+Caveman imports only core `skills/caveman/SKILL.md`. Local changes restrict activation, remove excluded aliases/compression exceptions, preserve truthful status, host precedence, full artifacts and audit evidence, and reject unsupported measured savings. `NOTICE.txt` retains the applicable upstream copyright/historical-MIT paragraph with local license pointers and an explicit modification/scope statement; only attributions for excluded runtime/CLI/browser/fonts are omitted. `LICENSE`, `LICENSE-MIT`, `NOTICE`, and `LICENSING.md` source paths/digests are recorded. No external Caveman runtime is installed or required.
+
+Security Audit retains all 20 files under its upstream skill directory. Only `SKILL.md` adds a prominent local integration notice and required `INTEGRATION.md` pointer. All phase/attack instructions, schema, validators and tests remain byte-identical. Agentic owns the new boundary document and generated metadata/dependency/Agentic-license files; no upstream origin is fabricated for those additions. New upstream notices live inside their respective skills so existing EGM bundles do not acquire unrelated third-party content.
+
+The existing vendored/static-data size exemption applies to unchanged upstream validators, tests, schema and cohesive functions/comments. No instruction, check, or evidence requirement is truncated to meet a local line cap. [Integration decisions](caveman-security-audit.md) record exclusions, boundaries and acceptance criteria; [verification](caveman-security-verification.md) distinguishes runtime evidence from static/package checks.

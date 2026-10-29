@@ -5,6 +5,7 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { ROOT } from './fixtures.mjs';
+import { assertInstalledSpecialist } from './specialist-fixtures.mjs';
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { encoding: 'utf8', ...options });
@@ -66,6 +67,12 @@ test('remote tar selected EGM and npm package retain complete installed consumer
   const installer = await readFile(path.join(ROOT, 'scripts/install-skills.sh'), 'utf8');
   run('bash', ['-s', '--', '--target', project, '--agent', 'agents', '--skill', 'egm-review'], { input: installer, env: { ...process.env, AGENTIC_TARBALL_URL: `file://${archive}` } });
   await assertInstalledBundle(path.join(project, '.agents/skills/egm-review'));
+  for (const name of ['caveman', 'security-audit']) {
+    const selected = path.join(directory, `remote-${name}`);
+    await mkdir(selected);
+    run('bash', ['-s', '--', '--target', selected, '--agent', 'agents', '--skill', name], { input: installer, env: { ...process.env, AGENTIC_TARBALL_URL: `file://${archive}` } });
+    await assertInstalledSpecialist(path.join(selected, '.agents/skills', name), name);
+  }
   const packed = run('npm', ['pack', '--json', '--pack-destination', directory], { cwd: ROOT, env: { ...process.env, npm_config_cache: path.join(directory, 'npm-cache') } });
   const filename = JSON.parse(packed.stdout)[0].filename;
   run('tar', ['-xzf', path.join(directory, filename), '-C', directory]);
@@ -77,10 +84,21 @@ test('remote tar selected EGM and npm package retain complete installed consumer
   const namespace = path.join(consumer, 'node_modules/@igmrrf');
   await mkdir(namespace, { recursive: true });
   await symlink(packageRoot, path.join(namespace, 'agentic'));
-  run(process.execPath, ['--input-type=module', '-e', `import { canonical } from '@igmrrf/agentic/lib/handoff/index.mjs'; import { parseRegistry } from '@igmrrf/agentic/lib/registry.mjs'; import { createRequire } from 'node:module'; const require = createRequire(import.meta.url); if (canonical({b:2,a:1}) !== '{"a":1,"b":2}' || typeof parseRegistry !== 'function' || require('@igmrrf/agentic/package').version !== '1.2.0' || require.resolve('@igmrrf/agentic/typescript/biome') !== require.resolve('@igmrrf/agentic/typescript/biome.json') || require.resolve('@igmrrf/agentic/package') !== require.resolve('@igmrrf/agentic/package.json') || require.resolve('@igmrrf/agentic/bin/agentic') !== require.resolve('@igmrrf/agentic/bin/agentic.js')) process.exit(1);`], { cwd: consumer });
+  run(process.execPath, ['--input-type=module', '-e', `import { canonical } from '@igmrrf/agentic/lib/handoff/index.mjs'; import { parseRegistry } from '@igmrrf/agentic/lib/registry.mjs'; import { createRequire } from 'node:module'; const require = createRequire(import.meta.url); if (canonical({b:2,a:1}) !== '{"a":1,"b":2}' || typeof parseRegistry !== 'function' || require('@igmrrf/agentic/package').version !== '1.3.0' || require.resolve('@igmrrf/agentic/typescript/biome') !== require.resolve('@igmrrf/agentic/typescript/biome.json') || require.resolve('@igmrrf/agentic/package') !== require.resolve('@igmrrf/agentic/package.json') || require.resolve('@igmrrf/agentic/bin/agentic') !== require.resolve('@igmrrf/agentic/bin/agentic.js')) process.exit(1);`], { cwd: consumer });
   const skill = path.join(consumer, '.agents/skills/egm-bootstrap');
   await assertInstalledBundle(skill);
   await access(path.join(skill, 'references/templates.md'));
+  for (const name of ['caveman', 'security-audit']) {
+    const selected = path.join(directory, `npm-${name}`);
+    await mkdir(selected);
+    run(process.execPath, [path.join(packageRoot, 'bin/agentic.js'), 'skills', '--target', selected, '--skill', name, '--agent', 'agents']);
+    await assertInstalledSpecialist(path.join(selected, '.agents/skills', name), name);
+    const packagedPaths = JSON.parse(packed.stdout)[0].files.map(file => file.path);
+    for (const relative of ['SKILL.md', 'LICENSE-Agentic.txt', 'agents/openai.yaml', 'dependencies.txt']) {
+      assert.ok(packagedPaths.includes(`skills/${name}/${relative}`));
+    }
+    assert.ok(!packagedPaths.some(filename => /skills\/caveman\/(proxy|hooks|packages|engine|telemetry)\//.test(filename)));
+  }
   const modulePath = `file://${path.join(packageRoot, 'lib/handoff/index.mjs')}`;
   run(process.execPath, ['--input-type=module', '-e', `const api = await import(${JSON.stringify(modulePath)}); if (api.canonical({z:1,a:2}) !== '{"a":2,"z":1}') process.exit(1);`]);
 });

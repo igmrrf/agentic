@@ -15,6 +15,8 @@ Skill | Focus | Description
 [`diagnosing-bugs`](./diagnosing-bugs/SKILL.md) | Systematic Debugging | Scientific root-cause isolation, feedback loop construction, and bisection for hard bugs and performance regressions.
 [`codebase-design`](./codebase-design/SKILL.md) | Deep Module Architecture | Shared vocabulary for designing deep interfaces, identifying seam locations, and applying "design-it-twice".
 [`domain-modeling`](./domain-modeling/SKILL.md) | Domain Models & ADRs | Domain-driven vocabulary generation, Architecture Decision Records (ADRs), and context boundary mapping.
+[`caveman`](./caveman/SKILL.md) | Optional Presentation | Explicit conversational mode, session persistence and truthful status; technical payload and full artifacts preserved.
+[`security-audit`](./security-audit/SKILL.md) | Security Guidance & Audits | Focused guidance or an explicitly requested six-phase independent audit with coverage, validators and verified records.
 
 ---
 
@@ -60,7 +62,7 @@ The same installer runs through `npx` (Node 18+) or `curl` (bash only); options 
 
 ```bash
 npx -y github:igmrrf/agentic skills --global
-npx -y github:igmrrf/agentic#v1.2.0 skills --global --skill codinary,tdd
+npx -y github:igmrrf/agentic#v1.3.0 skills --global --skill codinary,tdd
 ```
 
 ```bash
@@ -74,7 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scri
 curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --target /path/to/my-project
 
 # Pin to a tag, branch, or commit
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.2.0
+curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.3.0
 ```
 
 | Option | Effect |
@@ -172,3 +174,13 @@ All seven EGM skill directories and Codinary's optional intake contain generated
 Use `node bin/agentic.js registry list` for exact contracts, permissions, failure behavior and aliases. EGM presets interactive/uninterrupted run 5–9; feature_spec runs 5–8; implementation runs 9; individual string stages 5–9 remain callable. Claude plugin users have nine thin personas registered once; standalone copies use a fresh general agent loading the canonical persona. No duplicate plugin identity is registered. Read-only restrictions are advisory unless enforced by the host.
 
 The pinned-source inventory, conflicts and [provenance](../docs/integration/upstream-provenance.md) explain selective integration. Agentic/Matt MIT and EGM Apache-2.0 notices ship with copies; EGM is not an officially supported Google product.
+
+## Caveman and Security Audit
+
+Both install independently with no sibling skill dependency. Select `--skill caveman` or `--skill security-audit` through the existing installer or npm launcher; local links, archive installs, directory copies and marketplace discovery retain their local resources and notices. `.agents/skills.json` already discovers the canonical `skills` directory and needs no parallel list. Third-party `npx skills` selection and native host invocation require their own runtime verification.
+
+Invoke `/caveman` or `/agentic:caveman` explicitly; `/caveman status` reads existing mode without enabling it. `stop caveman` or `normal mode` disables it. Only the core voice ships: no alternate voice aliases, proxy, hooks, telemetry, CLI or compression infrastructure. Host communication, exact technical facts, full persisted artifacts, audit evidence and authorization take precedence; no measured token-savings claim is made.
+
+Security Audit remains guidance by default. Explicit codebase audits, comprehensive reviews, pen tests or requested report artifacts use all six phases. Its standalone directory includes every phase, attack-class companion, schema, validator, upstream test and Cloudflare MIT notice. Validators require Node.js >=18 with no additional npm dependency. Run `npm run test:security-audit` to exercise the vendored suites.
+
+Full audits retain independent validation, additive coverage and source freshness. Missing fresh delegation or any required OS sandbox/promotion control remains an explicit blocker. Installed metadata does not establish runtime support. Findings never authorize automatic remediation or replace Codinary's source QA, two-fix limit, verdicts or release authorization. See the [standalone boundary](./security-audit/INTEGRATION.md), [integration decisions](../docs/integration/caveman-security-audit.md), and [observed checks](../docs/integration/caveman-security-verification.md).

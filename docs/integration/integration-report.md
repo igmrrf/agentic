@@ -51,3 +51,7 @@ The completed [five-stage native fixture](/private/tmp/codinary/unified-agentic-
 Pinned Matt revision: `59db609eb1e18aaf59b63284d0e52255aff0c63c`, MIT. Pinned EGM revision: `f0ba151b252c9abf1318d9fe857a43265d06de89`, Apache-2.0. Existing Matt adaptations' historical import revision remains unknown; no false provenance is asserted. Agentic retains its MIT license. Complete notices and modified-file declarations accompany canonical and generated distributions. EGM is not an officially supported Google product.
 
 Edit canonical resources once, run registry generate/check, deliberately update provenance digests after source changes, and rerun relevant checks. No automatic upstream tracking, signer, mutable approval catalog or new agent runtime engine is introduced. Retained installed-probe and synthetic-handoff-fixture contain test data and public verification material only, no private signing key. Temporary per-test projects are removed by scoped teardown; run evidence/caches/probes remain for independent QA and resumption.
+
+## Caveman and Security Audit extension (2026-10-29)
+
+The separate [integration plan and decisions](caveman-security-audit.md) adds two standalone specialists to the same canonical registry/distribution architecture. [Verification evidence](caveman-security-verification.md) records current tests, behavioral probes and runtime limitations. Historical Codinary reviews and fix counts above are retained as historical evidence; this extension does not revise their outcomes or claim full native audit support.

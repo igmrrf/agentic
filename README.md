@@ -16,7 +16,7 @@ Pick whichever fits your tools. All three apply the same standards, linter confi
 | **Node 18+** | `npx -y github:igmrrf/agentic init --lang=go --claude` |
 | **Only bash and curl** | `curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/main/scripts/init.sh \| bash -s -- --lang=go --claude` |
 
-Install the agent skills the same way: `npx -y github:igmrrf/agentic skills --global`. Pin a release with `npx -y github:igmrrf/agentic#v1.2.0 …` or `--ref v1.2.0` on the curl form.
+Install the agent skills the same way: `npx -y github:igmrrf/agentic skills --global`. Pin a release with `npx -y github:igmrrf/agentic#v1.3.0 …` or `--ref v1.3.0` on the curl form.
 
 ### Common Options
 
@@ -93,6 +93,13 @@ Set `TEST_BASH=/bin/bash` on macOS to run them under bash 3.2, as CI does.
 
 Agentic owns engineering standards and initialization. Codinary remains the sole delivery orchestrator, including fresh implementation/QA roles, verification evidence, bounded fixes and authorized release. Grilling clarifies requirements; EGM supplies architecture and independent design review for complex/high-risk work. Small changes continue directly through Codinary.
 
+[Caveman](skills/caveman/SKILL.md) adds an explicitly activated conversational voice. [Security Audit](skills/security-audit/SKILL.md) supplies focused guidance and an explicitly requested six-phase audit with its complete standalone resources. Audits have separate records and never authorize fixes or replace Codinary QA/verdicts. See the [integration boundary and acceptance criteria](docs/integration/caveman-security-audit.md) and [verification evidence](docs/integration/caveman-security-verification.md).
+
+```bash
+node bin/agentic.js skills --target /path/to/project --skill caveman --agent agents
+node bin/agentic.js skills --target /path/to/project --skill security-audit --agent claude
+```
+
 The [architecture](docs/integration/architecture.md), [registry](docs/integration/skill-registry.md), [handoff contract](docs/integration/handoff-contract.md), [security model](docs/integration/security-model.md), [compatibility matrix](docs/integration/compatibility-matrix.md), [migration guide](docs/integration/migration-guide.md) and [integration report](docs/integration/integration-report.md) document the boundaries and evidence.
 
 ```bash
@@ -104,4 +111,4 @@ npm run test:integration
 
 Selected EGM skills include complete generated personas, rubrics, runtime guidance, templates and notices. Discovery/install support does not imply native fresh-review execution on every host. Goldfish review stops when genuine fresh dispatch is unavailable. Approved-design intake requires explicit handoff mode and a detached human signature plus separately caller-pinned key/current assertion; ordinary direct requests have no EGM prerequisite. No agent establishes real human signing trust or release authority.
 
-Agentic's own work remains MIT. Matt Pocock adaptations retain their [MIT notice](licenses/Matt-Pocock-MIT.txt); Google EGM-derived material retains [Apache-2.0](licenses/Google-EGM-Apache-2.0.txt) and modification notices. Complete notices accompany standalone skills. EGM is not an officially supported Google product; this integration does not imply Google endorsement. Exact pinned sources and file digests are in [provenance](docs/integration/upstream-provenance.md).
+Agentic's own work remains MIT. Matt Pocock adaptations retain their [MIT notice](licenses/Matt-Pocock-MIT.txt); Google EGM-derived material retains [Apache-2.0](licenses/Google-EGM-Apache-2.0.txt) and modification notices. Caveman retains current [Apache-2.0](skills/caveman/LICENSE-Upstream-Apache-2.0.txt), historical [MIT](skills/caveman/LICENSE-Upstream-MIT.txt), and applicable [NOTICE](skills/caveman/NOTICE.txt). Security Audit retains [Cloudflare MIT](skills/security-audit/LICENSE-Upstream-MIT.txt). Complete notices accompany standalone skills. EGM is not an officially supported Google product; no upstream endorsement is implied. Exact pinned sources and file digests are in [provenance](docs/integration/upstream-provenance.md).

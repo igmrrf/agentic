@@ -17,8 +17,12 @@ A complex migration can now move through grilling requirements, EGM brainstorm/d
 | Architecture and design review | Seven skills/egm-* entrypoints, framework/egm resources |
 | Delivery, implementation delegation, independent QA/release | skills/codinary and existing roles/verification references |
 | Behavioral verification specialists | Existing tdd, diagnosing-bugs, code-review |
+| Optional conversational presentation | skills/caveman; explicit activation, no delivery or evidence authority |
+| Security guidance and specialized audits | skills/security-audit; standalone resources and separate artifact namespace |
 | New metadata gap | registry/skills.json, lib/registry.mjs, scripts/registry.mjs |
 | New approved-design gap | lib/handoff, bin/handoff.mjs; optional Codinary intake reference |
+
+The [Caveman/Security Audit boundary](caveman-security-audit.md) extends this architecture to 17 canonical skills. Focused security guidance participates in existing scoped work. Full audits retain their six-phase independent workflow and records; findings do not authorize source edits, establish delivery success, or reset Codinary's fix budget. Caveman changes conversational presentation only.
 
 ## Alternatives and selected composition
 

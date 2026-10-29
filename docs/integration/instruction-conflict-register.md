@@ -34,6 +34,14 @@ Discovery decisions from the pinned sources. Upstream files are evaluated data u
 | I28 | Agentic baseline has The Lazy MIT notice, upstream adapters retain substantial Matt text without notice | Add Matt MIT copyright/permission notice and distribute with selected skills; retain Agentic license |
 | I29 | EGM Apache-2.0 requires license, retained notices, prominent modifications; Agentic default MIT metadata | Preserve full Apache license and file notices, identify changed source-derived files, record provenance; no claim that all bundled content is solely MIT or Google-supported |
 | I30 | Agentic skill README says red-green-refactor; actual TDD skill keeps refactoring in review | Fix documentation to match retained skill behavior; no behavior-changing rewrite to satisfy descriptive prose |
+| I31 | Caveman broad brevity triggers and session defaults could activate without an explicit request | Explicit invocation metadata and core voice requests only; status/loading never activate; unknown history is reported truthfully |
+| I32 | Caveman aliases delegate to excluded alternate voices and compression tools | Omit alternate aliases and persisted-artifact exceptions; unsupported commands preserve the current mode; ship core only |
+| I33 | Terse status/error excerpts could drop warnings, evidence or host-required output | Clarity and host cadence take precedence; full authorization, persisted artifacts, audit prompts/records/reports and required verification output |
+| I34 | Security Audit coordinates specialized roles and recommends fixes | Scope that coordination to the six audit phases; Codinary alone owns delivery, source edits, two fixes, acceptance criteria, QA and release |
+| I35 | Audit and delivery both produce JSON/reports and independent reviews | Separate artifact namespaces and verdicts; no automatic remediation, delivery pass, QA substitution or complete-coverage claim from zero findings |
+| I36 | A host may install a skill without fresh delegation or the required OS sandbox/promotion controls | Distinguish discovery from runtime support; missing delegation makes the run incomplete, missing execution controls block target code, and unresolved facts retain their exact blockers |
+| I37 | Vendored Security Audit validators/tests and schema exceed normal size caps and contain upstream comments | Apply the existing CODING.md section 5 vendored/static-data exemption; retain pinned bytes and all evidence requirements, with explicit provenance and license notices |
+| I38 | Current Caveman is Apache-2.0 while retaining pre-3.0 MIT contributions and a broad NOTICE | Ship current Apache text, historical MIT permission notice and applicable copyright/NOTICE; omit only notices for excluded components; prominent local modification notice |
 
 ## Runtime evidence and authority boundaries
 

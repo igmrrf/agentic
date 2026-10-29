@@ -68,6 +68,8 @@ jobs:
           node scripts/check-provenance.mjs
       - name: Unified integration, security and packaging tests
         run: node --test tests/integration/*.test.mjs
+      - name: Vendored Security Audit validator tests
+        run: npm run test:security-audit
       - name: Codinary recovery harness regression tests
         run: node --test skills/codinary/evals/scripts/recovery.test.mjs
       - name: Lint characterization tests
