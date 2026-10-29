@@ -56,7 +56,7 @@ Existing files, including `CLAUDE.md`, are kept unless you pass `--force`. When 
 ## Universal Foundations
 
 - **Root Rules:** [`CODING.md`](CODING.md) defines universal craft standards across all stacks (no explanatory comments, no backwards-compatibility `if`-branch shims, strict size caps, zero-swallowed errors, parity-first refactoring, folder/file design). Its §0 explains scope tags (`[service]`, `[app]`, `[lib]`), which rules are non-negotiable versus project-tunable, and how to adopt the standards into an existing repository.
-- **Agent Skills Library:** [`skills/`](skills/) provides production-ready agent skills (`codinary`, `tdd`, `code-review`, `diagnosing-bugs`, `codebase-design`, `domain-modeling`). See [`skills/README.md`](skills/README.md) for full documentation.
+- **Agent Skills Library:** [`skills/`](skills/) provides 15 canonical capabilities: existing standards/setup and delivery specialists, one requirements interview, and seven EGM design/review commands. See [`skills/README.md`](skills/README.md) for full documentation.
 - **Skills Installation:** Claude Code users run `/plugin marketplace add igmrrf/agentic` then `/plugin install agentic@agentic`. Other agents use `npx skills add igmrrf/agentic` or [`scripts/install-skills.sh`](scripts/install-skills.sh), which installs to `.claude/skills/` and `.agents/skills/` (globally or per project). See [`skills/README.md`](skills/README.md#installing-the-skills).
 - **Architecture Review:** [`standards_review.md`](standards_review.md) contains the review summary, verified research findings, version matrix, and architecture references.
 - **Scaffolding Tool:** [`scripts/init.sh`](scripts/init.sh) provides automated project configuration. Its implementation lives in [`scripts/lib/init/`](scripts/lib/init/), and the per-language headers of the generated agent rules files live in [`templates/rules/`](templates/rules/).
@@ -88,3 +88,20 @@ The universal rule behind all of them ([`CODING.md` §8](CODING.md#8-module-boun
 | [`scripts/test-install-skills.sh`](scripts/test-install-skills.sh) | The skills installer and marketplace manifest | `scripts/test-install-skills.sh` |
 
 Set `TEST_BASH=/bin/bash` on macOS to run them under bash 3.2, as CI does.
+
+## Unified engineering workflow
+
+Agentic owns engineering standards and initialization. Codinary remains the sole delivery orchestrator, including fresh implementation/QA roles, verification evidence, bounded fixes and authorized release. Grilling clarifies requirements; EGM supplies architecture and independent design review for complex/high-risk work. Small changes continue directly through Codinary.
+
+The [architecture](docs/integration/architecture.md), [registry](docs/integration/skill-registry.md), [handoff contract](docs/integration/handoff-contract.md), [security model](docs/integration/security-model.md), [compatibility matrix](docs/integration/compatibility-matrix.md), [migration guide](docs/integration/migration-guide.md) and [integration report](docs/integration/integration-report.md) document the boundaries and evidence.
+
+```bash
+node bin/agentic.js registry check
+node bin/agentic.js skills --target /path/to/project --skill egm-review --agent agents
+node bin/agentic.js handoff --help
+npm run test:integration
+```
+
+Selected EGM skills include complete generated personas, rubrics, runtime guidance, templates and notices. Discovery/install support does not imply native fresh-review execution on every host. Goldfish review stops when genuine fresh dispatch is unavailable. Approved-design intake requires explicit handoff mode and a detached human signature plus separately caller-pinned key/current assertion; ordinary direct requests have no EGM prerequisite. No agent establishes real human signing trust or release authority.
+
+Agentic's own work remains MIT. Matt Pocock adaptations retain their [MIT notice](licenses/Matt-Pocock-MIT.txt); Google EGM-derived material retains [Apache-2.0](licenses/Google-EGM-Apache-2.0.txt) and modification notices. Complete notices accompany standalone skills. EGM is not an officially supported Google product; this integration does not imply Google endorsement. Exact pinned sources and file digests are in [provenance](docs/integration/upstream-provenance.md).

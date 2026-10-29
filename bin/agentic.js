@@ -8,6 +8,8 @@ const ROOT = path.resolve(__dirname, "..");
 const COMMANDS = {
   init: path.join(ROOT, "scripts", "init.sh"),
   skills: path.join(ROOT, "scripts", "install-skills.sh"),
+  handoff: path.join(ROOT, "bin", "handoff.mjs"),
+  registry: path.join(ROOT, "scripts", "registry.mjs"),
 };
 
 const USAGE = `Usage: agentic <command> [options]
@@ -15,6 +17,8 @@ const USAGE = `Usage: agentic <command> [options]
 Commands:
   init      Apply coding standards, linter configs, CI, and agent rules to a project
   skills    Install agent skills for Claude Code and other agents
+  handoff   Validate design artifacts and approved Codinary intake
+  registry  List, validate or generate canonical skill metadata
   help      Show this message
 
 Run "agentic <command> --help" for command options.
@@ -25,7 +29,7 @@ Examples:
   npx -y github:igmrrf/agentic#v1.2.0 skills --global`;
 
 function run(script, args) {
-  const result = spawnSync("bash", [script, ...args], { stdio: "inherit" });
+  const result = spawnSync(script.endsWith(".mjs") ? process.execPath : "bash", [script, ...args], { stdio: "inherit" });
   if (result.error) {
     const reason = result.error.code === "ENOENT" ? "bash was not found on PATH" : result.error.message;
     console.error(`agentic: ${reason}`);

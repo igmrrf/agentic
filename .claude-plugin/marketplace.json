@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "agentic",
-      "description": "Engineering skills: setup (apply the standards to a project), codinary (implement, QA, fix loop), code-review, tdd, diagnosing-bugs, codebase-design, domain-modeling.",
+      "description": "Agentic standards, Codinary delivery, requirements specialists and EGM design review.",
       "source": "./",
       "version": "1.2.0",
       "author": {
@@ -19,7 +19,7 @@
       },
       "homepage": "https://github.com/igmrrf/agentic",
       "repository": "https://github.com/igmrrf/agentic",
-      "license": "MIT",
+      "license": "MIT AND Apache-2.0",
       "keywords": [
         "skills",
         "tdd",
@@ -30,13 +30,32 @@
       "category": "development",
       "strict": false,
       "skills": [
-        "./skills/setup",
-        "./skills/codinary",
         "./skills/code-review",
-        "./skills/tdd",
-        "./skills/diagnosing-bugs",
         "./skills/codebase-design",
-        "./skills/domain-modeling"
+        "./skills/codinary",
+        "./skills/diagnosing-bugs",
+        "./skills/domain-modeling",
+        "./skills/egm-bootstrap",
+        "./skills/egm-brainstorm",
+        "./skills/egm-draft",
+        "./skills/egm-drift-report",
+        "./skills/egm-resolve",
+        "./skills/egm-review",
+        "./skills/egm-review-loop",
+        "./skills/grilling",
+        "./skills/setup",
+        "./skills/tdd"
+      ],
+      "agents": [
+        "./.claude-plugin/agents/bootstrap_orchestrator.md",
+        "./.claude-plugin/agents/codebase_details.md",
+        "./.claude-plugin/agents/comprehension.md",
+        "./.claude-plugin/agents/design_critic.md",
+        "./.claude-plugin/agents/implementation_readiness.md",
+        "./.claude-plugin/agents/structural.md",
+        "./.claude-plugin/agents/style.md",
+        "./.claude-plugin/agents/synthesizer.md",
+        "./.claude-plugin/agents/zoom_out.md"
       ]
     }
   ]

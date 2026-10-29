@@ -2,7 +2,7 @@
   "name": "@igmrrf/agentic",
   "version": "1.2.0",
   "description": "Multi-language engineering standards, agent rules, and agent skills, set up in any project with one command.",
-  "license": "MIT",
+  "license": "MIT AND Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/igmrrf/agentic.git"
@@ -13,5 +13,11 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "test:integration": "node --test tests/integration/*.test.mjs",
+    "registry:check": "node scripts/registry.mjs check",
+    "registry:generate": "node scripts/registry.mjs generate",
+    "prepack": "node scripts/registry.mjs check >&2"
   }
 }

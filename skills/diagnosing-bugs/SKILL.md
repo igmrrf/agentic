@@ -75,6 +75,8 @@ Confirm:
 - [ ] The failure is reproducible across multiple runs (or, for non-deterministic bugs, reproducible at a high enough rate to debug against).
 - [ ] You have captured the exact symptom (error message, wrong output, slow timing) so later phases can verify the fix actually addresses it.
 
+When forcing a red signal with a temporary mutation, save the exact diff and observed failure, then restore only that mutation and verify the original source identity before proceeding. A mutation proves sensitivity, not the real defect.
+
 ### Minimise
 
 Once it's red, shrink the repro to the **smallest scenario that still goes red**. Cut inputs, callers, config, data, and steps **one at a time**, re-running the loop after each cut, and keep only what's load-bearing for the failure.

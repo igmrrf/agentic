@@ -1,0 +1,5 @@
+# Approved design handoff
+
+Direct Codinary tasks do not require EGM. Explicit approved-design intake runs the bundled CLI: `node bundle/bin/handoff.mjs intake --mode handoff --root <repo> --artifact <relative.json> --receipt <receipt.json> --trust <external-trust.json>`. Invalid intake blocks; do not reinterpret it as a direct request. Human approval and the expected current specification are supplied separately from project artifacts. Never sign or establish real key trust autonomously. See the installed `bundle/docs/handoff-contract.md` and `bundle/docs/security-model.md` for the exact schema and trust procedure.
+
+A specification is immutable once reviewed/approved. Any byte change to signed design or reports, or any payload field change including editorial text, invalidates approval. Create a new positive integer version, supersede the former version, rerun relevant review and obtain renewed human approval. Editorial changes outside signed artifacts do not affect approval. No semantic equivalence detector is claimed.

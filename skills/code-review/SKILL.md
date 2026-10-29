@@ -10,7 +10,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-The issue tracker should have been provided to you. If `docs/agents/issue-tracker.md` is missing, tell the user to run `/setup-matt-pocock-skills`.
+Use the repository's issue tracker integration only when fetching an issue. A supplied local specification works independently. If tracker configuration is missing, record the fetch prerequisite and continue with available local sources. Fresh independent review requires actual subagent support; unavailable delegation blocks that axis rather than permitting self-review.
 
 ## Process
 

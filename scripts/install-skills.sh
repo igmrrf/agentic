@@ -27,6 +27,7 @@ SKILLS_SOURCE_DIR=""
 TEMP_WORK_DIR=""
 AVAILABLE_SKILLS=()
 FINAL_SKILLS=()
+SKILL_HEIGHTS=()
 DESTINATIONS=()
 
 if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ -f "${BASH_SOURCE[0]}" ]]; then
@@ -201,19 +202,49 @@ is_available() {
     return 1
 }
 
-resolve_final_skills() {
-    local s
-    if [[ ${#SELECTED_SKILLS[@]} -eq 0 ]]; then
-        FINAL_SKILLS=("${AVAILABLE_SKILLS[@]}")
-        return
+resolve_alias() {
+    local alias_file="$SKILLS_SOURCE_DIR/aliases.tsv" resolved=""
+    if [[ -f "$alias_file" ]]; then
+        resolved="$(awk -F '\t' -v selected="$1" '$1 == selected {print $2}' "$alias_file")"
     fi
-    for s in "${SELECTED_SKILLS[@]}"; do
-        if [[ "$s" == "all" ]]; then
+    echo "${resolved:-$1}"
+}
+
+append_skill_with_dependencies() {
+    local skill="$1" depth="$2" index dependency height=0
+    [[ "$depth" -le 15 ]] || die "Skill dependency depth exceeded"
+    is_available "$skill" || die "Skill '$skill' not found. Available skills: ${AVAILABLE_SKILLS[*]}"
+    for index in "${!FINAL_SKILLS[@]}"; do
+        if [[ "${FINAL_SKILLS[index]}" == "$skill" ]]; then
+            SKILL_HEIGHT="${SKILL_HEIGHTS[index]}"
+            [[ "$((depth + SKILL_HEIGHT))" -le 15 ]] || die "Skill dependency depth exceeded"
+            return
+        fi
+    done
+    if [[ "$UNINSTALL" != "true" && -f "$SKILLS_SOURCE_DIR/$skill/dependencies.txt" ]]; then
+        while IFS= read -r dependency || [[ -n "$dependency" ]]; do
+            [[ -n "$dependency" ]] || continue
+            append_skill_with_dependencies "$dependency" "$((depth + 1))"
+            [[ "$height" -gt "$SKILL_HEIGHT" ]] || height="$((SKILL_HEIGHT + 1))"
+        done < "$SKILLS_SOURCE_DIR/$skill/dependencies.txt"
+    fi
+    FINAL_SKILLS+=("$skill")
+    SKILL_HEIGHTS+=("$height")
+    SKILL_HEIGHT="$height"
+}
+
+resolve_final_skills() {
+    local skill available_skill
+    if [[ ${#SELECTED_SKILLS[@]} -eq 0 ]]; then
+        SELECTED_SKILLS=("all")
+    fi
+    for skill in "${SELECTED_SKILLS[@]}"; do
+        if [[ "$skill" == "all" ]]; then
+            for available_skill in "${AVAILABLE_SKILLS[@]}"; do append_skill_with_dependencies "$available_skill" 0; done
             FINAL_SKILLS=("${AVAILABLE_SKILLS[@]}")
             return
         fi
-        is_available "$s" || die "Skill '$s' not found. Available skills: ${AVAILABLE_SKILLS[*]}"
-        FINAL_SKILLS+=("$s")
+        append_skill_with_dependencies "$(resolve_alias "$skill")" 0
     done
 }
 

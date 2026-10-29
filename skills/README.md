@@ -11,7 +11,7 @@ Skill | Focus | Description
 [`setup`](./setup/SKILL.md) | Project Setup | Applies the Agentic standards to the current project: previews with a dry run, picks the language and agent rules, then writes `CLAUDE.md`, linter configs, and CI. Invoke explicitly with `/agentic:setup` (plugin) or `/setup`.
 [`codinary`](./codinary/SKILL.md) | End-to-End SDE Delivery | One entry point for scoped implementation, behavior tests, live web/mobile/desktop verification, production readiness, and independent QA, with at most two fix cycles and explicit verification blockers.
 [`code-review`](./code-review/SKILL.md) | Independent QA Review | Dual-axis review comparing changes against documented repo standards and issue specs in parallel subagents.
-[`tdd`](./tdd/SKILL.md) | Test-Driven Development | Red &rarr; green &rarr; refactor discipline, seam discovery, interface-driven verification, and mock containment.
+[`tdd`](./tdd/SKILL.md) | Test-Driven Development | Red &rarr; green discipline; refactoring belongs to review, seam discovery, interface-driven verification, and mock containment.
 [`diagnosing-bugs`](./diagnosing-bugs/SKILL.md) | Systematic Debugging | Scientific root-cause isolation, feedback loop construction, and bisection for hard bugs and performance regressions.
 [`codebase-design`](./codebase-design/SKILL.md) | Deep Module Architecture | Shared vocabulary for designing deep interfaces, identifying seam locations, and applying "design-it-twice".
 [`domain-modeling`](./domain-modeling/SKILL.md) | Domain Models & ADRs | Domain-driven vocabulary generation, Architecture Decision Records (ADRs), and context boundary mapping.
@@ -147,7 +147,28 @@ Agent Platform | Where Skills Are Read From | How to Install
 
 ## Maintaining the Skills
 
-- Add a skill as `skills/<name>/SKILL.md` and list it under `skills` in [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json). CI fails if the two disagree.
+- Add a skill and its strict entry to [registry/skills.json](../registry/skills.json), then run `node scripts/registry.mjs generate` and `check`. Metadata, aliases, dependency files, marketplace list and self-contained bundles are generated.
 - Bump `version` in `marketplace.json` when you release changes so plugin users get the update, and tag the release (`git tag vX.Y.Z`) so `--ref` users can pin it.
 - Bump `version` in `package.json` alongside `marketplace.json`.
 - Run `scripts/test-install-skills.sh` and `scripts/test-init.sh` (set `TEST_BASH=/bin/bash` on macOS to test bash 3.2) and `claude plugin validate --strict .` before pushing.
+
+## Requirements and EGM design capabilities
+
+| Command | Purpose |
+| --- | --- |
+| grilling (legacy installer alias grill-me) | One requirements interview with traceable criteria |
+| egm-brainstorm | Problem framing and architectural alternatives |
+| egm-draft | Feature specification and detailed implementation plan |
+| egm-review | Five-stage fresh review or selected preset/stage |
+| egm-review-loop | Bounded antagonistic design review |
+| egm-resolve | Traceable dispositions and authorized document repairs |
+| egm-bootstrap | Bounded source-grounded contracts/blueprints |
+| egm-drift-report | Architecture/documentation drift findings |
+
+Codinary owns implementation and independent source/runtime QA. EGM owns design/documentation only. A clean design review is not human approval. Small direct work remains unchanged; complex approved-design intake is optional and fails closed when invalid. See the [architecture/routing table](../docs/integration/architecture.md), [handoff contract](../docs/integration/handoff-contract.md) and [compatibility evidence](../docs/integration/compatibility-matrix.md).
+
+All seven EGM skill directories and Codinary's optional intake contain generated self-contained bundles. Install one EGM skill through any directory-copy channel and its complete personas/rubrics/adapters/notices remain available. Third-party selected TDD installation must also include codebase-design if the tool ignores dependencies.txt. The native installer resolves dependency closure; uninstall keeps dependencies and existing workspace configuration.
+
+Use `node bin/agentic.js registry list` for exact contracts, permissions, failure behavior and aliases. EGM presets interactive/uninterrupted run 5–9; feature_spec runs 5–8; implementation runs 9; individual string stages 5–9 remain callable. Claude plugin users have nine thin personas registered once; standalone copies use a fresh general agent loading the canonical persona. No duplicate plugin identity is registered. Read-only restrictions are advisory unless enforced by the host.
+
+The pinned-source inventory, conflicts and [provenance](../docs/integration/upstream-provenance.md) explain selective integration. Agentic/Matt MIT and EGM Apache-2.0 notices ship with copies; EGM is not an officially supported Google product.

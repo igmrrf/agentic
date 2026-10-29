@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
     paths:
+      - "framework/**"
+      - "registry/**"
+      - "lib/**"
+      - "licenses/**"
+      - "docs/integration/**"
       - "skills/**"
       - "scripts/**"
       - "tests/**"
@@ -13,6 +18,11 @@ on:
       - ".github/workflows/setup.yml"
   pull_request:
     paths:
+      - "framework/**"
+      - "registry/**"
+      - "lib/**"
+      - "licenses/**"
+      - "docs/integration/**"
       - "skills/**"
       - "scripts/**"
       - "tests/**"
@@ -52,6 +62,12 @@ jobs:
         env:
           TEST_BASH: ${{ matrix.shell }}
         run: python3 tests/init/test_characterization.py
+      - name: Canonical registry and provenance
+        run: |
+          node scripts/registry.mjs check
+          node scripts/check-provenance.mjs
+      - name: Unified integration, security and packaging tests
+        run: node --test tests/integration/*.test.mjs
       - name: Codinary recovery harness regression tests
         run: node --test skills/codinary/evals/scripts/recovery.test.mjs
       - name: Lint characterization tests

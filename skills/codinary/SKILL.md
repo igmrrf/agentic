@@ -39,6 +39,8 @@ A successful build or an empty findings list alone does not establish completion
   source/contract review, and other independent checks required. Unavailability
   alone does not imply a waiver.
 
+Read [design-intake.md](references/design-intake.md) when routing unclear requirements, complex/high-risk design, or an explicitly supplied EGM handoff. Direct delivery retains this contract. Read [planning.md](references/planning.md) for dependency-aware vertical slices and interface decisions.
+
 ## Run and memory
 
 Create `${TMPDIR:-/tmp}/codinary/<slug>-<UTC timestamp>/` and pass its absolute
@@ -195,7 +197,7 @@ If delegation is unavailable, explain that independent
 QA cannot be completed in this session; provide the prepared brief and next step
 instead of silently claiming independent review.
 
-## 5. Release within scope and report
+## 5. Release within scope
 
 When release is requested and authorized, apply the release plan after pre-release
 QA passes. Use a fresh reviewer to verify the deployed/installed revision and run
@@ -210,6 +212,38 @@ pre-release QA, then release and verify the corrected build within authorization
 The two-fix limit is run-wide and never resets at release. Follow the authorized
 recovery plan for failed rollouts; avoid blind deployment retries. If release is
 outside scope, provide the verified artifact/local result and remaining steps.
+
+## 6. Clean up and report
+
+After a successful implementation/review/fix loop and any required release
+verification, clean up temporary resources before the final report. For failed,
+blocked, or pending work, retain what is needed to investigate or resume.
+
+1. Inventory resources against the baseline and ledger. A resource qualifies for
+   cleanup only when it was created by this task, is temporary, is no longer
+   needed, and is not intended to be shared or delivered. Include disposable
+   worktrees, generated build directories, mobile build artifacts/packages,
+   built desktop apps, binaries, archives, temporary files, and test data, even
+   when they live outside the repository or run directory.
+2. Preserve the implementation, required evidence, and deliverables first. Keep
+   source, tests, configuration, documentation, commits, review records, logs,
+   screenshots, and anything needed for handoff, release, rollback, or user use.
+   Move retained artifacts out of disposable locations and update their pointers
+   before deleting those locations. Inspect staged, unstaged, untracked, and
+   unpushed work in each disposable worktree; preserve it in a retained checkout
+   or recoverable archive before removing the worktree.
+3. Stop task-created processes that are no longer needed, then remove eligible
+   resources by exact path or identifier using the appropriate lifecycle tool.
+   Archive app-managed worktrees through the app's worktree tool; otherwise use
+   normal Git worktree removal without forcing away changes. Preserve reused or
+   shared worktrees, pre-existing files, shared caches, and installed apps that
+   are part of the delivered outcome. Avoid broad deletion or repository-wide
+   clean commands.
+4. Verify each removal and check that retained work, deliverables, and evidence
+   links remain intact. Record removed resources, intentional retentions and
+   reasons, and any cleanup failure with its exact remaining path/identifier in
+   the ledger. Report incomplete cleanup explicitly; never claim it succeeded
+   from an attempted command alone.
 
 Write `summary.md` from the final review and ledger, then give the user a concise
 report with links to evidence:
@@ -229,4 +263,5 @@ report with links to evidence:
 - **Release:** built / locally verified / staged / deployed as actually observed;
   remaining rollout, rollback, or human verification steps and exact prerequisites.
 - **Artifacts:** run directory, final review, and deliverable locations. Record
-  whether task-owned processes were stopped or intentionally left running.
+  cleanup results, retained resources and reasons, any cleanup still blocked,
+  and whether task-owned processes were stopped or intentionally left running.

@@ -1,5 +1,5 @@
 interface:
   display_name: "Setup"
-  short_description: "Apply Agentic standards to a project"
+  short_description: "Agentic project initialization"
 policy:
   allow_implicit_invocation: false

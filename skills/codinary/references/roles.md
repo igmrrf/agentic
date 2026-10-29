@@ -13,6 +13,10 @@ platform sections named in the brief. Agents share a workspace: preserve others'
 edits, work within assigned ownership, and coordinate access to runtime sessions.
 Append a compact timestamped ledger entry on finishing. Store detailed evidence in
 the run directory and return status plus paths in at most 120 words.
+Record each temporary resource you create in the ledger with its absolute path
+or runtime identifier and purpose, including worktrees and build outputs outside
+the run directory. Keep resources needed by later roles available for handoff;
+the orchestrator performs final cleanup after successful delivery verification.
 
 ## Implementer prompt
 

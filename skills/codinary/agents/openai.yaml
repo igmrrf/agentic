@@ -1,5 +1,5 @@
 interface:
   display_name: "Codinary"
-  short_description: "Deliver, test, run, and independently verify software"
+  short_description: "Sole engineering delivery orchestrator"
 policy:
   allow_implicit_invocation: false

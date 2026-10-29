@@ -1,0 +1,5 @@
+interface:
+  display_name: "Egm Review Loop"
+  short_description: "EGM architectural design, review or documentation: review-loop"
+policy:
+  allow_implicit_invocation: false
