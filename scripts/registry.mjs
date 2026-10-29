@@ -21,7 +21,7 @@ async function buildOutputs() {
   const adapters = await filesBelow(path.join(ROOT, 'framework/egm/adapters/claude'));
   marketplace.plugins[0].agents = adapters.map(filename => `./.claude-plugin/agents/${path.basename(filename)}`);
   for (const filename of adapters) generated.set(`.claude-plugin/agents/${path.basename(filename)}`, await readFile(filename));
-  marketplace.plugins[0].description = 'Agentic standards, Codinary delivery, requirements specialists and EGM design review.';
+  marketplace.plugins[0].description = 'Agentic standards, Codinary delivery, EGM design review, optional Caveman voice and Security Audit.';
   generated.set('.claude-plugin/marketplace.json', Buffer.from(`${JSON.stringify(marketplace, null, 2)}\n`));
   generated.set('skills/aliases.tsv', Buffer.from(registry.skills.flatMap(skill => skill.aliases.map(alias => `${alias}\t${skill.id}`)).join('\n') + '\n'));
   for (const skill of registry.skills) {

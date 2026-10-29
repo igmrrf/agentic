@@ -17,7 +17,7 @@
 | path | Exactly `skills/<id>`; existing root-confined realpath |
 | bundle | Boolean; generate self-contained EGM resources and intake tooling when true |
 
-Root/entry unexpected keys reject. Skills must be nonempty, arrays <=1000, strings <=16384. Each array has unique elements; IDs and aliases are unique across all entries. Dependencies/related IDs must exist and cannot refer to self. Dependency cycles and depth beyond the installer's 15-edge bound reject. All 15 directories must correspond exactly to the registry. Actual local Markdown links outside fenced examples must exist and remain within root. Runtime-only names in prose are not treated as filesystem links.
+Root/entry unexpected keys reject. Skills must be nonempty, arrays <=1000, strings <=16384. Each array has unique elements; IDs and aliases are unique across all entries. Dependencies/related IDs must exist and cannot refer to self. Dependency cycles and depth beyond the installer's 15-edge bound reject. All 17 directories must correspond exactly to the registry. Actual local Markdown links outside fenced examples must exist and remain within root. Runtime-only names in prose are not treated as filesystem links.
 
 For example, `tdd` has modelInvoked=true, dependencies=["codebase-design"], bundle=false. `egm-review` has modelInvoked=false, dependencies=[], bundle=true: every runtime resource is physically included in that skill directory. Full representative entries are inspectable with `agentic registry list`; no second hand-maintained schema or public type copy competes with the executable parser.
 
@@ -31,7 +31,7 @@ agentic registry list
 agentic registry check
 ```
 
-No flags or extra arguments are accepted. `list` prints the strict registry JSON. `generate` creates deterministic metadata/bundles then validates them; `check` changes nothing and compares actual bytes, detects extra generated bundle files and validates references. Both print `Registry <command>: 15 canonical skills, generated metadata and bundles valid` on success. Failures print the cause on stderr and exit 1; success exits 0. Unknown commands, malformed registries, missing paths, ambiguous aliases, cycles, bad references and any generated drift fail. `npm pack` checks registry first through prepack.
+No flags or extra arguments are accepted. `list` prints the strict registry JSON. `generate` creates deterministic metadata/bundles then validates them; `check` changes nothing and compares actual bytes, detects extra generated bundle files and validates references. Both print `Registry <command>: 17 canonical skills, generated metadata and bundles valid` on success. Failures print the cause on stderr and exit 1; success exits 0. Unknown commands, malformed registries, missing paths, ambiguous aliases, cycles, bad references and any generated drift fail. `npm pack` checks registry first through prepack.
 
 | Canonical input | Generated output |
 | --- | --- |
@@ -52,3 +52,7 @@ The installer resolves `grill-me` to `grilling`, preserving one interview engine
 ## Extension procedure
 
 Add a scoped canonical skill and all required resources, add its strict entry, resolve overlaps/ownership, then generate/check. Codinary needs no registry-specific rewrite. Add dependency edges only for actual mandatory invocation/installation requirements; use relatedSkills for optional guidance. Keep authority with Agentic standards, EGM design and Codinary delivery. Alias metadata never authorizes an operation.
+
+## Specialist extension
+
+The current 17 entries include `caveman` (modelInvoked=false) and `security-audit` (modelInvoked=true), each with dependencies=[] and bundle=false. Their resources are directly inside their standalone directory rather than the EGM bundle mechanism. Caveman has no aliases to excluded capabilities. Security Audit keeps guidance as its default and explicit full-audit triggers. Neither relatedSkills edge grants invocation or delivery authority. The existing Bash installer discovers generated skill directories and copies each complete tree; no parallel list or installer branch is needed. The existing workspace discovery path is unchanged.

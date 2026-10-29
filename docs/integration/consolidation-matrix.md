@@ -87,3 +87,7 @@ The intended public set is 15 canonical skills: seven existing, `grilling`, and 
 EGM design review is separate from source review, runtime QA and post-release verification. No subsystem can reset Codinary's two-fix count or infer release authorization. Routing depends on uncertainty, affected interfaces, security/data risk and reversibility, not line count. Small work bypasses full design review; optional bootstrap/drift/improvement work is never mandatory for every task.
 
 Implementation begins only after this inventory/selection record and the architecture proposal have been reviewed. Preserve public contracts, validate selected-install dependency closure and single registration, run baseline plus focused regression checks, and report native runtime evidence separately from static validation. Deferred capabilities do not block this integration; missing mandatory runtime evidence remains a disclosed limitation or blocker.
+
+## Specialist extension (2026-10-29)
+
+The 15-skill baseline above is extended to 17 by [Caveman and Security Audit](caveman-security-audit.md). Adopt Caveman core presentation only; exclude its infrastructure and alternate skill aliases. Adopt the complete Security Audit standalone directory, including phases, all attack companions, validators, schema and tests. Compose security guidance with scoped engineering and keep full audit records separate. Codinary ownership, budgets, review-only scope, QA and release authorization remain unchanged.

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-29
+
+### Added
+- Standalone Caveman core conversational skill, pinned to `9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4`, with explicit activation, truthful status, artifact/evidence preservation, and current Apache-2.0 plus historical MIT notices. Infrastructure and alternate skills/aliases are excluded.
+- Complete Security Audit skill, pinned to `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8`, with guidance/full-audit modes, all six phases, attack references, schema, validators/tests and Cloudflare MIT notice. Missing independence or OS enforcement stays an explicit runtime blocker.
+- Registry-generated discovery for both skills, standalone installation/package regressions, upstream validator CI checks, protected Codinary contract digests, and documented ownership, provenance and behavioral evidence. Codinary delivery rules remain unchanged; audit findings grant no remediation or release authority.
+
 ## [1.2.0] - 2026-10-09
 
 ### Changed
@@ -54,7 +61,8 @@ All notable changes to this project will be documented in this file.
 - **New Agents**: Out-of-the-box support for Cline (`.clinerules`), Windsurf (`.windsurfrules`), and GitHub Copilot (`.github/copilot-instructions.md`). These files automatically embed universal and language-specific coding standards just like Claude and Gemini files.
 - **Swift & Kotlin Standards**: Added full standards, toolchain configurations, starter templates, and CI workflows for Swift 6.0+ and Kotlin 2.0+ (K2 compiler).
 
-[Unreleased]: https://github.com/igmrrf/agentic/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/igmrrf/agentic/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/igmrrf/agentic/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/igmrrf/agentic/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/igmrrf/agentic/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/igmrrf/agentic/releases/tag/v1.0.0
