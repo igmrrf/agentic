@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Explicit global/project skill targets for Claude, Codex, Pi, OpenCode, Antigravity CLI/App, Gemini CLI, Cursor, Copilot, Cline, Windsurf, and Amp, with aliases and destination deduplication.
+- Registry-generated portable and Claude plugin manifests, a Codex marketplace, Pi package metadata, and strict validation of the packed distribution.
+- Harness installation lifecycle coverage, package content checks, and installation/use guides linked from a shorter README.
+
+### Changed
+
+- Project initialization now includes `AGENTS.md` by default and accepts shared-instruction harness targets. Setup selects the current harness instead of defaulting to Claude.
+- Explicit `--agent all` installs every harness location; the implicit default remains Claude plus shared `.agents` skills. Named Antigravity and Gemini installs now use their native global paths.
+- npm distributions exclude development context and local build/cache artifacts while retaining standards, standalone resources, and licenses.
+
 ## [1.3.0] - 2026-10-29
 
 ### Added

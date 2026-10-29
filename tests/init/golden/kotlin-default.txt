@@ -7,6 +7,7 @@ exit: 0
 .github/copilot-instructions.md  [generated, same as .clinerules]
 .github/workflows/kotlin-ci.yml  [copy of templates/ci/kotlin-ci.yml]
 .windsurfrules  [generated, same as .clinerules]
+AGENTS.md  [generated, same as .clinerules]
 CLAUDE.md  [generated, same as .clinerules]
 GEMINI.md  [generated, same as .clinerules]
 detekt.yml  [copy of kotlin/detekt.yml]

@@ -1,114 +1,119 @@
-# Agentic Engineering Standards
+# Agentic
 
-Authoritative engineering standards, coding rules, architectural blueprints, and toolchain configurations for multi-language development across **Rust**, **Go**, **TypeScript**, **Python**, **Lua**, **Swift**, and **Kotlin**.
+Agentic is a portable engineering system for AI-assisted software development: coding standards, project setup, requirements discovery, architecture and design review, implementation, testing, security audits, and production verification.
 
-Every language guide is written to hold in **any** project of that language — library, CLI, service, or application — not for one framework. Framework- and runtime-specific guidance is always scoped explicitly (a tagged section or an appendix) so it can be ignored where it does not apply. Named tools are defaults for greenfield projects; the binding requirement is *one* formatter, *one* linter, *one* type checker, enforced in CI.
+It brings together **17 reusable agent skills**, standards and toolchains for **Rust, Go, TypeScript, Python, Lua, Swift, and Kotlin**, and installation paths for **12 coding harnesses**. Use the standards in an existing repository, install individual skills, or follow the connected workflow from an idea through verified delivery.
 
----
+## What Agentic covers
 
-## Quickstart: Set Up Any Project (No Clone Needed)
+| Area | What it provides | Entry point |
+| --- | --- | --- |
+| Engineering foundations | Universal coding rules, language-specific standards, architecture blueprints, formatter/linter configurations, and CI templates. | [Language standards](docs/standards.md), [universal rules](CODING.md) |
+| Project setup | Apply standards and agent instructions to a repository, preview changes, preserve existing files, and optionally add starter code. | [`setup`](skills/setup/SKILL.md), `agentic init` |
+| Requirements and domain design | Clarify decisions and acceptance criteria, establish domain vocabulary and ADRs, and design module boundaries and interfaces. | [`grilling`](skills/grilling/SKILL.md), [`domain-modeling`](skills/domain-modeling/SKILL.md), [`codebase-design`](skills/codebase-design/SKILL.md) |
+| Architecture and design review | Explore alternatives, write specifications and implementation plans, run independent design critiques, and resolve findings through bounded review cycles. | `egm-brainstorm`, `egm-draft`, `egm-review`, `egm-review-loop`, `egm-resolve` — [EGM workflows](skills/README.md#requirements-and-egm-design-capabilities) |
+| Codebase documentation | Create source-grounded architecture documentation and report divergence between the code and its documented design. | [`egm-bootstrap`](skills/egm-bootstrap/SKILL.md), [`egm-drift-report`](skills/egm-drift-report/SKILL.md) |
+| Implementation and delivery | Coordinate scoped implementation, independent QA, automated tests, live product checks, production readiness, bounded fixes, and authorized release. | [`codinary`](skills/codinary/SKILL.md) |
+| Testing, debugging, and source review | Develop behavior tests, reproduce and diagnose failures, and review changes against both coding standards and the requested behavior. | [`tdd`](skills/tdd/SKILL.md), [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md), [`code-review`](skills/code-review/SKILL.md) |
+| Security | Focused security guidance or an explicitly requested six-phase audit with coverage records, independent validation, and structured findings. | [`security-audit`](skills/security-audit/SKILL.md) |
+| Conversational presentation | An optional terse voice that preserves technical facts, complete artifacts, and verification evidence. | [`caveman`](skills/caveman/SKILL.md) |
+| Design handoffs and evidence | Validate approved-design artifacts, human signatures, source fingerprints, and review coverage before optional design-to-delivery intake. | [`agentic handoff`](docs/integration/handoff-contract.md), [security model](docs/integration/security-model.md) |
 
-Pick whichever fits your tools. All three apply the same standards, linter configs, CI workflows, and agent rules.
+The [skill catalog](skills/README.md) explains individual commands. The [architecture guide](docs/integration/architecture.md) explains how their responsibilities connect.
 
-| You have | Run |
-| :--- | :--- |
-| **Claude Code** | `/plugin marketplace add igmrrf/agentic`, `/plugin install agentic@agentic`, then `/agentic:setup` in your project |
-| **Node 18+** | `npx -y github:igmrrf/agentic init --lang=go --claude` |
-| **Only bash and curl** | `curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/main/scripts/init.sh \| bash -s -- --lang=go --claude` |
+## Install in your coding harness
 
-Install the agent skills the same way: `npx -y github:igmrrf/agentic skills --global`. Pin a release with `npx -y github:igmrrf/agentic#v1.3.0 …` or `--ref v1.3.0` on the curl form.
+Choose one installation method for each harness.
 
-### Common Options
+### Claude Code
 
-Each command writes the standards into the agent rules files (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/coding.mdc`, `.clinerules`, `.windsurfrules`, `.github/copilot-instructions.md`), plus linter configs and CI workflows. It never adds sample code unless you ask for it with `--with-starter`. The same flags work with the curl form.
+Run inside Claude Code:
 
-```bash
-npx -y github:igmrrf/agentic init                          # auto-detect the language, all agents
-npx -y github:igmrrf/agentic init --lang=python --claude   # one language, Claude only
-npx -y github:igmrrf/agentic init --claude --cursor        # several agents
-npx -y github:igmrrf/agentic init --lang=all               # multi-language repository
-npx -y github:igmrrf/agentic init --dry-run                # preview without writing
-npx -y github:igmrrf/agentic init --force --backup         # replace existing files, keeping .bak copies
-npx -y github:igmrrf/agentic init --lang=go --with-starter # new project with starter code and tests
-npx -y github:igmrrf/agentic init --help                   # every option
+```text
+/plugin marketplace add igmrrf/agentic
+/plugin install agentic@agentic
 ```
 
-Existing files, including `CLAUDE.md`, are kept unless you pass `--force`. When piping through curl, pass `--lang`; there is no terminal to answer the language prompt.
+Then run `/agentic:setup` in your project.
 
----
+### Codex, OpenCode, and other harnesses
 
-## Language Standards
+Run the matching command in your terminal. The installer needs Node.js 18+ and Bash (macOS, Linux, or Windows with WSL/Git Bash).
 
-| Language | Baseline | Standards & Rules | Blueprint & Overview | Toolchain / Configs | CI Workflow |
-|---|---|---|---|---|---|
-| **Rust** | Rust 2024 (1.85.0+) | [`rust/CODING.md`](rust/CODING.md) | [`rust/README.md`](rust/README.md) | [`rustfmt.toml`](rust/rustfmt.toml), [`clippy.toml`](rust/clippy.toml), [`Cargo.toml`](rust/Cargo.toml) | [`rust-ci.yml`](templates/ci/rust-ci.yml) |
-| **Go** | Go 1.26 | [`go/CODING.md`](go/CODING.md) | [`go/README.md`](go/README.md) | [`.golangci.yml`](go/.golangci.yml) | [`go-ci.yml`](templates/ci/go-ci.yml) |
-| **TypeScript** | TypeScript 5.5+ | [`typescript/CODING.md`](typescript/CODING.md) | [`typescript/README.md`](typescript/README.md) | [`biome.json`](typescript/biome.json), [`tsconfig.json`](typescript/tsconfig.json) | [`typescript-ci.yml`](templates/ci/typescript-ci.yml) |
-| **Python** | Python 3.12+ | [`python/CODING.md`](python/CODING.md) | [`python/README.md`](python/README.md) | [`pyproject.toml`](python/pyproject.toml) | [`python-ci.yml`](templates/ci/python-ci.yml) |
-| **Lua** | LuaJIT / Lua 5.4 | [`lua/CODING.md`](lua/CODING.md) | [`lua/README.md`](lua/README.md) | [`.stylua.toml`](lua/.stylua.toml), [`.luarc.json`](lua/.luarc.json), [`.luacheckrc`](lua/.luacheckrc) | [`lua-ci.yml`](templates/ci/lua-ci.yml) |
-| **Swift** | Swift 6.0+ | [`swift/CODING.md`](swift/CODING.md) | [`swift/README.md`](swift/README.md) | [`.swiftlint.yml`](swift/.swiftlint.yml), [`.swiftformat`](swift/.swiftformat), [`Package.swift`](swift/Package.swift) | [`swift-ci.yml`](templates/ci/swift-ci.yml) |
-| **Kotlin** | Kotlin 2.0+ (K2) | [`kotlin/CODING.md`](kotlin/CODING.md) | [`kotlin/README.md`](kotlin/README.md) | [`detekt.yml`](kotlin/detekt.yml), [`.editorconfig`](kotlin/.editorconfig), [`build.gradle.kts`](kotlin/build.gradle.kts) | [`kotlin-ci.yml`](templates/ci/kotlin-ci.yml) |
+| Harness | Install for all your projects |
+| --- | --- |
+| **Codex** | `npx -y github:igmrrf/agentic skills --global --agent codex` |
+| **OpenCode** | `npx -y github:igmrrf/agentic skills --global --agent opencode` |
+| **Antigravity CLI (agy)** | `agy plugin install https://github.com/igmrrf/agentic` |
+| **Antigravity App / IDE** | `npx -y github:igmrrf/agentic skills --global --agent antigravity` |
+| **Gemini CLI** | `npx -y github:igmrrf/agentic skills --global --agent gemini` |
+| **Cursor** | `npx -y github:igmrrf/agentic skills --global --agent cursor` |
+| **GitHub Copilot** | `npx -y github:igmrrf/agentic skills --global --agent copilot` |
+| **Cline** | `npx -y github:igmrrf/agentic skills --global --agent cline` |
+| **Windsurf** | `npx -y github:igmrrf/agentic skills --global --agent windsurf` |
+| **Amp** | `npx -y github:igmrrf/agentic skills --global --agent amp` |
 
-**Baseline** is the version whose idioms the guide assumes, not a hard requirement. Each guide marks its version-gated rules and states how to pin lower.
-
----
-
-## Universal Foundations
-
-- **Root Rules:** [`CODING.md`](CODING.md) defines universal craft standards across all stacks (no explanatory comments, no backwards-compatibility `if`-branch shims, strict size caps, zero-swallowed errors, parity-first refactoring, folder/file design). Its §0 explains scope tags (`[service]`, `[app]`, `[lib]`), which rules are non-negotiable versus project-tunable, and how to adopt the standards into an existing repository.
-- **Agent Skills Library:** [`skills/`](skills/) provides 15 canonical capabilities: existing standards/setup and delivery specialists, one requirements interview, and seven EGM design/review commands. See [`skills/README.md`](skills/README.md) for full documentation.
-- **Skills Installation:** Claude Code users run `/plugin marketplace add igmrrf/agentic` then `/plugin install agentic@agentic`. Other agents use `npx skills add igmrrf/agentic` or [`scripts/install-skills.sh`](scripts/install-skills.sh), which installs to `.claude/skills/` and `.agents/skills/` (globally or per project). See [`skills/README.md`](skills/README.md#installing-the-skills).
-- **Architecture Review:** [`standards_review.md`](standards_review.md) contains the review summary, verified research findings, version matrix, and architecture references.
-- **Scaffolding Tool:** [`scripts/init.sh`](scripts/init.sh) provides automated project configuration. Its implementation lives in [`scripts/lib/init/`](scripts/lib/init/), and the per-language headers of the generated agent rules files live in [`templates/rules/`](templates/rules/).
-
----
-
-## Folder & File Architecture Patterns
-
-Each language guide offers several layouts and expects you to pick the one matching the project shape — a library does not inherit a service's layering.
-
-| Project shape | Where the layout lives |
-|---|---|
-| **Library / SDK** | [Rust §10 Option A](rust/CODING.md#10-folder--file-design-architecture) · [Go §10 Option A](go/CODING.md#10-folder--file-design-architecture) · [TypeScript §12](typescript/CODING.md#12-project-layout) · [Python §10](python/CODING.md#10-project-layout) · [Lua §9](lua/CODING.md#9-project-layout) · [Swift §7](swift/CODING.md#7-folder--file-architecture) |
-| **CLI** | [Rust §10 Option A](rust/CODING.md#10-folder--file-design-architecture) · [Go §10 Option B](go/CODING.md#10-folder--file-design-architecture) · [TypeScript §12](typescript/CODING.md#12-project-layout) |
-| **Backend service** (hexagonal ports & adapters) | [Go §10 Option C](go/CODING.md#10-folder--file-design-architecture) · [Rust §10 Option B](rust/CODING.md#10-folder--file-design-architecture) · [TypeScript §12](typescript/CODING.md#12-project-layout) · [Python §10](python/CODING.md#10-project-layout) · [Swift §7](swift/CODING.md#7-folder--file-architecture) · [Kotlin §7](kotlin/CODING.md#7-folder--file-architecture) |
-| **UI application** (feature-driven vertical slices) | [TypeScript §12](typescript/CODING.md#12-project-layout) + [Appendix A](typescript/CODING.md#appendix-a-ui-component-frameworks) |
-| **Multi-crate monorepo** | [Rust §10 Option C](rust/CODING.md#10-folder--file-design-architecture) |
-
-The universal rule behind all of them ([`CODING.md` §8](CODING.md#8-module-boundaries-layering--folder-architecture)): dependencies point inward, and the pure core never imports the impure edge.
-
----
-
-## Testing the Tooling
-
-| Suite | Covers | Run |
-| :--- | :--- | :--- |
-| [`tests/init/`](tests/init/README.md) | Characterization (golden-file) tests for every `init.sh` path | `python3 tests/init/test_characterization.py` |
-| [`scripts/test-init.sh`](scripts/test-init.sh) | Remote `init.sh` runs and the `npx` launcher | `scripts/test-init.sh` |
-| [`scripts/test-install-skills.sh`](scripts/test-install-skills.sh) | The skills installer and marketplace manifest | `scripts/test-install-skills.sh` |
-
-Set `TEST_BASH=/bin/bash` on macOS to run them under bash 3.2, as CI does.
-
-## Unified engineering workflow
-
-Agentic owns engineering standards and initialization. Codinary remains the sole delivery orchestrator, including fresh implementation/QA roles, verification evidence, bounded fixes and authorized release. Grilling clarifies requirements; EGM supplies architecture and independent design review for complex/high-risk work. Small changes continue directly through Codinary.
-
-[Caveman](skills/caveman/SKILL.md) adds an explicitly activated conversational voice. [Security Audit](skills/security-audit/SKILL.md) supplies focused guidance and an explicitly requested six-phase audit with its complete standalone resources. Audits have separate records and never authorize fixes or replace Codinary QA/verdicts. See the [integration boundary and acceptance criteria](docs/integration/caveman-security-audit.md) and [verification evidence](docs/integration/caveman-security-verification.md).
+### Pi
 
 ```bash
-node bin/agentic.js skills --target /path/to/project --skill caveman --agent agents
-node bin/agentic.js skills --target /path/to/project --skill security-audit --agent claude
+pi install git:github.com/igmrrf/agentic
 ```
 
-The [architecture](docs/integration/architecture.md), [registry](docs/integration/skill-registry.md), [handoff contract](docs/integration/handoff-contract.md), [security model](docs/integration/security-model.md), [compatibility matrix](docs/integration/compatibility-matrix.md), [migration guide](docs/integration/migration-guide.md) and [integration report](docs/integration/integration-report.md) document the boundaries and evidence.
+Reload your harness or start a new session after installation. In Codex, select `$setup`; in Pi, run `/skill:setup`. In other harnesses, ask: **“Use the setup skill to apply Agentic standards to this project.”**
+
+Prefer a project install, selected skills, a Codex plugin marketplace, or a clone? See the [installation guide](docs/installation.md), including updates, removal, and exact install locations.
+
+## Use it
+
+For a focused feature or bug, start with Codinary and a concrete result. For uncertain requirements, use Grilling first. For complex architectural work, use EGM to develop and review a design before handing implementation to Codinary. Design and review skills can also be used independently.
+
+```text
+Use codinary to add password reset. Tokens must expire after 30 minutes.
+Use diagnosing-bugs to investigate this failing test.
+Use code-review to review the changes since main.
+```
+
+Codinary owns implementation and delivery verification; EGM owns architecture and design documentation. A clean design review and human approval are separate. Small tasks can go directly to delivery, while approved-design intake uses the explicit handoff contract.
+
+Claude plugin commands use `/agentic:codinary`. Codex skills use `$codinary`; Pi uses `/skill:codinary`. OpenCode loads skills through its skill tool when you name them in your request. The [usage guide](docs/usage.md) covers common workflows and harness differences.
+
+## Apply standards without installing skills
+
+Run this from your project:
 
 ```bash
-node bin/agentic.js registry check
-node bin/agentic.js skills --target /path/to/project --skill egm-review --agent agents
-node bin/agentic.js handoff --help
-npm run test:integration
+npx -y github:igmrrf/agentic init --lang=typescript --agent codex
 ```
 
-Selected EGM skills include complete generated personas, rubrics, runtime guidance, templates and notices. Discovery/install support does not imply native fresh-review execution on every host. Goldfish review stops when genuine fresh dispatch is unavailable. Approved-design intake requires explicit handoff mode and a detached human signature plus separately caller-pinned key/current assertion; ordinary direct requests have no EGM prerequisite. No agent establishes real human signing trust or release authority.
+Replace `typescript` with `rust`, `go`, `python`, `lua`, `swift`, `kotlin`, or `all`. Omit `--agent` to generate rules for all supported agents, including `AGENTS.md`. Existing files are preserved; add `--dry-run` to preview changes.
 
-Agentic's own work remains MIT. Matt Pocock adaptations retain their [MIT notice](licenses/Matt-Pocock-MIT.txt); Google EGM-derived material retains [Apache-2.0](licenses/Google-EGM-Apache-2.0.txt) and modification notices. Caveman retains current [Apache-2.0](skills/caveman/LICENSE-Upstream-Apache-2.0.txt), historical [MIT](skills/caveman/LICENSE-Upstream-MIT.txt), and applicable [NOTICE](skills/caveman/NOTICE.txt). Security Audit retains [Cloudflare MIT](skills/security-audit/LICENSE-Upstream-MIT.txt). Complete notices accompany standalone skills. EGM is not an officially supported Google product; no upstream endorsement is implied. Exact pinned sources and file digests are in [provenance](docs/integration/upstream-provenance.md).
+The initializer writes coding instructions, formatter/linter configurations, and GitHub Actions workflows. Add `--no-ci` to skip workflows, or `--with-starter` when you want starter code. See [project setup](docs/usage.md#project-setup) for examples.
+
+## How the codebase fits together
+
+| Location | Responsibility |
+| --- | --- |
+| [`CODING.md`](CODING.md) and the seven language directories | Standards, architecture examples, language toolchains, and starter implementations. |
+| [`templates/`](templates/) | Agent instruction templates and language-specific CI workflows. |
+| [`bin/`](bin/) and [`scripts/`](scripts/) | Project initialization, harness installation, registry generation, handoff commands, and packaging validation. |
+| [`skills/`](skills/) | The 17 installable workflows, their references, scripts, and standalone resource bundles. |
+| [`framework/egm/`](framework/egm/) | Canonical design-review personas, rubrics, runtime adapters, and documentation templates. |
+| [`registry/`](registry/) | Skill identities, dependencies, invocation policies, and metadata used to generate consistent installable packages. |
+| [`lib/`](lib/) | Registry validation and the contracts and cryptographic checks behind approved-design handoffs. |
+| [`tests/`](tests/) | Initializer characterization, installation lifecycle, packaging, integration, and handoff regression coverage. Additional validator and recovery tests live with their skills. |
+| [`docs/`](docs/) and [`licenses/`](licenses/) | Usage and technical guides, compatibility evidence, security boundaries, upstream provenance, and retained licenses. |
+
+Native plugins and packages expose the same canonical skills. Generated manifests, metadata, and self-contained bundles are checked for drift so selected-skill installs retain their required resources. See [development and verification](docs/development.md) for the checks and release process.
+
+## Further reading
+
+- [Installation](docs/installation.md): native plugins, project/global skills, updates, removal, and troubleshooting.
+- [Usage](docs/usage.md): setup, delivery, debugging, and review examples.
+- [Skill catalog](skills/README.md): individual workflows and their requirements.
+- [Language standards](docs/standards.md): language guides, configuration files, and architecture patterns.
+- [Development and verification](docs/development.md): packaging, validation, tests, and release checks.
+- [Integration architecture](docs/integration/architecture.md): contracts, security boundaries, and compatibility evidence.
+
+Installation makes the workflows discoverable. Independent reviews and live verification also need the corresponding tools and fresh subagents in your harness; unavailable checks are reported as blocked.
+
+Agentic is MIT-licensed, with adapted materials retaining their upstream MIT and Apache-2.0 notices. See the [license and provenance details](skills/README.md#licenses-and-provenance). No upstream endorsement is implied.

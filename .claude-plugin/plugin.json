@@ -1,0 +1,22 @@
+{
+  "name": "agentic",
+  "version": "1.3.0",
+  "description": "Multi-language engineering standards, agent rules, and agent skills, set up in any project with one command.",
+  "author": {
+    "name": "igmrrf"
+  },
+  "homepage": "https://github.com/igmrrf/agentic#readme",
+  "repository": "https://github.com/igmrrf/agentic",
+  "license": "MIT AND Apache-2.0",
+  "agents": [
+    "./.claude-plugin/agents/bootstrap_orchestrator.md",
+    "./.claude-plugin/agents/codebase_details.md",
+    "./.claude-plugin/agents/comprehension.md",
+    "./.claude-plugin/agents/design_critic.md",
+    "./.claude-plugin/agents/implementation_readiness.md",
+    "./.claude-plugin/agents/structural.md",
+    "./.claude-plugin/agents/style.md",
+    "./.claude-plugin/agents/synthesizer.md",
+    "./.claude-plugin/agents/zoom_out.md"
+  ]
+}

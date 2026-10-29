@@ -22,137 +22,18 @@ Skill | Focus | Description
 
 ## Installing the Skills
 
-Pick one method. Claude Code reads skills from `~/.claude/skills/` (personal), `<project>/.claude/skills/` (project), or installed plugins — **not** from `~/.agents/skills/`. Every method below puts the skills somewhere Claude Code will find them.
-
-### Method 1: Claude Code Plugin Marketplace (Recommended for Claude Code)
-
-Run this inside Claude Code:
-
-```text
-/plugin marketplace add igmrrf/agentic
-/plugin install agentic@agentic
-```
-
-Or from a shell:
+Start with the [installation guide](../docs/installation.md) for native Claude/Codex/Antigravity plugins, Pi packages, and named targets for twelve coding harnesses. It covers project and global scope, updates, removal, local links, and troubleshooting.
 
 ```bash
-claude plugin marketplace add igmrrf/agentic
-claude plugin install agentic@agentic
+npx -y github:igmrrf/agentic skills --global --agent codex
+npx -y github:igmrrf/agentic skills --agent opencode --skill codinary,tdd
 ```
 
-Plugin skills are namespaced: invoke them as `/agentic:codinary`, `/agentic:tdd`, and so on. Run `/agentic:setup` in a project to apply the coding standards there. Pull updates with `/plugin marketplace update agentic`. To make the skills available to everyone on a team, add the marketplace and plugin to the repo's `.claude/settings.json` (`extraKnownMarketplaces` and `enabledPlugins`).
-
----
-
-### Method 2: `npx skills` (Any Agent)
-
-The [`skills`](https://github.com/vercel-labs/skills) CLI reads this repository's `skills/` folder and installs each skill wherever your agent looks for it (Claude Code, Cursor, Codex, Antigravity, and others):
-
-```bash
-npx skills add igmrrf/agentic                    # interactive: pick skills and agents
-npx skills add igmrrf/agentic --skill codinary   # a single skill
-npx skills add igmrrf/agentic --list             # list what is available
-```
-
----
-
-### Method 3: One-Line Installer
-
-The same installer runs through `npx` (Node 18+) or `curl` (bash only); options are identical.
-
-```bash
-npx -y github:igmrrf/agentic skills --global
-npx -y github:igmrrf/agentic#v1.3.0 skills --global --skill codinary,tdd
-```
-
-```bash
-# All skills, global, for Claude Code (~/.claude/skills) and other agents (~/.agents/skills)
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global
-
-# Only some skills, Claude Code only
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --skill codinary,tdd --agent claude
-
-# Into a project (writes .claude/skills and .agents/skills; commit them to share)
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --target /path/to/my-project
-
-# Pin to a tag, branch, or commit
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.3.0
-```
-
-| Option | Effect |
-| :--- | :--- |
-| `-g, --global` | Install into your home directory instead of a project |
-| `-t, --target <dir>` | Project to install into (default: current directory) |
-| `-s, --skill <names>` | Comma-separated skills, or `all` (default) |
-| `-A, --agent <names>` | `claude` (`.claude/skills`), `agents` (`.agents/skills`), or `all` (default) |
-| `-r, --ref <ref>` | Git branch, tag, or commit to download (default `main`) |
-| `-f, --force`, `--update` | Replace existing installs — rerun with this to update |
-| `-u, --uninstall` | Remove the selected skills |
-| `--link` | Symlink to a local clone instead of copying (local clone only) |
-| `-l, --list` / `-d, --dry-run` | List skills / preview changes |
-
-Restart Claude Code (or start a new session) after installing, then check with `/skills`.
-
----
-
-### Method 4: Project Bootstrapping via `init.sh`
-
-`init.sh --skills` runs the installer against the target project alongside the language standards:
-
-```bash
-./scripts/init.sh --skills
-npx -y github:igmrrf/agentic init --lang=typescript --skills
-curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/init.sh | bash -s -- --lang=typescript --skills --target .
-```
-
----
-
-### Method 5: Local Clone with Live Symlinks
-
-If you cloned this repository and want `git pull` to update your skills:
-
-```bash
-./scripts/install-skills.sh --list
-./scripts/install-skills.sh --global --link
-```
-
----
-
-### Method 6: Workspace Auto-Discovery (Antigravity)
-
-Antigravity can load skills straight from a repository through `.agents/skills.json`. This repository ships one pointing at `skills/`:
-
-```json
-{
-  "entries": [
-    {
-      "path": "skills"
-    }
-  ]
-}
-```
-
-To use the skills everywhere without copying, add the absolute path of your clone's `skills/` folder to `~/.gemini/config/skills.json` in the same format. Claude Code ignores this file; use Methods 1–5 for Claude Code.
-
----
-
-## Agent Runtime Compatibility
-
-Agent Platform | Where Skills Are Read From | How to Install
-:--- | :--- | :---
-**Claude Code** | `~/.claude/skills/`, `<project>/.claude/skills/`, plugins | Method 1, 2, 3, 4, or 5
-**Google Antigravity** | `~/.agents/skills/`, `<project>/.agents/skills/`, `.agents/skills.json` | Method 2, 3, or 6
-**Codex** | `~/.agents/skills/`, `<project>/.agents/skills/` (uses `agents/openai.yaml` metadata) | Method 2 or 3
-**Cursor / Windsurf / Cline** | Depends on the tool version | Method 2
-
----
+The [usage guide](../docs/usage.md) explains invocation and project setup. Installation establishes discoverability; host tools and independent-worker capabilities determine runtime coverage. See the [compatibility matrix](../docs/integration/compatibility-matrix.md).
 
 ## Maintaining the Skills
 
-- Add a skill and its strict entry to [registry/skills.json](../registry/skills.json), then run `node scripts/registry.mjs generate` and `check`. Metadata, aliases, dependency files, marketplace list and self-contained bundles are generated.
-- Bump `version` in `marketplace.json` when you release changes so plugin users get the update, and tag the release (`git tag vX.Y.Z`) so `--ref` users can pin it.
-- Bump `version` in `package.json` alongside `marketplace.json`.
-- Run `scripts/test-install-skills.sh` and `scripts/test-init.sh` (set `TEST_BASH=/bin/bash` on macOS to test bash 3.2) and `claude plugin validate --strict .` before pushing.
+Add skills to [registry/skills.json](../registry/skills.json), then generate and check metadata. Versions come from `package.json`; plugin manifests and catalogs are generated. Follow the [development and verification guide](../docs/development.md) before release.
 
 ## Requirements and EGM design capabilities
 
@@ -177,10 +58,16 @@ The pinned-source inventory, conflicts and [provenance](../docs/integration/upst
 
 ## Caveman and Security Audit
 
-Both install independently with no sibling skill dependency. Select `--skill caveman` or `--skill security-audit` through the existing installer or npm launcher; local links, archive installs, directory copies and marketplace discovery retain their local resources and notices. `.agents/skills.json` already discovers the canonical `skills` directory and needs no parallel list. Third-party `npx skills` selection and native host invocation require their own runtime verification.
+Both install independently with no sibling skill dependency. Select `--skill caveman` or `--skill security-audit` through the existing installer or npm launcher; local links, archive installs, directory copies and marketplace discovery retain their local resources and notices. Native packages discover the canonical `skills` directory. Third-party `npx skills` selection and native host invocation require their own runtime verification.
 
 Invoke `/caveman` or `/agentic:caveman` explicitly; `/caveman status` reads existing mode without enabling it. `stop caveman` or `normal mode` disables it. Only the core voice ships: no alternate voice aliases, proxy, hooks, telemetry, CLI or compression infrastructure. Host communication, exact technical facts, full persisted artifacts, audit evidence and authorization take precedence; no measured token-savings claim is made.
 
 Security Audit remains guidance by default. Explicit codebase audits, comprehensive reviews, pen tests or requested report artifacts use all six phases. Its standalone directory includes every phase, attack-class companion, schema, validator, upstream test and Cloudflare MIT notice. Validators require Node.js >=18 with no additional npm dependency. Run `npm run test:security-audit` to exercise the vendored suites.
 
 Full audits retain independent validation, additive coverage and source freshness. Missing fresh delegation or any required OS sandbox/promotion control remains an explicit blocker. Installed metadata does not establish runtime support. Findings never authorize automatic remediation or replace Codinary's source QA, two-fix limit, verdicts or release authorization. See the [standalone boundary](./security-audit/INTEGRATION.md), [integration decisions](../docs/integration/caveman-security-audit.md), and [observed checks](../docs/integration/caveman-security-verification.md).
+
+## Licenses and provenance
+
+Agentic's own work is MIT. Matt Pocock adaptations retain their [MIT notice](../licenses/Matt-Pocock-MIT.txt). Google EGM-derived material retains [Apache-2.0](../licenses/Google-EGM-Apache-2.0.txt) and modification notices; EGM is not an officially supported Google product.
+
+Caveman retains its current [Apache-2.0](caveman/LICENSE-Upstream-Apache-2.0.txt), historical [MIT](caveman/LICENSE-Upstream-MIT.txt), and applicable [NOTICE](caveman/NOTICE.txt). Security Audit retains [Cloudflare MIT](security-audit/LICENSE-Upstream-MIT.txt). Complete notices accompany standalone installs. Exact sources and digests are in [provenance](../docs/integration/upstream-provenance.md). No upstream endorsement is implied.

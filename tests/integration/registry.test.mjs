@@ -17,12 +17,43 @@ test('all canonical metadata, complete bundles and marketplace agree', async () 
 });
 
 const mutations = [
-  ['duplicate ID', value => { value.skills[1].id = value.skills[0].id; }],
-  ['ambiguous alias', value => { value.skills[0].aliases = [value.skills[1].id]; }],
-  ['unknown dependency', value => { value.skills[0].dependencies = ['missing']; }],
-  ['dependency cycle', value => { value.skills[0].dependencies = [value.skills[1].id]; value.skills[1].dependencies = [value.skills[0].id]; }],
-  ['unexpected field', value => { value.skills[0].autoDeploy = true; }],
-  ['invalid path', value => { value.skills[0].path = '../escape'; }],
+  [
+    'duplicate ID',
+    (value) => {
+      value.skills[1].id = value.skills[0].id;
+    },
+  ],
+  [
+    'ambiguous alias',
+    (value) => {
+      value.skills[0].aliases = [value.skills[1].id];
+    },
+  ],
+  [
+    'unknown dependency',
+    (value) => {
+      value.skills[0].dependencies = ['missing'];
+    },
+  ],
+  [
+    'dependency cycle',
+    (value) => {
+      value.skills[0].dependencies = [value.skills[1].id];
+      value.skills[1].dependencies = [value.skills[0].id];
+    },
+  ],
+  [
+    'unexpected field',
+    (value) => {
+      value.skills[0].autoDeploy = true;
+    },
+  ],
+  [
+    'invalid path',
+    (value) => {
+      value.skills[0].path = '../escape';
+    },
+  ],
 ];
 for (const [name, mutate] of mutations) {
   test(`registry rejects ${name}`, () => {
@@ -33,14 +64,24 @@ for (const [name, mutate] of mutations) {
 }
 
 function dependencyChain(edges) {
-  return Array.from({ length: edges + 1 }, (_, index) => ({ ...structuredClone(registry.skills[0]), id: `probe-${index}`, path: `skills/probe-${index}`, aliases: [], relatedSkills: [], dependencies: index ? [`probe-${index - 1}`] : [] }));
+  return Array.from({ length: edges + 1 }, (_, index) => ({
+    ...structuredClone(registry.skills[0]),
+    id: `probe-${index}`,
+    path: `skills/probe-${index}`,
+    aliases: [],
+    relatedSkills: [],
+    dependencies: index ? [`probe-${index - 1}`] : [],
+  }));
 }
 
 for (const order of ['dependency-first', 'dependent-first']) {
   test(`registry enforces the 15-edge dependency boundary in ${order} order`, () => {
     for (const edges of [15, 16, 17]) {
       const skills = dependencyChain(edges);
-      const value = { schemaVersion: 1, skills: order === 'dependency-first' ? skills : skills.reverse() };
+      const value = {
+        schemaVersion: 1,
+        skills: order === 'dependency-first' ? skills : skills.reverse(),
+      };
       if (edges === 15) assert.equal(parseRegistry(value), value);
       else assert.throws(() => parseRegistry(value), { code: 'REGISTRY' });
     }
@@ -49,33 +90,77 @@ for (const order of ['dependency-first', 'dependent-first']) {
 
 test('registry counts shared cached dependency paths and preserves cycle and missing-reference rejection', () => {
   const skills = dependencyChain(15);
-  const extra = { ...structuredClone(skills[0]), id: 'shared', path: 'skills/shared', dependencies: ['probe-15', 'probe-0'] };
-  assert.throws(() => parseRegistry({ schemaVersion: 1, skills: [...skills, extra] }), { code: 'REGISTRY' });
+  const extra = {
+    ...structuredClone(skills[0]),
+    id: 'shared',
+    path: 'skills/shared',
+    dependencies: ['probe-15', 'probe-0'],
+  };
+  assert.throws(() => parseRegistry({ schemaVersion: 1, skills: [...skills, extra] }), {
+    code: 'REGISTRY',
+  });
   skills[0].dependencies = ['probe-15'];
   assert.throws(() => parseRegistry({ schemaVersion: 1, skills }), { code: 'REGISTRY' });
   skills[0].dependencies = ['missing'];
   assert.throws(() => parseRegistry({ schemaVersion: 1, skills }), { code: 'REGISTRY' });
 });
 
-test('missing paths and broken real document references fail', async t => {
+test('missing paths and broken real document references fail', async (t) => {
   const directory = await mkdtemp(path.join(tmpdir(), 'agentic-registry-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  const skill = { ...structuredClone(registry.skills[0]), id: 'example', path: 'skills/example', dependencies: [], relatedSkills: [], aliases: [] };
+  const skill = {
+    ...structuredClone(registry.skills[0]),
+    id: 'example',
+    path: 'skills/example',
+    dependencies: [],
+    relatedSkills: [],
+    aliases: [],
+  };
   const minimal = { schemaVersion: 1, skills: [skill] };
   await mkdir(path.join(directory, 'skills/example'), { recursive: true });
   await assert.rejects(validateRegistry(directory, minimal));
-  await writeFile(path.join(directory, 'skills/example/SKILL.md'), `---\nname: example\ndisable-model-invocation: ${!skill.modelInvoked}\n---\n[Missing](missing.md)\n`);
+  await writeFile(
+    path.join(directory, 'skills/example/SKILL.md'),
+    `---\nname: example\ndisable-model-invocation: ${!skill.modelInvoked}\n---\n[Missing](missing.md)\n`,
+  );
   await assert.rejects(validateRegistry(directory, minimal));
 });
 
-test('generated bundle, metadata and marketplace drift is detected in isolated copy', async t => {
+test('generated bundle, metadata and marketplace drift is detected in isolated copy', async (t) => {
   const directory = await mkdtemp(path.join(tmpdir(), 'agentic-generated-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  for (const folder of ['registry', 'scripts', 'lib', 'framework', 'skills', 'docs', '.claude-plugin', 'bin', 'licenses', 'LICENSE']) await cp(path.join(ROOT, folder), path.join(directory, folder), { recursive: true });
-  const check = () => spawnSync(process.execPath, [path.join(directory, 'scripts/registry.mjs'), 'check'], { encoding: 'utf8' });
+  for (const folder of [
+    'registry',
+    'scripts',
+    'lib',
+    'framework',
+    'skills',
+    'docs',
+    '.claude-plugin',
+    '.agents',
+    'plugin.json',
+    'package.json',
+    'bin',
+    'licenses',
+    'LICENSE',
+  ])
+    await cp(path.join(ROOT, folder), path.join(directory, folder), { recursive: true });
+  const check = () =>
+    spawnSync(process.execPath, [path.join(directory, 'scripts/registry.mjs'), 'check'], {
+      encoding: 'utf8',
+    });
   const baseline = check();
   assert.equal(baseline.status, 0, baseline.stderr);
-  for (const filename of ['skills/egm-review/bundle/agents/comprehension.md', 'skills/egm-review/agents/openai.yaml', 'skills/caveman/agents/openai.yaml', 'skills/security-audit/dependencies.txt', '.claude-plugin/marketplace.json']) {
+  for (const filename of [
+    'skills/egm-review/bundle/agents/comprehension.md',
+    'skills/egm-review/agents/openai.yaml',
+    'skills/caveman/agents/openai.yaml',
+    'skills/security-audit/dependencies.txt',
+    '.claude-plugin/marketplace.json',
+    '.claude-plugin/plugin.json',
+    '.agents/plugins/marketplace.json',
+    'plugin.json',
+  ]) {
     const target = path.join(directory, filename);
     const original = await readFile(target);
     await writeFile(target, 'drift');

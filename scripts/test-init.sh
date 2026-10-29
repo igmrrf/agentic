@@ -92,7 +92,7 @@ test_npx_bin() {
     quietly node "$BIN" init --lang=rust --claude --no-ci --target "$WORK/proj"
     check "agentic init writes CLAUDE.md" test -s "$WORK/proj/CLAUDE.md"
     check "agentic init copies rustfmt.toml" test -f "$WORK/proj/rustfmt.toml"
-    check "npm package includes scripts and skills" sh -c "cd '$REPO_ROOT' && npm pack --dry-run 2>&1 | grep -q 'skills/setup/SKILL.md'"
+    check "npm package includes scripts and skills" sh -c "cd '$REPO_ROOT' && npm_config_cache='$WORK/npm-cache' npm pack --dry-run 2>&1 | grep 'skills/setup/SKILL.md' > /dev/null"
 }
 
 main() {

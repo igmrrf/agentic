@@ -7,6 +7,7 @@ exit: 0
 .github/workflows/go-ci.yml  [copy of templates/ci/go-ci.yml]
 .golangci.yml  [copy of go/.golangci.yml]
 .windsurfrules  [generated, same as .clinerules]
+AGENTS.md  [generated, same as .clinerules]
 CLAUDE.md  [generated, same as .clinerules]
 GEMINI.md  [generated, same as .clinerules]
 

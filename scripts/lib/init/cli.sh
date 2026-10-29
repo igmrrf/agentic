@@ -17,7 +17,8 @@ Usage: init.sh [OPTIONS]
 Options:
   -l, --lang <language>       Target language: rust, go, ts (typescript), python, lua, swift, kotlin, all
                               (Auto-detected if run in an existing project)
-  -a, --agent <agent>         Target AI agent: gemini, claude, cursor, cline, windsurf, copilot, all (default: all)
+  -a, --agent <agent>         claude, codex, pi, opencode, agy, antigravity, gemini,
+                              cursor, cline, windsurf, copilot, amp, agents, all (default: all)
       --gemini                Shortcut for --agent gemini
       --claude                Shortcut for --agent claude
       --cursor                Shortcut for --agent cursor
@@ -55,7 +56,16 @@ add_agents() {
     local agents=()
     IFS=',' read -ra agents <<< "$1"
     for agent in ${agents[@]+"${agents[@]}"}; do
-        AGENTS+=("$(echo "$agent" | tr '[:upper:]' '[:lower:]')")
+        agent="$(echo "$agent" | tr '[:upper:]' '[:lower:]')"
+        case "$agent" in
+            claude-code) agent="claude" ;;
+            codex|pi|opencode|agy|antigravity|antigravity-cli|amp) agent="agents" ;;
+            gemini-cli) agent="gemini" ;;
+            github-copilot) agent="copilot" ;;
+            all|agents|claude|gemini|cursor|cline|windsurf|copilot) ;;
+            *) log_error "Unknown agent '$agent'"; exit 1 ;;
+        esac
+        AGENTS+=("$agent")
     done
 }
 

@@ -122,13 +122,14 @@ test_link() {
 }
 
 test_marketplace_in_sync() {
-    check "marketplace lists exactly the skills/ directories" python3 - "$REPO_ROOT" << 'EOF'
+    check "marketplace loads the plugin and canonical skills directory" python3 - "$REPO_ROOT" << 'EOF'
 import json, pathlib, sys
 root = pathlib.Path(sys.argv[1])
 manifest = json.loads((root / ".claude-plugin/marketplace.json").read_text())
-listed = {pathlib.Path(p).name for plugin in manifest["plugins"] for p in plugin.get("skills", [])}
+plugin = json.loads((root / ".claude-plugin/plugin.json").read_text())
+listed = {skill["id"] for skill in json.loads((root / "registry/skills.json").read_text())["skills"]}
 present = {p.parent.name for p in (root / "skills").glob("*/SKILL.md")}
-sys.exit(0 if listed == present else 1)
+sys.exit(0 if listed == present and manifest["plugins"][0]["strict"] and plugin["name"] == "agentic" else 1)
 EOF
 }
 

@@ -19,6 +19,7 @@ exit: 0
 .swiftformat  [copy of swift/.swiftformat]
 .swiftlint.yml  [copy of swift/.swiftlint.yml]
 .windsurfrules  [generated, same as .clinerules]
+AGENTS.md  [generated, same as .clinerules]
 CLAUDE.md  [generated, same as .clinerules]
 GEMINI.md  [generated, same as .clinerules]
 biome.json  [copy of typescript/biome.json]

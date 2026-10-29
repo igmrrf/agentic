@@ -9,6 +9,7 @@ exit: 0
 .luarc.json  [copy of lua/.luarc.json]
 .stylua.toml  [copy of lua/.stylua.toml]
 .windsurfrules  [generated, same as .clinerules]
+AGENTS.md  [generated, same as .clinerules]
 CLAUDE.md  [generated, same as .clinerules]
 GEMINI.md  [generated, same as .clinerules]
 

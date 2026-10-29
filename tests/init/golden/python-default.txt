@@ -6,6 +6,7 @@ exit: 0
 .github/copilot-instructions.md  [generated, same as .clinerules]
 .github/workflows/python-ci.yml  [copy of templates/ci/python-ci.yml]
 .windsurfrules  [generated, same as .clinerules]
+AGENTS.md  [generated, same as .clinerules]
 CLAUDE.md  [generated, same as .clinerules]
 GEMINI.md  [generated, same as .clinerules]
 pyproject.toml  [copy of python/pyproject.toml]

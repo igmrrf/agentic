@@ -31,6 +31,9 @@ write_agent_rules() {
     RULES_MD="${RULES_MD}"$'\n\n'"${UNIVERSAL_RULES}"$'\n\n'"${LANG_RULES}"
     CURSOR_MDC="${CURSOR_MDC}"$'\n\n'"${UNIVERSAL_RULES}"$'\n\n'"${LANG_RULES}"
 
+    if has_agent "agents"; then
+        create_rule_file "$TARGET_DIR/AGENTS.md" "$RULES_MD"
+    fi
     if has_agent "gemini"; then
         create_rule_file "$TARGET_DIR/GEMINI.md" "$RULES_MD"
     fi

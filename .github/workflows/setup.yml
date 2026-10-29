@@ -14,6 +14,10 @@ on:
       - "tests/**"
       - "bin/**"
       - "package.json"
+      - "plugin.json"
+      - "README.md"
+      - "docs/**"
+      - ".agents/plugins/**"
       - ".claude-plugin/**"
       - ".github/workflows/setup.yml"
   pull_request:
@@ -28,6 +32,10 @@ on:
       - "tests/**"
       - "bin/**"
       - "package.json"
+      - "plugin.json"
+      - "README.md"
+      - "docs/**"
+      - ".agents/plugins/**"
       - ".claude-plugin/**"
       - ".github/workflows/setup.yml"
 
@@ -83,5 +91,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate Claude Code marketplace
-        run: npx -y @anthropic-ai/claude-code plugin validate --strict .
+      - name: Install Claude Code validator
+        run: npm install --global @anthropic-ai/claude-code
+      - name: Validate distributable plugin and marketplace
+        run: npm run test:plugins

@@ -28,37 +28,7 @@
         "architecture"
       ],
       "category": "development",
-      "strict": false,
-      "skills": [
-        "./skills/caveman",
-        "./skills/code-review",
-        "./skills/codebase-design",
-        "./skills/codinary",
-        "./skills/diagnosing-bugs",
-        "./skills/domain-modeling",
-        "./skills/egm-bootstrap",
-        "./skills/egm-brainstorm",
-        "./skills/egm-draft",
-        "./skills/egm-drift-report",
-        "./skills/egm-resolve",
-        "./skills/egm-review",
-        "./skills/egm-review-loop",
-        "./skills/grilling",
-        "./skills/security-audit",
-        "./skills/setup",
-        "./skills/tdd"
-      ],
-      "agents": [
-        "./.claude-plugin/agents/bootstrap_orchestrator.md",
-        "./.claude-plugin/agents/codebase_details.md",
-        "./.claude-plugin/agents/comprehension.md",
-        "./.claude-plugin/agents/design_critic.md",
-        "./.claude-plugin/agents/implementation_readiness.md",
-        "./.claude-plugin/agents/structural.md",
-        "./.claude-plugin/agents/style.md",
-        "./.claude-plugin/agents/synthesizer.md",
-        "./.claude-plugin/agents/zoom_out.md"
-      ]
+      "strict": true
     }
   ]
 }

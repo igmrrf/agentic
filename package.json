@@ -8,6 +8,52 @@
     "url": "git+https://github.com/igmrrf/agentic.git"
   },
   "homepage": "https://github.com/igmrrf/agentic#readme",
+  "keywords": [
+    "pi-package",
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "opencode",
+    "antigravity"
+  ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  },
+  "files": [
+    "plugin.json",
+    ".agents/plugins/marketplace.json",
+    ".agents/skills.json",
+    ".claude-plugin/",
+    "bin/",
+    "lib/",
+    "scripts/",
+    "registry/",
+    "framework/",
+    "licenses/",
+    "skills/",
+    "templates/",
+    "docs/",
+    "CODING.md",
+    "standards_review.md",
+    "tests/init/README.md",
+    "CHANGELOG.md",
+    "rust/",
+    "go/",
+    "typescript/",
+    "python/",
+    "lua/",
+    "swift/",
+    "kotlin/",
+    "!**/.DS_Store",
+    "!**/__pycache__/**",
+    "!**/.pytest_cache/**",
+    "!**/.ruff_cache/**",
+    "!**/target/**",
+    "!**/.build/**",
+    "!**/*.pyc"
+  ],
   "bin": {
     "agentic": "bin/agentic.js"
   },
@@ -19,6 +65,7 @@
     "test:security-audit": "node --test skills/security-audit/*.test.cjs",
     "registry:check": "node scripts/registry.mjs check",
     "registry:generate": "node scripts/registry.mjs generate",
+    "test:plugins": "node scripts/validate-plugins.mjs",
     "prepack": "node scripts/registry.mjs check >&2"
   }
 }

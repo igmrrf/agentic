@@ -59,15 +59,6 @@ die() {
     exit 1
 }
 
-print_banner() {
-    echo -e "${COLOR_BLUE}${COLOR_BOLD}" >&2
-    echo "============================================================" >&2
-    echo "   ⚡ AGENTIC SKILLS INSTALLER" >&2
-    echo "   Codinary, TDD, Code Review & Engineering Agent Skills" >&2
-    echo "============================================================" >&2
-    echo -e "${COLOR_RESET}" >&2
-}
-
 print_usage() {
     cat << EOF
 Usage: install-skills.sh [OPTIONS]
@@ -77,9 +68,10 @@ Options:
   -t, --target <directory>    Install into a project directory (default: current directory)
   -s, --skill <name>          Install specific skill (repeatable, comma-separated, or 'all')
   -a, --all                   Install all available skills (default)
-  -A, --agent <name>          Agent to install for: claude, agents, or all (default: all; repeatable, comma-separated)
-                                claude  -> ~/.claude/skills  or <target>/.claude/skills
-                                agents  -> ~/.agents/skills  or <target>/.agents/skills (Antigravity, Codex, Gemini)
+  -A, --agent <names>         Harness targets (repeatable or comma-separated; default: claude,agents)
+                              claude, codex, pi, opencode, agy, antigravity, gemini,
+                              cursor, copilot, cline, windsurf, amp, agents, all
+                              all installs to every supported harness location
   -l, --list                  List available skills with descriptions
       --link                  Create symbolic links instead of copying (local clone only)
   -f, --force, --update       Overwrite existing installs (use to update to the latest version)
@@ -87,19 +79,6 @@ Options:
   -r, --ref <git-ref>         Branch, tag, or commit to fetch in remote mode (default: main; env AGENTIC_REF)
   -d, --dry-run               Preview without writing files
   -h, --help                  Show this help message
-
-Examples:
-  # Install all skills globally for Claude Code and other agents
-  ./scripts/install-skills.sh --global
-
-  # Install only codinary and tdd, for Claude Code only
-  ./scripts/install-skills.sh --skill codinary,tdd --agent claude --global
-
-  # Install into a project repository (commit .claude/skills to share with your team)
-  ./scripts/install-skills.sh --target /path/to/my-project
-
-  # Remote installation pinned to a tag
-  curl -fsSL https://raw.githubusercontent.com/igmrrf/agentic/refs/heads/main/scripts/install-skills.sh | bash -s -- --global --ref v1.0.0
 EOF
 }
 
@@ -140,7 +119,7 @@ parse_args() {
             -r|--ref) require_value "$@"; AGENTIC_REF="$2"; shift 2 ;;
             --ref=*) AGENTIC_REF="${1#*=}"; shift ;;
             -d|--dry-run) DRY_RUN=true; shift ;;
-            -h|--help) print_banner; print_usage; exit 0 ;;
+            -h|--help) print_usage; exit 0 ;;
             *) log_error "Unknown option: $1"; print_usage >&2; exit 1 ;;
         esac
     done
@@ -185,7 +164,6 @@ skill_description() {
 }
 
 list_skills() {
-    print_banner
     echo -e "${COLOR_BOLD}Available Skills in Agentic Inventory:${COLOR_RESET}\n"
     local name
     for name in "${AVAILABLE_SKILLS[@]}"; do
@@ -249,24 +227,46 @@ resolve_final_skills() {
 }
 
 agent_base_dir() {
-    if [[ "$INSTALL_GLOBAL" == "true" ]]; then
-        echo "$HOME/.$1/skills"
-    else
-        echo "$TARGET_DIR/.$1/skills"
-    fi
+    local project_path global_path
+    case "$1" in
+        claude|claude-code) project_path=".claude/skills"; global_path="$HOME/.claude/skills" ;;
+        agents|codex) project_path=".agents/skills"; global_path="$HOME/.agents/skills" ;;
+        pi) project_path=".pi/skills"; global_path="$HOME/.pi/agent/skills" ;;
+        opencode) project_path=".opencode/skills"; global_path="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/skills" ;;
+        agy|antigravity-cli) project_path=".agents/skills"; global_path="$HOME/.gemini/antigravity-cli/skills" ;;
+        antigravity) project_path=".agents/skills"; global_path="$HOME/.gemini/config/skills" ;;
+        gemini|gemini-cli) project_path=".gemini/skills"; global_path="$HOME/.gemini/skills" ;;
+        cursor) project_path=".cursor/skills"; global_path="$HOME/.cursor/skills" ;;
+        copilot|github-copilot) project_path=".github/skills"; global_path="$HOME/.copilot/skills" ;;
+        cline) project_path=".cline/skills"; global_path="$HOME/.cline/skills" ;;
+        windsurf) project_path=".windsurf/skills"; global_path="$HOME/.codeium/windsurf/skills" ;;
+        amp) project_path=".agents/skills"; global_path="${XDG_CONFIG_HOME:-$HOME/.config}/agents/skills" ;;
+        *) die "Unknown agent '$1'. Run --help for supported harnesses" ;;
+    esac
+    if [[ "$INSTALL_GLOBAL" == "true" ]]; then echo "$global_path"; else echo "$TARGET_DIR/$project_path"; fi
+}
+
+append_destination() {
+    local destination existing
+    destination="$(agent_base_dir "$1")" || return 1
+    for existing in ${DESTINATIONS[@]+"${DESTINATIONS[@]}"}; do
+        [[ "$destination" == "$existing" ]] && return
+    done
+    DESTINATIONS+=("$destination")
 }
 
 resolve_destinations() {
-    local agent
+    local agent expanded
     if [[ ${#SELECTED_AGENTS[@]} -eq 0 ]]; then
-        SELECTED_AGENTS=("all")
+        SELECTED_AGENTS=("claude" "agents")
     fi
     for agent in "${SELECTED_AGENTS[@]}"; do
         case "$(echo "$agent" | tr '[:upper:]' '[:lower:]')" in
-            all) DESTINATIONS=("$(agent_base_dir claude)" "$(agent_base_dir agents)"); return ;;
-            claude) DESTINATIONS+=("$(agent_base_dir claude)") ;;
-            agents|antigravity|codex|gemini) DESTINATIONS+=("$(agent_base_dir agents)") ;;
-            *) die "Unknown agent '$agent'. Use: claude, agents, all" ;;
+            all)
+                for expanded in claude codex pi opencode agy antigravity gemini cursor copilot cline windsurf amp; do
+                    append_destination "$expanded"
+                done ;;
+            *) append_destination "$(echo "$agent" | tr '[:upper:]' '[:lower:]')" ;;
         esac
     done
 }
@@ -323,7 +323,6 @@ EOF
 print_plan() {
     local action="Install"
     [[ "$UNINSTALL" == "true" ]] && action="Uninstall"
-    print_banner
     log_info "Action          : $action"
     log_info "Scope           : $(if [[ "$INSTALL_GLOBAL" == "true" ]]; then echo "Global ($HOME)"; else echo "Project ($TARGET_DIR)"; fi)"
     log_info "Destinations    : ${DESTINATIONS[*]}"
@@ -363,9 +362,9 @@ print_next_steps() {
         return
     fi
     log_success "Skills installation complete!"
-    log_info "Restart Claude Code (or start a new session) to pick up new skills; check with /skills."
+    log_info "Start a new harness session or reload skills, then invoke setup or codinary."
     if [[ "$INSTALL_GLOBAL" == "false" ]]; then
-        log_info "Commit .claude/skills and .agents/ to share these skills with your team."
+        log_info "Commit the installed skill directories to share them with your team."
     fi
 }
 
