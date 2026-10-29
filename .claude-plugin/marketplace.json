@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Engineering agent skills from the Agentic standards repository.",
-    "version": "1.3.0"
+    "version": "1.4.0"
   },
   "plugins": [
     {
       "name": "agentic",
       "description": "Agentic standards, Codinary delivery, EGM design review, optional Caveman voice and Security Audit.",
       "source": "./",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "author": {
         "name": "igmrrf"
       },

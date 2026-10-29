@@ -16,6 +16,8 @@ import { spawnSync } from 'node:child_process';
 import { ROOT } from './fixtures.mjs';
 import { assertInstalledSpecialist } from './specialist-fixtures.mjs';
 
+const PACKAGE_VERSION = JSON.parse(await readFile(path.join(ROOT, 'package.json'), 'utf8')).version;
+
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { encoding: 'utf8', ...options });
   assert.equal(result.status, 0, `${command}: ${result.stderr}\n${result.stdout}`);
@@ -193,7 +195,7 @@ async function assertPackageConsumer(directory, packageRoot) {
     [
       '--input-type=module',
       '-e',
-      `import { canonical } from '@igmrrf/agentic/lib/handoff/index.mjs'; import { parseRegistry } from '@igmrrf/agentic/lib/registry.mjs'; import { createRequire } from 'node:module'; const require = createRequire(import.meta.url); if (canonical({b:2,a:1}) !== '{"a":1,"b":2}' || typeof parseRegistry !== 'function' || require('@igmrrf/agentic/package').version !== '1.3.0' || require.resolve('@igmrrf/agentic/typescript/biome') !== require.resolve('@igmrrf/agentic/typescript/biome.json') || require.resolve('@igmrrf/agentic/package') !== require.resolve('@igmrrf/agentic/package.json') || require.resolve('@igmrrf/agentic/bin/agentic') !== require.resolve('@igmrrf/agentic/bin/agentic.js')) process.exit(1);`,
+      `import { canonical } from '@igmrrf/agentic/lib/handoff/index.mjs'; import { parseRegistry } from '@igmrrf/agentic/lib/registry.mjs'; import { createRequire } from 'node:module'; const require = createRequire(import.meta.url); if (canonical({b:2,a:1}) !== '{"a":1,"b":2}' || typeof parseRegistry !== 'function' || require('@igmrrf/agentic/package').version !== ${JSON.stringify(PACKAGE_VERSION)} || require.resolve('@igmrrf/agentic/typescript/biome') !== require.resolve('@igmrrf/agentic/typescript/biome.json') || require.resolve('@igmrrf/agentic/package') !== require.resolve('@igmrrf/agentic/package.json') || require.resolve('@igmrrf/agentic/bin/agentic') !== require.resolve('@igmrrf/agentic/bin/agentic.js')) process.exit(1);`,
     ],
     { cwd: consumer },
   );

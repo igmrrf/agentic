@@ -1,6 +1,6 @@
 {
   "name": "@igmrrf/agentic",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Multi-language engineering standards, agent rules, and agent skills, set up in any project with one command.",
   "license": "MIT AND Apache-2.0",
   "repository": {

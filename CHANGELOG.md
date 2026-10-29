@@ -4,11 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-29
+
 ### Added
 
 - Explicit global/project skill targets for Claude, Codex, Pi, OpenCode, Antigravity CLI/App, Gemini CLI, Cursor, Copilot, Cline, Windsurf, and Amp, with aliases and destination deduplication.
 - Registry-generated portable and Claude plugin manifests, a Codex marketplace, Pi package metadata, and strict validation of the packed distribution.
-- Harness installation lifecycle coverage, package content checks, and installation/use guides linked from a shorter README.
+- Harness installation lifecycle coverage, package content checks, and installation/use guides linked from a README covering the complete engineering workflow.
 
 ### Changed
 
